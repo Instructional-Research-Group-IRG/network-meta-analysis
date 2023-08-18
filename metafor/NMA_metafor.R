@@ -105,8 +105,7 @@
   var_covar_matrix 
 
 # add contrast matrix to dataset
-  dat_nodnm_grp2 <- contrmat(dat_nodnm_grp2, grp1="intervention", grp2="comparison")
-  #dat_nodnm_grp2 <- contrmat(dat_nodnm_grp2, grp1="group1_id", grp2="group2_id") #(?) Should we also use group ID instead of intervention/comparison? Though note results are the same but that may not be the case with the full
+  dat_nodnm_grp2 <- contrmat(dat_nodnm_grp2, grp1="group1_id", grp2="group2_id")
   dat_nodnm_grp2
   
 # network meta-analysis using a contrast-based random-effects model using
@@ -115,3 +114,7 @@
   res <- rma.mv(effect_size, var_covar_matrix, mods = ~ wwc_rating + dosage - 1,
                 random = ~ contrast | record_id, rho=0.60, data=dat_nodnm_grp2)
   res
+  
+  weights.rma.mv(res)
+  
+  forest(res, slab= dat_nodnm_grp2$contrast_id)
