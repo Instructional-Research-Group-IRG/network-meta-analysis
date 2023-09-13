@@ -43,7 +43,7 @@
   NMA_data %>% group_by(comparison_prelim, comparison_2) %>% count() %>% ungroup()
   
   ## Subset data for analysis 
-  NMA_data_analysis_subset <- NMA_data %>% filter(aggregated=="OUT" & (measure_type=="Follow up (10-14 days)" | measure_type=="Main") & (wwc_rating=="MWR" | wwc_rating=="MWOR") & comparison_2=="BAU")
+  NMA_data_analysis_subset <- NMA_data %>% filter(aggregated=="IN" & (measure_type=="Follow up (10-14 days)" | measure_type=="Main") & (wwc_rating=="MWR" | wwc_rating=="MWOR") & comparison_2=="BAU")
   
   ## Retabulate variables upon which to subset data to verify correct subset
   NMA_data_analysis_subset %>% group_by(aggregated) %>% count() %>% ungroup()
