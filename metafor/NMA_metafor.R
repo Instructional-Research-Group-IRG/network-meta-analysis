@@ -51,6 +51,8 @@
   NMA_data_analysis_subset %>% group_by(wwc_rating) %>% count() %>% ungroup()  
   NMA_data_analysis_subset %>% group_by(comparison_2) %>% count() %>% ungroup()
   
+  tabyl(NMA_data_analysis_subset$intervention) #NOTE: Need to add component bundle restriction: "ONLY be pulling in data if there is a 1 in the component columns (e.g., NL, V)" 
+  
 # Create unique group ID for each independent group within a study (record ID)
   
   ##Keep only record ID, intervention/comparison bundle, intervention/comparison sample size 
