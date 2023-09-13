@@ -1,74 +1,94 @@
-# This is just a special case of the multivariate model
-
-# Install 'devel' version of metafor package
-  #install.packages("remotes")
-  #remotes::install_github("wviechtb/metafor")
+# Network meta-analysis (NMA) is a multivariate meta-regression technique for comparing multiple interventions from a network of studies 
+# within a single analysis. In effect, NMAs allow for comparisons of interventions not evaluated within the same study. Because a network 
+# meta-analysis accounts for all evidence, that is evidence from both direct and indirect comparisons, it produces more precise estimates 
+# than those obtained from a traditional multivariate meta-regression, which only includes direct comparisons of interventions. NMA also 
+# allows for the ranking of interventions.  
 
 # Load required packages
+  
+  ## Install 'devel' version of metafor package
+  #install.packages("remotes") 
+  #remotes::install_github("wviechtb/metafor") 
+  
+  ## Install other required packages
   #install.packages("pacman")
-  pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr)
+  pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr, janitor)
 
 # Load (read) data (i.e., copy data to 'dat')
-  dat <- read_sheet("https://docs.google.com/spreadsheets/d/1bWugw06yFyetIVYlhAHHzM_d3KGhegxxLBm-5463j2Q/edit#gid=0")
-  #dat <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_mN43K7HH3C7WhsPMnPsB1HDuRLE4/edit#gid=0")
+  #dat <- read_sheet("https://docs.google.com/spreadsheets/d/1bWugw06yFyetIVYlhAHHzM_d3KGhegxxLBm-5463j2Q/edit#gid=0") #Test data
+  NMA_data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_mN43K7HH3C7WhsPMnPsB1HDuRLE4/edit#gid=0") #Full data set
+  NMA_data <- subset(NMA_data, !is.na(record_id)) #There are no true rows after row 608 (not counting the headers/column names as row 1). Those after row 608 are loaded in despite having no record IDs because column C is incorrectly filled out with "FALSE" after row 608.
   
 # Explore data  
-  head(dat)
-  skim(dat)
+  head(NMA_data)
+  skim(NMA_data)
   
   ## Check for full duplicates
-  dups <- anyDuplicated(dat)
+  dups <- anyDuplicated(NMA_data)
   assert("assert no duplicate entries", dups == 0) #No full duplicates. Data already in wide format.
 
   ## Review outcome measures by domain
-  dat %>% count(domain, measure_name)
+  NMA_data %>% count(domain, measure_name) %>% print(n= Inf)
     
   ## Check ratings
-  dat %>% group_by(wwc_rating) %>% count() %>% ungroup()
-  dat %>% group_by(domain, wwc_rating) %>% count() %>% ungroup()
-
-  ratings_dnms <- dat %>% filter(wwc_rating == "dnm")
-  ratings_dnms 
-  dat_nodnm <- dat %>% filter(wwc_rating != "dnm") #Drop measure entries rated DNM
-  dat_nodnm %>% group_by(wwc_rating) %>% count()
+  NMA_data %>% group_by(wwc_rating) %>% count() %>% ungroup()
+  NMA_data %>% group_by(domain, wwc_rating) %>% count() %>% ungroup() %>% print(n= Inf)
+  
+# Subset data following NMA analysis specifications: "Analysis Notes for Seth 9-1-2023
+  
+  ## Tabulate variables upon which to subset data
+  NMA_data %>% group_by(aggregated) %>% count() %>% ungroup()
+  NMA_data %>% group_by(measure_type) %>% count() %>% ungroup()
+  NMA_data %>% group_by(wwc_rating) %>% count() %>% ungroup()  
+  NMA_data %>% group_by(comparison_prelim, comparison_2) %>% count() %>% ungroup()
+  
+  ## Subset data for analysis 
+  NMA_data_analysis_subset <- NMA_data %>% filter(aggregated=="OUT" & (measure_type=="Follow up (10-14 days)" | measure_type=="Main") & (wwc_rating=="MWR" | wwc_rating=="MWOR") & comparison_2=="BAU")
+  
+  ## Retabulate variables upon which to subset data to verify correct subset
+  NMA_data_analysis_subset %>% group_by(aggregated) %>% count() %>% ungroup()
+  NMA_data_analysis_subset %>% group_by(measure_type) %>% count() %>% ungroup()
+  NMA_data_analysis_subset %>% group_by(wwc_rating) %>% count() %>% ungroup()  
+  NMA_data_analysis_subset %>% group_by(comparison_2) %>% count() %>% ungroup()
   
 # Create unique group ID for each independent group within a study (record ID)
   
   ##Keep only record ID, intervention/comparison bundle, intervention/comparison sample size 
-  dat_nodnm_grp <- dat_nodnm %>% select(record_id, intervention, comparison, intervention_n, comparison_n)
+  NMA_data_grpID <- NMA_data_analysis_subset %>% select(record_id, intervention, comparison = comparison_2, intervention_n, comparison_n)
+  str(NMA_data_grpID)
   
   ## For each assignment group, combine component bundle and sample size into a single character variable to distinguish groups with the same sample sizes but different component bundles. 
   ## In such cases, these are presumably two unique groups of individuals because they received different component bundles despite happening to have the same sample sizes. 
   ## There may be no cases within the same record ID in which two different component bundles happen to have the same group sample sizes but let's control for that just in case.
-  str(dat_nodnm_grp)
-  dat_nodnm_grp <- dat_nodnm_grp %>% mutate(intervention_n_chr = as.character(intervention_n))
-  dat_nodnm_grp <- dat_nodnm_grp %>% unite("int_n_chr_bundle" , c(intervention, intervention_n_chr), remove = FALSE)
-  dat_nodnm_grp <- dat_nodnm_grp %>% mutate(comparison_n_chr = as.character(comparison_n))
-  dat_nodnm_grp <- dat_nodnm_grp %>% unite("com_n_chr_bundle" , c(comparison,comparison_n_chr), remove = FALSE)
-  str(dat_nodnm_grp)
-  dat_nodnm_grp
+  str(NMA_data_grpID)
+  NMA_data_grpID <- NMA_data_grpID %>% mutate(intervention_n_chr = as.character(intervention_n))
+  NMA_data_grpID <- NMA_data_grpID %>% unite("int_n_chr_bundle" , c(intervention, intervention_n_chr), remove = FALSE)
+  NMA_data_grpID <- NMA_data_grpID %>% mutate(comparison_n_chr = as.character(comparison_n))
+  NMA_data_grpID <- NMA_data_grpID %>% unite("com_n_chr_bundle" , c(comparison,comparison_n_chr), remove = FALSE)
+  str(NMA_data_grpID)
+  NMA_data_grpID
   
-  dat_nodnm_grp <- dat_nodnm_grp %>% select(record_id, int_n_chr_bundle, com_n_chr_bundle)
-  dat_nodnm_grp
+  NMA_data_grpID <- NMA_data_grpID %>% select(record_id, int_n_chr_bundle, com_n_chr_bundle)
+  NMA_data_grpID
   
   ## Reshape long so that total number of unique groups within each record ID can be counted and assigned a unique group ID 
-  dat_nodnm_grp_long <- dat_nodnm_grp %>% pivot_longer(-record_id, names_to="assignment", values_to="bundle_samplesize")
-  dat_nodnm_grp_long
+  NMA_data_grpID_long <- NMA_data_grpID %>% pivot_longer(-record_id, names_to="assignment", values_to="bundle_samplesize")
+  NMA_data_grpID_long
   
   ## Keep only unique combinations of assignment bundle + group sample size within record ID so that unique group IDs can be assigned.
   ## Do this regardless of intervention/comparison group assignment because the same combination of bundle + sample size presumably should be considered one unique group regardless of group assignment.
   ## For example, one combination of bundle + sample size could have been assigned to intervention for one contrast but to comparison for another contrast of the same record ID. 
   ## In this case, this would be the same unique group of individuals in both contrasts despite the different group assignments and therefore should have the same group ID (not two different ones) to capture all dependencies.
   ## There may be no cases of this in the data but let's control for it just in case by removing bundle + group sample size duplicates within each study regardless of group assignment.
-  dat_nodnm_grp_long_unique <- dat_nodnm_grp_long %>% group_by(record_id) %>% distinct(bundle_samplesize, .keep_all = TRUE) %>% select(-assignment) %>% ungroup()
-  dat_nodnm_grp_long_unique
+  NMA_data_grpID_long_unique <- NMA_data_grpID_long %>% group_by(record_id) %>% distinct(bundle_samplesize, .keep_all = TRUE) %>% select(-assignment) %>% ungroup()
+  NMA_data_grpID_long_unique
 
   ##Create unique group ID for each combination of bundle + sample size, by record ID (study)
-  dat_nodnm_grp_long_unique_withids <- dat_nodnm_grp_long_unique %>% group_by(record_id) %>% mutate(group_id=row_number()) %>% ungroup()
-  dat_nodnm_grp_long_unique_withids
+  NMA_data_grpID_long_unique_withids <- NMA_data_grpID_long_unique %>% group_by(record_id) %>% mutate(group_id=row_number()) %>% ungroup()
+  NMA_data_grpID_long_unique_withids
   
 # Merge group IDs onto main data set
-# Note that above, we created {dat_nodnm_grp_long_unique_withids} which is effectively a master list of the group IDs in which each group ID is a unique combination of bundle + sample size within each record ID 
+# Note that above, we created {NMA_data_grpID_long_unique_withids} which is effectively a master list of the group IDs in which each group ID is a unique combination of bundle + sample size within each record ID 
 #   regardless of group assignment.
 # The main data set has intervention and comparison groups in separate columns. But because the master group ID list is agnostic to group assignment, we can use it to merge on group IDs to both intervention and comparison 
 #   groups in the following two steps:
@@ -79,42 +99,56 @@
 #   across those contrasts because they are the same unique group of individuals, otherwise we do not capture all dependencies.
   
   ## Merge unique group IDs onto the intervention groups
-  dat_nodnm_grp_long_unique_withids_Imerge <- dat_nodnm_grp_long_unique_withids %>% separate(bundle_samplesize, c("intervention","intervention_n"), "_")
-  dat_nodnm_grp_long_unique_withids_Imerge
-  dat_nodnm_grp_long_unique_withids_Imerge$intervention_n <- as.numeric(dat_nodnm_grp_long_unique_withids_Imerge$intervention_n)
-  dat_nodnm_grp_long_unique_withids_Imerge <- dat_nodnm_grp_long_unique_withids_Imerge %>% rename(group1_id = group_id)
-  str(dat_nodnm_grp_long_unique_withids_Imerge)
-  dat_nodnm_grp2 <- dat_nodnm %>% left_join(dat_nodnm_grp_long_unique_withids_Imerge, by = c("record_id","intervention","intervention_n"))
-
+  NMA_data_grpID_long_unique_withids_Imerge <- NMA_data_grpID_long_unique_withids %>% separate(bundle_samplesize, c("intervention","intervention_n"), "_")
+  NMA_data_grpID_long_unique_withids_Imerge
+  NMA_data_grpID_long_unique_withids_Imerge$intervention_n <- as.numeric(NMA_data_grpID_long_unique_withids_Imerge$intervention_n)
+  NMA_data_grpID_long_unique_withids_Imerge <- NMA_data_grpID_long_unique_withids_Imerge %>% rename(group1_id = group_id)
+  str(NMA_data_grpID_long_unique_withids_Imerge)
+  NMA_data_analysis_subset$intervention <- NMA_data_analysis_subset$intervention %>% replace_na("NA") #This facilitates the merge below. When the IDs were created, intervention and intervention_n were combined then separated, which creates "NA" character values from the any original NA values, which don't match in a merge.
+  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset %>% left_join(NMA_data_grpID_long_unique_withids_Imerge, by = c("record_id","intervention","intervention_n"))
+  NMA_data_analysis_subset_grpID %>% group_by(group1_id) %>% count()
+  
   ## Merge unique group IDs onto the comparison groups  
-  dat_nodnm_grp_long_unique_withids_Cmerge <- dat_nodnm_grp_long_unique_withids %>% separate(bundle_samplesize, c("comparison","comparison_n"), "_")  
-  dat_nodnm_grp_long_unique_withids_Cmerge
-  dat_nodnm_grp_long_unique_withids_Cmerge$comparison_n <- as.numeric(dat_nodnm_grp_long_unique_withids_Cmerge$comparison_n)
-  dat_nodnm_grp_long_unique_withids_Cmerge <- dat_nodnm_grp_long_unique_withids_Cmerge %>% rename(group2_id = group_id)
-  str(dat_nodnm_grp_long_unique_withids_Cmerge)
-  dat_nodnm_grp2 <- dat_nodnm_grp2 %>% left_join(dat_nodnm_grp_long_unique_withids_Cmerge, by = c("record_id","comparison","comparison_n"))
- 
+  NMA_data_grpID_long_unique_withids_Cmerge <- NMA_data_grpID_long_unique_withids %>% separate(bundle_samplesize, c("comparison_2","comparison_n"), "_")  
+  NMA_data_grpID_long_unique_withids_Cmerge
+  NMA_data_grpID_long_unique_withids_Cmerge$comparison_n <- as.numeric(NMA_data_grpID_long_unique_withids_Cmerge$comparison_n)
+  NMA_data_grpID_long_unique_withids_Cmerge <- NMA_data_grpID_long_unique_withids_Cmerge %>% rename(group2_id = group_id)
+  str(NMA_data_grpID_long_unique_withids_Cmerge)
+  NMA_data_analysis_subset$comparison_2 <- NMA_data_analysis_subset$comparison_2 %>% replace_na("NA") #This facilitates the merge below. When the IDs were created, comparison_2 and comparison were combined then separated, which creates "NA" character values from the any original NA values, which don't match in a merge.
+  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% left_join(NMA_data_grpID_long_unique_withids_Cmerge, by = c("record_id","comparison_2","comparison_n"))
+  NMA_data_analysis_subset_grpID %>% group_by(group2_id) %>% count()
+  
   ## Validate merge results
-  assert_values(dat_nodnm_grp2, colnames= c("group1_id","group2_id"), test = "not_na", test_val = NA)
-  assert_values(dat_nodnm_grp2, colnames= "group1_id", test="not_equal", test_val= "group2_id")
-  dat_nodnm_grp2_check <- dat_nodnm_grp2 %>% select(record_id, contrast_id, contrast, measure_name, wwc_rating, intervention_n, comparison_n, group1_id, group2_id)
-  dat_nodnm_grp2_check %>% print(n = Inf) 
+  assert_values(NMA_data_analysis_subset_grpID, colnames= c("group1_id","group2_id"), test = "not_na", test_val = NA)
+  assert_values(NMA_data_analysis_subset_grpID, colnames= "group1_id", test="not_equal", test_val= "group2_id")
+  NMA_data_analysis_subset_grpID_check <- NMA_data_analysis_subset_grpID %>% select(record_id, contrast_id, aggregated, measure_type, measure_name, wwc_rating, intervention, intervention_n, group1_id, comparison_2, comparison_n, group2_id)
+  NMA_data_analysis_subset_grpID_check %>% print(n = Inf) 
 
 # calculate the variance-covariance matrix for multi-treatment studies
-  var_covar_matrix <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=dat_nodnm_grp2)
+  var_covar_matrix <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID)
   var_covar_matrix 
 
 # add contrast matrix to dataset
-  dat_nodnm_grp2 <- contrmat(dat_nodnm_grp2, grp1="group1_id", grp2="group2_id")
-  dat_nodnm_grp2
+  NMA_data_analysis_subset_grpID <- contrmat(NMA_data_analysis_subset_grpID, grp1="group1_id", grp2="group2_id")
+  NMA_data_analysis_subset_grpID
   
 # network meta-analysis using a contrast-based random-effects model using
 # BAU as the reference condition (and by setting rho=0.60, tau^2
 # reflects the amount of heterogeneity for all treatment comparisons)
-  res <- rma.mv(effect_size, var_covar_matrix, mods = ~ wwc_rating + dosage - 1,
-                random = ~ contrast | record_id, rho=0.60, data=dat_nodnm_grp2)
+  class(NMA_data_analysis_subset_grpID$contrast_id) 
+  NMA_data_analysis_subset_grpID$contrast_id <- as.character(NMA_data_analysis_subset_grpID$contrast_id)
+  tabyl(NMA_data_analysis_subset_grpID$contrast_id)
+  class(NMA_data_analysis_subset_grpID$contrast_id)
+  
+  class(NMA_data_analysis_subset_grpID$dosage_weekly_freq)
+  NMA_data_analysis_subset_grpID$dosage_weekly_freq <- as.character(NMA_data_analysis_subset_grpID$dosage_weekly_freq)
+  tabyl(NMA_data_analysis_subset_grpID$dosage_weekly_freq)
+  class(NMA_data_analysis_subset_grpID$dosage_weekly_freq)
+  
+  res <- rma.mv(effect_size, var_covar_matrix, mods = ~ wwc_rating + dosage_weekly_freq - 1,
+                random = ~ contrast_id | record_id, rho=0.60, data=NMA_data_analysis_subset_grpID)
   res
   
   weights.rma.mv(res)
+  forest(res)
   
-  forest(res, slab= dat_nodnm_grp2$contrast_id)
