@@ -44,7 +44,10 @@
   tabyl(NMA_data$comparison_prelim) 
   
   ## Subset data for analysis 
-  NMA_data_analysis_subset <- NMA_data %>% filter(aggregated=="IN" & (measure_type=="Follow up (10-14 days)" | measure_type=="Main") & (wwc_rating=="MWR" | wwc_rating=="MWOR") & comparison_prelim=="BAU" & (NL...48==1 | SE...50==1 | V...53==1 | F...56==1 | BX...63==1 | RS...74==1))
+  #NMA_data_analysis_subset <- NMA_data %>% filter(aggregated=="IN" & (measure_type=="Follow up (10-14 days)" | measure_type=="Main") & (wwc_rating=="MWR" | wwc_rating=="MWOR") & comparison_prelim=="BAU" & (NL...48==1 | SE...50==1 | V...53==1 | F...56==1 | BX...63==1 | RS...74==1))
+  NMA_data_analysis_subset <- subset(NMA_data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") &
+                               aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") &
+                               comparison_prelim=="BAU" & (NL...48==1 | SE...50==1 | V...53==1 | F...56==1 | BX...63==1 | RS...74==1))
   
   ## Retabulate variables upon which to subset data to verify correct subset
   tabyl(NMA_data_analysis_subset$aggregated)
