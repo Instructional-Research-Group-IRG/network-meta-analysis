@@ -47,7 +47,7 @@
   #NMA_data_analysis_subset <- NMA_data %>% filter(aggregated=="IN" & (measure_type=="Follow up (10-14 days)" | measure_type=="Main") & (wwc_rating=="MWR" | wwc_rating=="MWOR") & comparison_prelim=="BAU" & (NL...48==1 | SE...50==1 | V...53==1 | F...56==1 | BX...63==1 | RS...74==1))
   NMA_data_analysis_subset <- subset(NMA_data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") &
                                aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") &
-                               comparison_prelim=="BAU" & (NL_TX==1 | SE_TX==1 | F_TX==1 | BX_TX==1 | RS_TX==1   | V_TX==1 )) #(NL...48==1 | SE...50==1 | V...53==1 | F...56==1 | BX...63==1 | RS...74==1))
+                               comparison_prelim=="BAU" & (NL_TX==1 | SE_TX==1 | VF_TX==1 | F_TX==1 | BX_TX==1 | RS_TX==1 )) 
 
   ## Retabulate variables upon which to subset data to verify correct subset
   tabyl(NMA_data_analysis_subset$aggregated)
@@ -56,8 +56,8 @@
   tabyl(NMA_data_analysis_subset$intervention_prelim)    
   tabyl(NMA_data_analysis_subset$comparison_prelim) 
   
-  #NMA_data_analysis_subset_check <- NMA_data_analysis_subset %>% select(intervention_prelim, NL...48, SE...50, V...53, F...56, BX...63, RS...74)
-  #print(NMA_data_analysis_subset_check, n=Inf)
+  NMA_data_analysis_subset_check <- NMA_data_analysis_subset %>% select(intervention_prelim, NL_TX, SE_TX, VF_TX, F_TX, BX_TX, RS_TX)
+  print(NMA_data_analysis_subset_check, n=Inf)
   
 # Create unique group ID for each independent group within a study (record ID)
   
