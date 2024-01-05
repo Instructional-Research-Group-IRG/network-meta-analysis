@@ -164,7 +164,7 @@
   weights.rma.mv(res)
   forest(res)
 
-  ##Run standard NMA with rating and dosage as moderators moderators  
+  ##Run standard NMA with rating and dosage as moderators  
   res_mod1 <- rma.mv(effect_size, var_covar_matrix, 
                      mods = ~ wwc_rating + dosage_weekly_freq - 1,
                      random = ~ contrast_id | record_id, rho=0.60, 
