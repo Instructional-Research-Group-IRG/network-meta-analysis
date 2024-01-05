@@ -134,14 +134,8 @@
 # calculate the variance-covariance matrix for multi-treatment studies
   var_covar_matrix <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID)
   var_covar_matrix 
-
-# add contrast matrix to dataset
-  NMA_data_analysis_subset_grpID <- contrmat(NMA_data_analysis_subset_grpID, grp1="group1_id", grp2="group2_id")
-  NMA_data_analysis_subset_grpID
   
-# execute network meta-analysis using a contrast-based random-effects model using
-# BAU as the reference condition (and by setting rho=0.60, tau^2
-# reflects the amount of heterogeneity for all treatment comparisons)
+  #Additional modifications to data to facilitate running NMA with metafor
   class(NMA_data_analysis_subset_grpID$contrast_id) 
   NMA_data_analysis_subset_grpID$contrast_id <- as.character(NMA_data_analysis_subset_grpID$contrast_id)
   tabyl(NMA_data_analysis_subset_grpID$contrast_id)
@@ -150,17 +144,28 @@
   class(NMA_data_analysis_subset_grpID$dosage_weekly_freq)
   NMA_data_analysis_subset_grpID$dosage_weekly_freq <- as.character(NMA_data_analysis_subset_grpID$dosage_weekly_freq)
   tabyl(NMA_data_analysis_subset_grpID$dosage_weekly_freq)
-  class(NMA_data_analysis_subset_grpID$dosage_weekly_freq)
+  class(NMA_data_analysis_subset_grpID$dosage_weekly_freq) 
+
+# add contrast matrix to dataset
+  NMA_data_analysis_subset_grpID <- contrmat(NMA_data_analysis_subset_grpID, grp1="group1_id", grp2="group2_id")
+  NMA_data_analysis_subset_grpID
+   
+# execute network meta-analysis using a contrast-based random-effects model using
+# BAU as the reference condition (and by setting rho=0.60, tau^2
+# reflects the amount of heterogeneity for all treatment comparisons)
+
   
-  ##Run preliminary standard NMA without moderators but have placeholder code below set up for moderators
+  ##Run preliminary standard NMA without moderators
   res <- rma.mv(effect_size, var_covar_matrix,
           random = ~ intervention_prelim | record_id, rho=0.60, data=NMA_data_analysis_subset_grpID)
-  
-  #res <- rma.mv(effect_size, var_covar_matrix, mods = ~ wwc_rating + dosage_weekly_freq - 1,
-          #random = ~ contrast_id | record_id, rho=0.60, data=NMA_data_analysis_subset_grpID)
-  
   res
-  
   weights.rma.mv(res)
   forest(res)
+
+  ##Run preliminary standard NMA with moderators  
+  res_mod <- rma.mv(effect_size, var_covar_matrix, mods = ~ wwc_rating + dosage_weekly_freq - 1,
+             random = ~ contrast_id | record_id, rho=0.60, data=NMA_data_analysis_subset_grpID)
+  res_mod
+  weights.rma.mv(res_mod)
+  forest(res_mod)
   
