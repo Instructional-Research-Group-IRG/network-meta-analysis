@@ -7,11 +7,11 @@
 # Load required packages
   
   ## Install 'devel' version of metafor package
-  #install.packages("remotes") 
-  #remotes::install_github("wviechtb/metafor") 
+  ##install.packages("remotes") 
+  ##remotes::install_github("wviechtb/metafor") 
   
   ## Install and load other required packages
-  #install.packages("pacman")
+  ##install.packages("pacman")
   pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr, janitor)
 
 # Load (read) data (i.e., copy data to 'dat')
@@ -94,16 +94,16 @@
   NMA_data_grpID_long_unique_withids <- NMA_data_grpID_long_unique %>% group_by(record_id) %>% mutate(group_id=row_number()) %>% ungroup()
   NMA_data_grpID_long_unique_withids
   
-# Merge group IDs onto main data set
-# Note that above, we created {NMA_data_grpID_long_unique_withids} which is effectively a master list of the group IDs in which each group ID is a unique combination of bundle + sample size within each record ID 
-#   regardless of group assignment.
-# The main data set has intervention and comparison groups in separate columns. But because the master group ID list is agnostic to group assignment, we can use it to merge on group IDs to both intervention and comparison 
-#   groups in the following two steps:
-#     i) once for the intervention groups; then ii) a second time for the comparison groups. 
-# If our logic and subsequent group ID coding above are correct, the result should be each intervention and comparison group receiving a unique group ID (i.e., there should be no missing group ID values after the merges); 
-#   AND there should be no intervention and comparison groups of the same contrast (i.e., within the same row) with the same group ID.
-# However, as noted above, the same group (i.e., the same bundle + sample size combination) in different contrasts (rows) of the same record ID should receive the same group ID regardless of their group assignment 
-#   across those contrasts because they are the same unique group of individuals, otherwise we do not capture all dependencies.
+  ## Merge group IDs onto main data set
+  ## Note that above, we created {NMA_data_grpID_long_unique_withids} which is effectively a master list of the group IDs in which each group ID is a unique combination of bundle + sample size within each record ID 
+  ##   regardless of group assignment.
+  ## The main data set has intervention and comparison groups in separate columns. But because the master group ID list is agnostic to group assignment, we can use it to merge on group IDs to both intervention and comparison 
+  ##   groups in the following two steps:
+  ##     i) once for the intervention groups; then ii) a second time for the comparison groups. 
+  ## If our logic and subsequent group ID coding above are correct, the result should be each intervention and comparison group receiving a unique group ID (i.e., there should be no missing group ID values after the merges); 
+  ##   AND there should be no intervention and comparison groups of the same contrast (i.e., within the same row) with the same group ID.
+  ## However, as noted above, the same group (i.e., the same bundle + sample size combination) in different contrasts (rows) of the same record ID should receive the same group ID regardless of their group assignment 
+  ##   across those contrasts because they are the same unique group of individuals, otherwise we do not capture all dependencies.
   
   ## Merge unique group IDs onto the intervention groups
   NMA_data_grpID_long_unique_withids_Imerge <- NMA_data_grpID_long_unique_withids %>% separate(bundle_samplesize, c("intervention_prelim","intervention_n"), "_")
@@ -130,12 +130,11 @@
   assert_values(NMA_data_analysis_subset_grpID, colnames= "group1_id", test="not_equal", test_val= "group2_id")
   NMA_data_analysis_subset_grpID_check <- NMA_data_analysis_subset_grpID %>% select(record_id, contrast_id, aggregated, measure_type, measure_name, wwc_rating, intervention_prelim, intervention_n, group1_id, comparison_prelim, comparison_n, group2_id)
   NMA_data_analysis_subset_grpID_check %>% print(n = Inf) 
-
-# calculate the variance-covariance matrix for multi-treatment studies
-  var_covar_matrix <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID)
-  var_covar_matrix 
   
-  #Additional modifications to data to facilitate running NMA with metafor
+  ##Replace all NA values in the moderators with 0 to avoid the "Processing terminated since k <= 1" error when including as moderators in the rma.mv function below executing the NMA.
+  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% replace_na(list(NL_TX = 0, SE_TX = 0, VF_TX = 0, F_TX = 0, BX_TX = 0, RS_TX = 0, TE_TX = 0))
+  
+  ##Additional modifications to data to facilitate running NMA with metafor
   class(NMA_data_analysis_subset_grpID$contrast_id) 
   NMA_data_analysis_subset_grpID$contrast_id <- as.character(NMA_data_analysis_subset_grpID$contrast_id)
   tabyl(NMA_data_analysis_subset_grpID$contrast_id)
@@ -146,26 +145,43 @@
   tabyl(NMA_data_analysis_subset_grpID$dosage_weekly_freq)
   class(NMA_data_analysis_subset_grpID$dosage_weekly_freq) 
 
-# add contrast matrix to dataset
+# calculate the variance-covariance matrix for multi-treatment studies
+  var_covar_matrix <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID)
+  var_covar_matrix 
+
+  ## Add contrast matrix to dataset
   NMA_data_analysis_subset_grpID <- contrmat(NMA_data_analysis_subset_grpID, grp1="group1_id", grp2="group2_id")
   NMA_data_analysis_subset_grpID
    
-# execute network meta-analysis using a contrast-based random-effects model using
-# BAU as the reference condition (and by setting rho=0.60, tau^2
-# reflects the amount of heterogeneity for all treatment comparisons)
-
+# execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition 
+  
+  ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
   
   ##Run preliminary standard NMA without moderators
   res <- rma.mv(effect_size, var_covar_matrix,
-          random = ~ intervention_prelim | record_id, rho=0.60, data=NMA_data_analysis_subset_grpID)
+         random = ~ intervention_prelim | record_id, rho=0.60, data=NMA_data_analysis_subset_grpID)
   res
   weights.rma.mv(res)
   forest(res)
 
-  ##Run preliminary standard NMA with moderators  
-  res_mod <- rma.mv(effect_size, var_covar_matrix, mods = ~ wwc_rating + dosage_weekly_freq - 1,
-             random = ~ contrast_id | record_id, rho=0.60, data=NMA_data_analysis_subset_grpID)
-  res_mod
-  weights.rma.mv(res_mod)
-  forest(res_mod)
+  ##Run standard NMA with rating and dosage as moderators moderators  
+  res_mod1 <- rma.mv(effect_size, var_covar_matrix, 
+                     mods = ~ wwc_rating + dosage_weekly_freq - 1,
+                     random = ~ contrast_id | record_id, rho=0.60, 
+                     data=NMA_data_analysis_subset_grpID)
+  res_mod1
+  weights.rma.mv(res_mod1)
+  forest(res_mod1)
+  
+  ##Run standard NMA with intervention components as moderators  
+  res_mod2 <- rma.mv(effect_size, var_covar_matrix, 
+                     mods = ~ NL_TX + SE_TX + VF_TX + F_TX + BX_TX + RS_TX - 1, #NL_TX SE_TX VF_TX F_TX BX_TX RS_TX TE_TX
+                     random = ~ contrast_id | record_id, rho=0.60, 
+                     data=NMA_data_analysis_subset_grpID)
+  res_mod2
+  weights.rma.mv(res_mod2)
+  forest(coef(res_mod2), diag(vcov(res_mod2)), slab=sub(".", " ", names(coef(res_mod2)), fixed=TRUE),
+         #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention Component", top=2,
+         header="Intervention Component",
+         xlab="Difference in Standardized Mean Change (compared to TE_TX)")
   
