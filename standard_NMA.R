@@ -11,7 +11,7 @@
   ##remotes::install_github("wviechtb/metafor") 
   
   ## Install and load other required packages
-  ##install.packages("pacman")
+  ##install.packages("pacman") 
   pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr, janitor)
 
 # Load (read) data (i.e., copy data to 'dat')
