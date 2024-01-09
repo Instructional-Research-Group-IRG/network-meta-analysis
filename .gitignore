@@ -3,6 +3,6 @@
 .RData
 .Ruserdata
 archive/
-.docx
-.xlsx
-.csv
+*.docx
+*.xlsx
+*.csv
