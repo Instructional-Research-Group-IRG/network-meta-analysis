@@ -167,7 +167,7 @@
   res <- rma.mv(effect_size, var_covar_matrix,
          random = ~ intervention_prelim | record_id, rho=0.60, data=NMA_data_analysis_subset_grpID)
   res
-  weights.rma.mv(res)
+  #weights.rma.mv(res)
   forest(res)
 
   ##Run standard NMA with the unique interventions bundles as moderators  
@@ -176,10 +176,9 @@
                      mods = ~ intervention_prelim - 1,
                      random = ~ contrast_id | record_id, rho=0.60, 
                      data=NMA_data_analysis_subset_grpID)
-  summary(res_mod1)
-  
-  weights.rma.mv(res_mod1)
-  forest(coef(res_mod1), diag(vcov(res_mod2)), slab=sub(".", " ", names(coef(res_mod2)), fixed=TRUE),
+  summary(res_mod)
+  #weights.rma.mv(res_mod)
+  forest(coef(res_mod), diag(vcov(res_mod)), slab=sub(".", " ", names(coef(res_mod)), fixed=TRUE),
          #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention Component", top=2,
          header="Intervention Component",
          xlab="Difference in Standardized Mean Change (compared to TE_TX)")
