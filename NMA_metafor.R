@@ -47,7 +47,13 @@
   NMA_data_analysis_subset <- subset(NMA_data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") &
                                aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") &
                                comparison_prelim=="BAU" & (NL_TX==1 | SE_TX==1 | VF_TX==1 | F_TX==1 | BX_TX==1 | RS_TX==1 )) 
-
+  NMA_data_analysis_subset2 <- subset(NMA_data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") &
+                                        aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") &
+                                        comparison_prelim=="BAU" & (NL_TX==1 | SE_TX==1 | VF_TX==1 | F_TX==1 | BX_TX==1 | RS_TX==1 ) &
+                                        intervention_prelim!="NA")
+  NMA_data_analysis_subset3 <- NMA_data_analysis_subset2 %>% select(intervention_prelim, comparison_prelim)
+  print(NMA_data_analysis_subset3, n=30)
+  
   ## Retabulate variables upon which to subset data to verify correct subset
   tabyl(NMA_data_analysis_subset$aggregated)
   tabyl(NMA_data_analysis_subset$measure_type)
@@ -164,23 +170,16 @@
   weights.rma.mv(res)
   forest(res)
 
-  ##Run standard NMA with rating and dosage as moderators  
-  res_mod1 <- rma.mv(effect_size, var_covar_matrix, 
-                     mods = ~ wwc_rating + dosage_weekly_freq - 1,
+  ##Run standard NMA with the unique interventions bundles as moderators  
+  tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
+  res_mod <- rma.mv(effect_size, var_covar_matrix, 
+                     mods = ~ intervention_prelim - 1,
                      random = ~ contrast_id | record_id, rho=0.60, 
                      data=NMA_data_analysis_subset_grpID)
-  res_mod1
-  weights.rma.mv(res_mod1)
-  forest(res_mod1)
+  summary(res_mod1)
   
-  ##Run standard NMA with intervention components as moderators  
-  res_mod2 <- rma.mv(effect_size, var_covar_matrix, 
-                     mods = ~ NL_TX + SE_TX + VF_TX + F_TX + BX_TX + RS_TX - 1, #NL_TX SE_TX VF_TX F_TX BX_TX RS_TX TE_TX
-                     random = ~ contrast_id | record_id, rho=0.60, 
-                     data=NMA_data_analysis_subset_grpID)
-  res_mod2
-  weights.rma.mv(res_mod2)
-  forest(coef(res_mod2), diag(vcov(res_mod2)), slab=sub(".", " ", names(coef(res_mod2)), fixed=TRUE),
+  weights.rma.mv(res_mod1)
+  forest(coef(res_mod1), diag(vcov(res_mod2)), slab=sub(".", " ", names(coef(res_mod2)), fixed=TRUE),
          #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention Component", top=2,
          header="Intervention Component",
          xlab="Difference in Standardized Mean Change (compared to TE_TX)")
