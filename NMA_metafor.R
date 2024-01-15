@@ -64,6 +64,9 @@
   NMA_data_analysis_subset_check <- NMA_data_analysis_subset %>% select(intervention_prelim, NL_TX, SE_TX, VF_TX, F_TX, BX_TX, RS_TX)
   print(NMA_data_analysis_subset_check, n=Inf)
   
+  ##Replace all NA values in the moderators with 0 to avoid the "Processing terminated since k <= 1" error when including as moderators in the rma.mv function below executing the NMA.
+  NMA_data_analysis_subset <- NMA_data_analysis_subset %>% replace_na(list(NL_TX = 0, SE_TX = 0, VF_TX = 0, F_TX = 0, BX_TX = 0, RS_TX = 0, TE_TX = 0))
+  
 # Create unique group ID for each independent group within a study (record ID)
   
   ##Keep only record ID, intervention/comparison bundle, intervention/comparison sample size 
@@ -137,9 +140,14 @@
   NMA_data_analysis_subset_grpID_check <- NMA_data_analysis_subset_grpID %>% select(record_id, contrast_id, aggregated, measure_type, measure_name, wwc_rating, intervention_prelim, intervention_n, group1_id, comparison_prelim, comparison_n, group2_id)
   NMA_data_analysis_subset_grpID_check %>% print(n = Inf) 
   
-  ##Replace all NA values in the moderators with 0 to avoid the "Processing terminated since k <= 1" error when including as moderators in the rma.mv function below executing the NMA.
-  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% replace_na(list(NL_TX = 0, SE_TX = 0, VF_TX = 0, F_TX = 0, BX_TX = 0, RS_TX = 0, TE_TX = 0))
-  
+# calculate the variance-covariance matrix for multi-treatment studies
+  V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID)
+  V_list 
+
+  ## Add contrast matrix to dataset
+  NMA_data_analysis_subset_grpID <- contrmat(NMA_data_analysis_subset_grpID, grp1="group1_id", grp2="group2_id")
+  NMA_data_analysis_subset_grpID
+   
   ##Additional modifications to data to facilitate running NMA with metafor
   class(NMA_data_analysis_subset_grpID$contrast_id) 
   NMA_data_analysis_subset_grpID$contrast_id <- as.character(NMA_data_analysis_subset_grpID$contrast_id)
@@ -150,31 +158,26 @@
   NMA_data_analysis_subset_grpID$dosage_weekly_freq <- as.character(NMA_data_analysis_subset_grpID$dosage_weekly_freq)
   tabyl(NMA_data_analysis_subset_grpID$dosage_weekly_freq)
   class(NMA_data_analysis_subset_grpID$dosage_weekly_freq) 
-
-# calculate the variance-covariance matrix for multi-treatment studies
-  var_covar_matrix <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID)
-  var_covar_matrix 
-
-  ## Add contrast matrix to dataset
-  NMA_data_analysis_subset_grpID <- contrmat(NMA_data_analysis_subset_grpID, grp1="group1_id", grp2="group2_id")
-  NMA_data_analysis_subset_grpID
-   
+  
 # execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition 
   
   ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
   
   ##Run preliminary standard NMA without moderators
-  res <- rma.mv(effect_size, var_covar_matrix,
-         random = ~ intervention_prelim | record_id, rho=0.60, data=NMA_data_analysis_subset_grpID)
+  res <- rma.mv(effect_size, V_list,
+         random = ~ 1 | record_id/contrast_name/domain/es_id, 
+         rho=0.60, 
+         data=NMA_data_analysis_subset_grpID)
   res
   #weights.rma.mv(res)
   forest(res)
 
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
-  res_mod <- rma.mv(effect_size, var_covar_matrix, 
+  res_mod <- rma.mv(effect_size, V_list, 
                      mods = ~ intervention_prelim - 1,
-                     random = ~ contrast_id | record_id, rho=0.60, 
+                     random = ~ 1 | record_id/contrast_name/domain/es_id, 
+                     rho=0.60, 
                      data=NMA_data_analysis_subset_grpID)
   summary(res_mod)
   #weights.rma.mv(res_mod)
