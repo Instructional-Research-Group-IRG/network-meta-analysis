@@ -70,7 +70,7 @@
   NMA_data_grpID_long_unique_withids_Imerge$intervention_n <- as.numeric(NMA_data_grpID_long_unique_withids_Imerge$intervention_n)
   NMA_data_grpID_long_unique_withids_Imerge <- NMA_data_grpID_long_unique_withids_Imerge %>% rename(group1_id = group_id)
   str(NMA_data_grpID_long_unique_withids_Imerge)
-  NNMA_Data_Subset$intervention_prelim <- NNMA_Data_Subset$intervention_prelim %>% replace_na("NA") #This facilitates the merge below. When the IDs were created, intervention and intervention_n were combined then separated, which creates "NA" character values from the any original NA values, which don't match in a merge.
+  NNMA_Data_Subset$intervention_prelim <- NNMA_Data_Subset$intervention_prelim %>% replace_na("NA") #This facilitates the merge below. When the IDs were created, intervention and intervention_n were combined then separated, which creates "NA" character values from the original true NA values, which don't match in a merge.
   NNMA_Data_Subset_grpID <- NNMA_Data_Subset %>% left_join(NMA_data_grpID_long_unique_withids_Imerge, by = c("record_id","intervention_prelim","intervention_n"))
   NNMA_Data_Subset_grpID %>% group_by(group1_id) %>% count()
   
@@ -80,7 +80,7 @@
   NMA_data_grpID_long_unique_withids_Cmerge$comparison_n <- as.numeric(NMA_data_grpID_long_unique_withids_Cmerge$comparison_n)
   NMA_data_grpID_long_unique_withids_Cmerge <- NMA_data_grpID_long_unique_withids_Cmerge %>% rename(group2_id = group_id)
   str(NMA_data_grpID_long_unique_withids_Cmerge)
-  NNMA_Data_Subset$comparison_prelim <- NNMA_Data_Subset$comparison_prelim %>% replace_na("NA") #This facilitates the merge below. When the IDs were created, comparison_prelim and comparison were combined then separated, which creates "NA" character values from the any original NA values, which don't match in a merge.
+  NNMA_Data_Subset$comparison_prelim <- NNMA_Data_Subset$comparison_prelim %>% replace_na("NA") #This facilitates the merge below. When the IDs were created, comparison_prelim and comparison were combined then separated, which creates "NA" character values from the original true NA values, which don't match in a merge.
   NNMA_Data_Subset_grpID <- NNMA_Data_Subset_grpID %>% left_join(NMA_data_grpID_long_unique_withids_Cmerge, by = c("record_id","comparison_prelim","comparison_n"))
   NNMA_Data_Subset_grpID %>% group_by(group2_id) %>% count()
   
