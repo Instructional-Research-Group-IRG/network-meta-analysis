@@ -61,7 +61,7 @@
   tabyl(NMA_data_analysis_subset$intervention_prelim)    
   tabyl(NMA_data_analysis_subset$comparison_prelim) 
   
-  NMA_data_analysis_subset_check <- NMA_data_analysis_subset %>% select(intervention_prelim, NL_TX, SE_TX, VF_TX, F_TX, BX_TX, RS_TX)
+  NMA_data_analysis_subset_check <- NMA_data_analysis_subset %>% select(sortcode, es_id, simple_number, record_id, contrast_id, intervention_prelim, comparison_prelim, intervention_n, comparison_n, NL_TX, SE_TX, VF_TX, F_TX, BX_TX, RS_TX)
   print(NMA_data_analysis_subset_check, n=Inf)
   
   ##Replace all NA values in the moderators with 0 to avoid the "Processing terminated since k <= 1" error when including as moderators in the rma.mv function below executing the NMA.
@@ -182,7 +182,7 @@
   summary(res_mod)
   #weights.rma.mv(res_mod)
   forest(coef(res_mod), diag(vcov(res_mod)), slab=sub(".", " ", names(coef(res_mod)), fixed=TRUE),
-         #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention Component", top=2,
-         header="Intervention Component",
-         xlab="Difference in Standardized Mean Change (compared to TE_TX)")
+         #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention", top=2,
+         header="Intervention",
+         xlab="Difference in Standardized Mean Change (compared to BAU)")
   
