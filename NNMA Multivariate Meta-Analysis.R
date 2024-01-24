@@ -5,6 +5,9 @@
   library(robumeta)
   library(clubSandwich)
   library(weightr)
+  library(assertable)
+  library(janitor)
+  library(naniar)
 
 #Primary Database 
   NNMA_Data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_mN43K7HH3C7WhsPMnPsB1HDuRLE4/edit#gid=0")
