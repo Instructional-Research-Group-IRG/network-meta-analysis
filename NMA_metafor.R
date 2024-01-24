@@ -17,7 +17,11 @@
 # Load (read) data (i.e., copy data to 'dat')
   #dat <- read_sheet("https://docs.google.com/spreadsheets/d/1bWugw06yFyetIVYlhAHHzM_d3KGhegxxLBm-5463j2Q/edit#gid=0") #Test data
   NMA_data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_mN43K7HH3C7WhsPMnPsB1HDuRLE4/edit#gid=0") #Full data set
-  NMA_data <- subset(NMA_data, !is.na(record_id)) #There are no true rows after row 608 (not counting the headers/column names as row 1). Those after row 608 are loaded in despite having no record IDs because column C is incorrectly filled out with "FALSE" after row 608.
+  NMA_data %>% count()
+  tabyl(NMA_data$record_id)
+  NMA_data <- subset(NMA_data, !is.na(record_id)) #There are no true rows after row 608 (not counting the headers/column names as row 1). Those after row 608 are loaded in despite having no record IDs because column C is filled out with "FALSE" after row 608 (artifact of the Excel function in the cells of that column).
+  NMA_data %>% count()
+  assert_values(NMA_data, colnames= c("record_id"), test = "not_na", test_val = "NA")
   
 # Explore data  
   head(NMA_data)
@@ -34,7 +38,10 @@
   NMA_data %>% group_by(wwc_rating) %>% count() %>% ungroup()
   NMA_data %>% group_by(domain, wwc_rating) %>% count() %>% ungroup() %>% print(n= Inf)
   
-# Subset data following NMA analysis specifications: "Analysis Notes for Seth 9-1-2023
+  ##Replace all NA values in the moderators with 0 to avoid the "Processing terminated since k <= 1" error when including as moderators in the rma.mv function below executing the NMA.
+  NMA_data <- NMA_data %>% replace_na(list(NL_TX = 0, SE_TX = 0, VF_TX = 0, F_TX = 0, BX_TX = 0, RS_TX = 0, TE_TX = 0))
+  
+# Subset data following NMA analysis specifications
   
   ## Tabulate variables upon which to subset data
   tabyl(NMA_data$aggregated)
@@ -47,12 +54,6 @@
   NMA_data_analysis_subset <- subset(NMA_data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") &
                                aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") &
                                comparison_prelim=="BAU" & (NL_TX==1 | SE_TX==1 | VF_TX==1 | F_TX==1 | BX_TX==1 | RS_TX==1 )) 
-  NMA_data_analysis_subset2 <- subset(NMA_data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") &
-                                        aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") &
-                                        comparison_prelim=="BAU" & (NL_TX==1 | SE_TX==1 | VF_TX==1 | F_TX==1 | BX_TX==1 | RS_TX==1 ) &
-                                        intervention_prelim!="NA")
-  NMA_data_analysis_subset3 <- NMA_data_analysis_subset2 %>% select(intervention_prelim, comparison_prelim)
-  print(NMA_data_analysis_subset3, n=30)
   
   ## Retabulate variables upon which to subset data to verify correct subset
   tabyl(NMA_data_analysis_subset$aggregated)
@@ -61,12 +62,20 @@
   tabyl(NMA_data_analysis_subset$intervention_prelim)    
   tabyl(NMA_data_analysis_subset$comparison_prelim) 
   
-  NMA_data_analysis_subset_check <- NMA_data_analysis_subset %>% select(sortcode, es_id, simple_number, record_id, contrast_id, intervention_prelim, comparison_prelim, intervention_n, comparison_n, NL_TX, SE_TX, VF_TX, F_TX, BX_TX, RS_TX)
-  print(NMA_data_analysis_subset_check, n=Inf)
-  
-  ##Replace all NA values in the moderators with 0 to avoid the "Processing terminated since k <= 1" error when including as moderators in the rma.mv function below executing the NMA.
-  NMA_data_analysis_subset <- NMA_data_analysis_subset %>% replace_na(list(NL_TX = 0, SE_TX = 0, VF_TX = 0, F_TX = 0, BX_TX = 0, RS_TX = 0, TE_TX = 0))
-  
+  ##Check <NA> values in character variable intervention_prelim 
+  tabyl(NMA_data_analysis_subset$intervention_prelim) #n=2 with intervention_prelim == <NA>
+  NMA_data_analysis_subset %>% count()  # n= 273
+
+  NMA_data_analysis_subset_check <- subset(NMA_data_analysis_subset, is.na(intervention_prelim), select = c(sortcode, es_id, simple_number, record_id, contrast_id, intervention_prelim, comparison_prelim, intervention_n, comparison_n, NL_TX, SE_TX, VF_TX, F_TX, BX_TX, RS_TX))
+  print(NMA_data_analysis_subset_check, n=Inf) 
+
+  NMA_data_analysis_subset2 <- subset(NMA_data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") &
+                                        aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") &
+                                        comparison_prelim=="BAU" & (NL_TX==1 | SE_TX==1 | VF_TX==1 | F_TX==1 | BX_TX==1 | RS_TX==1 ) &
+                                        !is.na(intervention_prelim))
+  tabyl(NMA_data_analysis_subset2$intervention_prelim) #n=0 with intervention_prelim == <NA>
+  NMA_data_analysis_subset2 %>% count() # n= 271
+
 # Create unique group ID for each independent group within a study (record ID)
   
   ##Keep only record ID, intervention/comparison bundle, intervention/comparison sample size 
@@ -120,8 +129,9 @@
   NMA_data_grpID_long_unique_withids_Imerge$intervention_n <- as.numeric(NMA_data_grpID_long_unique_withids_Imerge$intervention_n)
   NMA_data_grpID_long_unique_withids_Imerge <- NMA_data_grpID_long_unique_withids_Imerge %>% rename(group1_id = group_id)
   str(NMA_data_grpID_long_unique_withids_Imerge)
-  NMA_data_analysis_subset$intervention_prelim <- NMA_data_analysis_subset$intervention_prelim %>% replace_na("NA") #This facilitates the merge below. When the IDs were created, intervention and intervention_n were combined then separated, which creates "NA" character values from the any original NA values, which don't match in a merge.
-  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset %>% left_join(NMA_data_grpID_long_unique_withids_Imerge, by = c("record_id","intervention_prelim","intervention_n"))
+  NMA_data_analysis_subset_chrNA <- NMA_data_analysis_subset
+  NMA_data_analysis_subset_chrNA$intervention_prelim <- NMA_data_analysis_subset$intervention_prelim %>% replace_na("NA") #This facilitates the merge below. When the IDs were created, intervention and intervention_n were combined then separated, which creates "NA" character values from the original true NA values, which don't match in a merge.
+  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_chrNA %>% left_join(NMA_data_grpID_long_unique_withids_Imerge, by = c("record_id","intervention_prelim","intervention_n"))
   NMA_data_analysis_subset_grpID %>% group_by(group1_id) %>% count()
   
   ## Merge unique group IDs onto the comparison groups  
@@ -130,7 +140,7 @@
   NMA_data_grpID_long_unique_withids_Cmerge$comparison_n <- as.numeric(NMA_data_grpID_long_unique_withids_Cmerge$comparison_n)
   NMA_data_grpID_long_unique_withids_Cmerge <- NMA_data_grpID_long_unique_withids_Cmerge %>% rename(group2_id = group_id)
   str(NMA_data_grpID_long_unique_withids_Cmerge)
-  NMA_data_analysis_subset_grpID$comparison_prelim <- NMA_data_analysis_subset_grpID$comparison_prelim %>% replace_na("NA") #This facilitates the merge below. When the IDs were created, comparison_prelim and comparison were combined then separated, which creates "NA" character values from the any original NA values, which don't match in a merge.
+  NMA_data_analysis_subset_grpID$comparison_prelim <- NMA_data_analysis_subset_grpID$comparison_prelim %>% replace_na("NA") #This facilitates the merge below. When the IDs were created, intervention and intervention_n were combined then separated, which creates "NA" character values from the original true NA values, which don't match in a merge.
   NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% left_join(NMA_data_grpID_long_unique_withids_Cmerge, by = c("record_id","comparison_prelim","comparison_n"))
   NMA_data_analysis_subset_grpID %>% group_by(group2_id) %>% count()
   
@@ -139,6 +149,13 @@
   assert_values(NMA_data_analysis_subset_grpID, colnames= "group1_id", test="not_equal", test_val= "group2_id")
   NMA_data_analysis_subset_grpID_check <- NMA_data_analysis_subset_grpID %>% select(record_id, contrast_id, aggregated, measure_type, measure_name, wwc_rating, intervention_prelim, intervention_n, group1_id, comparison_prelim, comparison_n, group2_id)
   NMA_data_analysis_subset_grpID_check %>% print(n = Inf) 
+  
+  ## Restore "NA" (non-missing) values to their true <NA> (missing) values because the unite then separate functions used above changed the values from <NA> to "NA"
+  tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)
+  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% replace_with_na_at(.vars = c("intervention_prelim","comparison_prelim"), condition = ~.x %in% common_na_strings)
+  tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)
   
 # calculate the variance-covariance matrix for multi-treatment studies
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID)
@@ -168,12 +185,11 @@
          random = ~ 1 | record_id/contrast_name/domain/es_id, 
          rho=0.60, 
          data=NMA_data_analysis_subset_grpID)
-  res
+  summary(res)
   #weights.rma.mv(res)
   forest(res)
 
   ##Run standard NMA with the unique interventions bundles as moderators  
-  tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
   res_mod <- rma.mv(effect_size, V_list, 
                      mods = ~ intervention_prelim - 1,
                      random = ~ 1 | record_id/contrast_name/domain/es_id, 
@@ -185,4 +201,5 @@
          #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention", top=2,
          header="Intervention",
          xlab="Difference in Standardized Mean Change (compared to BAU)")
-  
+  #weights.rma.mv(res_mod)
+  forest(res_mod)

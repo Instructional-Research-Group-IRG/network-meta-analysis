@@ -90,6 +90,13 @@
   assert_values(NNMA_Data_Subset_grpID, colnames= "group1_id", test="not_equal", test_val= "group2_id")
   NNMA_Data_Subset_grpID_check <- NNMA_Data_Subset_grpID %>% select(record_id, contrast_id, aggregated, measure_type, measure_name, wwc_rating, intervention_prelim, intervention_n, group1_id, comparison_prelim, comparison_n, group2_id)
   NNMA_Data_Subset_grpID_check %>% print(n = Inf) 
+  
+  ## Restore "NA" (non-missing) values to their true <NA> (missing) values because the unite then separate functions used above changed the values from <NA> to "NA"
+  tabyl(NNMA_Data_Subset_grpID$intervention_prelim)
+  tabyl(NNMA_Data_Subset_grpID$comparison_prelim)
+  NNMA_Data_Subset_grpID <- NNMA_Data_Subset_grpID %>% replace_with_na_at(.vars = c("intervention_prelim","comparison_prelim"), condition = ~.x %in% common_na_strings)
+  tabyl(NNMA_Data_Subset_grpID$intervention_prelim)
+  tabyl(NNMA_Data_Subset_grpID$comparison_prelim)
 
 #Create covariance matrix
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NNMA_Data_Subset_grpID)
