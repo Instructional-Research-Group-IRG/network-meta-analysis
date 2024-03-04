@@ -31,24 +31,31 @@
 # Create network graph
   
   ## Use the igraph package
-  NMA_data_analysis_subset_long <- pivot_longer(NMA_data_analysis_subset, c(intervention_prelim, comparison_prelim), names_to = "assignment_T_C", values_to = "treatment")
+    ### Note: The data are currently in a contrast-based, "wide" format in which each contrast is an observation 
+    ###       (i.e., intervention and comparison assignments of each contrast are in separate columns of the same row.)
+    ###       Need to reshape the data "long" to an arm-based format in which the two assignment groups (intervention/comparison)
+    ###       are in separate rows of the same column grouped by contrast ID across those rows. This facilitates the pairing of intervention/comparison 
+    ###       groups for the creation of the (weighted) edges of the network graph.
+  NMA_data_analysis_subset2 <- NMA_data_analysis_subset %>% select(record_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size)
+  print(NMA_data_analysis_subset2) #Example rows of the contrast-based wide format. Compare to the long format printed below.
   
-  NMA_data_analysis_subset_long2 <- NMA_data_analysis_subset_long %>% select(record_id, assignment_T_C, treatment)
+  NMA_data_analysis_subset_long <- pivot_longer(NMA_data_analysis_subset, c(intervention_prelim, comparison_prelim), names_to = "assignment_I_C", values_to = "intervention_comparison")
   
-  dat_igraph <- NMA_data_analysis_subset_long2
-  pairs <- data.frame(do.call(rbind, sapply(split(dat_igraph$treatment, dat_igraph$record_id), function(x) t(combn(x,2)))), stringsAsFactors=FALSE)
-  pairs$X1 <- factor(pairs$X1, levels=sort(unique(dat_igraph$treatment)))
-  pairs$X2 <- factor(pairs$X2, levels=sort(unique(dat_igraph$treatment)))
+  NMA_data_analysis_subset_long2 <- NMA_data_analysis_subset_long %>% select(record_id, contrast_id, assignment_I_C, intervention_comparison, domain, measure_name, es_id, effect_size)
+  print(NMA_data_analysis_subset_long2) #Example rows of the arm-based long format. Compare to the wide format printed above.
+  
+  dat_igraph <- NMA_data_analysis_subset_long
+  pairs <- data.frame(do.call(rbind, sapply(split(dat_igraph$intervention_comparison, dat_igraph$record_id), function(x) t(combn(x,2)))), stringsAsFactors=FALSE)
+  pairs$X1 <- factor(pairs$X1, levels=sort(unique(dat_igraph$intervention_comparison)))
+  pairs$X2 <- factor(pairs$X2, levels=sort(unique(dat_igraph$intervention_comparison)))
   tab <- table(pairs[,1], pairs[,2])
   tab
   
   g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
-  g <- graph_from_adjacency_matrix(tab, mode = "plus",                diag=FALSE)
-  g <- graph_from_adjacency_matrix(tab,                               diag=FALSE)
-  g <- graph_from_adjacency_matrix(tab, mode = "max")
-  plot(g, edge.curved=FALSE, edge.width=E(g)$weight/2,
+  plot(g, edge.curved=FALSE, edge.width=E(g)$weight/25,
        layout=layout_in_circle(g),
-       vertex.size=25, vertex.color="lightgray", vertex.label.color="black", vertex.label.font=2)  
+       #layout=layout_with_lgl(g),
+       vertex.size=20, vertex.color="lightgray", vertex.label.color="black", vertex.label.font=2)  
   
   ## Use the network package
   
