@@ -39,24 +39,27 @@
   NMA_data_analysis_subset2 <- NMA_data_analysis_subset %>% select(record_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size)
   print(NMA_data_analysis_subset2) #Example rows of the contrast-based wide format. Compare to the long format printed below.
   
+  NMA_data_analysis_subset3 <- NMA_data_analysis_subset %>% distinct(record_id, contrast_id, .keep_all = TRUE)
+  
   NMA_data_analysis_subset_long <- pivot_longer(NMA_data_analysis_subset, c(intervention_prelim, comparison_prelim), names_to = "assignment_I_C", values_to = "intervention_comparison")
   
   NMA_data_analysis_subset_long2 <- NMA_data_analysis_subset_long %>% select(record_id, contrast_id, assignment_I_C, intervention_comparison, domain, measure_name, es_id, effect_size)
   print(NMA_data_analysis_subset_long2) #Example rows of the arm-based long format. Compare to the wide format printed above.
   
   dat_igraph <- NMA_data_analysis_subset_long
-  pairs <- data.frame(do.call(rbind, sapply(split(dat_igraph$intervention_comparison, dat_igraph$record_id), function(x) t(combn(x,2)))), stringsAsFactors=FALSE)
+  dat_igraph$contrast_id <- as.character(dat_igraph$contrast_id)
+  pairs <- data.frame(do.call(rbind, sapply(split(dat_igraph$intervention_comparison, dat_igraph$contrast_id), function(x) t(combn(x,2)))), stringsAsFactors=FALSE)
+  print(pairs)
   pairs$X1 <- factor(pairs$X1, levels=sort(unique(dat_igraph$intervention_comparison)))
   pairs$X2 <- factor(pairs$X2, levels=sort(unique(dat_igraph$intervention_comparison)))
   tab <- table(pairs[,1], pairs[,2])
   tab
   
   g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
-  plot(g, edge.curved=FALSE, edge.width=E(g)$weight/25,
+  plot(g, edge.curved=FALSE, edge.width=E(g)$weight/20,
        layout=layout_in_circle(g),
+       #layout=layout_nicely(g),
        #layout=layout_with_lgl(g),
        vertex.size=20, vertex.color="lightgray", vertex.label.color="black", vertex.label.font=2)  
   
   ## Use the network package
-  
-  
