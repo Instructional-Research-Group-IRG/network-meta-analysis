@@ -8,6 +8,7 @@
   library(assertable)
   library(janitor)
   library(naniar)
+  library(glmulti)
 
 #Primary Database 
   NNMA_Data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_mN43K7HH3C7WhsPMnPsB1HDuRLE4/edit#gid=0")
@@ -123,22 +124,59 @@
   (PI_low <- coef(NNMA_MVmodel) - 1.96*sqrt(NNMA_MVmodel$sigma2[1] + NNMA_MVmodel$sigma2[2]))
   (PI_high <- coef(NNMA_MVmodel) + 1.96*sqrt(NNMA_MVmodel$sigma2[1] + NNMA_MVmodel$sigma2[2]))
 
-#Add moderators (as.numeric(unlist(final_domain)))
-  NNMA_MVmod_model <- rma.mv(yi = effect_size, 
-                       V = V_list, 
-                       random = ~ 1 | record_id/contrast_name/domain/es_id,
-                       mods = ~ NL_TX + SE_TX + VF_TX + F_TX + BX_TX + RS_TX - 1,
-                       test =  "t", 
-                       data = NNMA_Data_Subset_grpID, 
-                       method = "REML")
-  summary(NNMA_MVmod_model)
+  ##Add moderators (as.numeric(unlist(final_domain)))
+    NNMA_MVmod_model <- rma.mv(yi = effect_size, 
+                         V = V_list, 
+                         random = ~ 1 | record_id/contrast_name/domain/es_id,
+                         mods = ~ NL_TX + SE_TX + VF_TX + F_TX + BX_TX + RS_TX - 1,
+                         test =  "t", 
+                         data = NNMA_Data_Subset_grpID, 
+                         method = "REML")
+    summary(NNMA_MVmod_model)
+  
+  ##Use RVE
+  
+    NNMA_mvMODcf <- coef_test(NNMA_MVmod_model,
+                         cluster = NNMA_Data_Subset_grpID$record_id, 
+                         vcov = "CR2")
+    NNMA_mvMODcf
 
-##Use RVE
+  ##Calculate Correlation Matrix
+    cor(NNMA_Data_Subset_grpID[c("NL_TX", "SE_TX", "VF_TX", "F_TX", "BX_TX", "RS_TX")])
 
-  NNMA_mvMODcf <- coef_test(NNMA_MVmod_model,
-                       cluster = NNMA_Data_Subset_grpID$record_id, 
-                       vcov = "CR2")
-  NNMA_mvMODcf
+  
+# Meta-regression model selection methods: Hierarchical, Step-wise, and Multi-model inference
 
-#Calculate Correlation Matrix
-  cor(NNMA_Data_Subset_grpID[c("NL_TX", "SE_TX", "VF_TX", "F_TX", "BX_TX", "RS_TX")])
+  ## Use glmulti package to run models of all possible combinations of the moderators
+    ### Note: The following code is based on the following authored by the creator of the metafor package: https://www.metafor-project.org/doku.php/tips:model_selection_with_glmulti_and_mumin
+    
+    ### "remove rows where at least one of the values of these 7 moderator variables is missing"
+    dat_glmulti <- NNMA_Data_Subset_grpID
+    dat_glmulti <- dat_glmulti[!apply(dat_glmulti[,c("NL_TX", "VF_TX", "RS_TX", "SE_TX", "F_TX")], 1, anyNA),]
+    
+    ### "define a function that (a) takes a model formula and dataset as input and (b) then fits a mixed-effects meta-regression model to the given data using maximum likelihood estimation:"
+    rma.glmulti <- function(formula, data, ...) 
+    rma(formula, variance, data=dat_glmulti, method="ML", ...) #(?) Do we want to use REML as above? "It is important to use ML (instead of REML) estimation, since log-likelihoods (and hence information criteria) are not directly comparable for models with different fixed effects (although see Gurka, 2006, for a different perspective on this)."
+    #rma(formula, vi, data=data, method="REML", ...)
+    
+    ### Fit all possible models
+    res_glmulti <- glmulti(effect_size ~ NL_TX + VF_TX	+ RS_TX	+ SE_TX	+ F_TX, data=dat_glmulti,
+                           level=1, fitfunction=rma.glmulti, crit="aicc", confsetsize=128)
+    ### Review results
+    print(res_glmulti)
+    plot(res_glmulti)
+    
+    ### Look at the top models
+    top <- weightable(res_glmulti)
+    top <- top[top$aicc <= min(top$aicc) + 2,]
+    top
+    
+    ### Review details of "top" model
+    summary(res_glmulti@objects[[1]])
+    
+    ### Review relative variable importance
+    plot(res_glmulti, type="s")
+    
+    ### Multimodel Inference
+    eval(metafor:::.glmulti)
+    coef(res_glmulti, varweighting="Johnson")
