@@ -261,7 +261,7 @@
     res_mumin
     
     # multimodel inference
-    summary(model.avg(res2))
+    summary(model.avg(res_mumin))
     
     # for easier comparison with the results from glmulti
     #round(mmi[colnames(model.avg(res_mumin)$coefficients),], 4)
