@@ -108,12 +108,12 @@
 
 #Run multivariate meta-regression
   NNMA_MVmodel <- rma.mv(yi = effect_size, 
-                    V = V_list, 
-                    random = ~ 1 | record_id/contrast_name/domain/es_id,
-                    test =  "t", 
-                    data = NNMA_Data_Subset_grpID, 
-                    method = "REML")
-  summary(NNMA_MVmodel)
+                          V = V_list, 
+                          random = ~ 1 | record_id/contrast_name/domain/es_id,
+                          test =  "t", 
+                          data = NNMA_Data_Subset_grpID, 
+                          method = "REML")
+  summary(NNMA_MVmodel)  
 
   ##Use RVE for robustness
   mvcf <- coef_test(NNMA_MVmodel,
@@ -153,68 +153,200 @@
     ###        For the sake of setting up the analysis, let’s use the following variables in the following order: 1. NL_TX; 2.	VF_TX; 3.	RS_TX; 4.	SE_TX; 5.	F_TX
     
     ### Model 1: NL_TX
-    NNMA_MVmod_model1 <- rma.mv(yi = effect_size, 
+    NNMA_MVmod_Hmodel1 <- rma.mv(yi = effect_size, 
                                 V = V_list, 
                                 random = ~ 1 | record_id/contrast_name/domain/es_id,
                                 mods = ~ NL_TX - 1,
                                 test =  "t", 
                                 data = NNMA_Data_Subset_grpID, 
                                 method = "REML")
-    summary(NNMA_MVmod_model1)   
+    summary(NNMA_MVmod_Hmodel1)   
     
     ### Model 2: NL_TX + VF_TX 
-    NNMA_MVmod_model2 <- rma.mv(yi = effect_size, 
+    NNMA_MVmod_Hmodel2 <- rma.mv(yi = effect_size, 
                                 V = V_list, 
                                 random = ~ 1 | record_id/contrast_name/domain/es_id,
                                 mods = ~ NL_TX + VF_TX - 1,
                                 test =  "t", 
                                 data = NNMA_Data_Subset_grpID, 
                                 method = "REML")
-    summary(NNMA_MVmod_model2)
+    summary(NNMA_MVmod_Hmodel2)
     
     ### Model 3: NL_TX + VF_TX + RS_TX
-    NNMA_MVmod_model3 <- rma.mv(yi = effect_size, 
+    NNMA_MVmod_Hmodel3 <- rma.mv(yi = effect_size, 
                                 V = V_list, 
                                 random = ~ 1 | record_id/contrast_name/domain/es_id,
                                 mods = ~ NL_TX + VF_TX + RS_TX - 1,
                                 test =  "t", 
                                 data = NNMA_Data_Subset_grpID, 
                                 method = "REML")
-    summary(NNMA_MVmod_model3)  
+    summary(NNMA_MVmod_Hmodel3)  
     
     ### Model 4: NL_TX + VF_TX + RS_TX + SE_TX
-    NNMA_MVmod_model4 <- rma.mv(yi = effect_size, 
+    NNMA_MVmod_Hmodel4 <- rma.mv(yi = effect_size, 
                                 V = V_list, 
                                 random = ~ 1 | record_id/contrast_name/domain/es_id,
                                 mods = ~ NL_TX + VF_TX + RS_TX + SE_TX - 1,
                                 test =  "t", 
                                 data = NNMA_Data_Subset_grpID, 
                                 method = "REML")
-    summary(NNMA_MVmod_model4)
+    summary(NNMA_MVmod_Hmodel4)
     
     ### Model 5: NL_TX + VF_TX + RS_TX + SE_TX + F_TX
-    NNMA_MVmod_model5 <- rma.mv(yi = effect_size, 
+    NNMA_MVmod_Hmodel5 <- rma.mv(yi = effect_size, 
                                 V = V_list, 
                                 random = ~ 1 | record_id/contrast_name/domain/es_id,
                                 mods = ~ NL_TX + VF_TX + RS_TX + SE_TX + F_TX - 1,
                                 test =  "t", 
                                 data = NNMA_Data_Subset_grpID, 
                                 method = "REML")
-    summary(NNMA_MVmod_model5)
-    
+    summary(NNMA_MVmod_Hmodel5)
+ 
   ## Step-wise 
     ### Notes: First we would look at each covariate in isolation. Then, run a series of models (as above) but where each is added in order of highest explanation of variability to least.
-    # NNMA_MVmod_fun <- function(x) {
-    # NNMA_MVmod_model <- rma.mv(yi = effect_size, 
-    #                            V = V_list, 
-    #                            random = ~ 1 | record_id/contrast_name/domain/es_id,
-    #                            mods = ~ x - 1,
-    #                            test =  "t", 
-    #                            data = NNMA_Data_Subset_grpID, 
-    #                            method = "REML")
-    #  summary(NNMA_MVmod_model)
-    #}
-    # NNMA_MVmod_fun(NL_TX)
+    NNMA_MVmod_model_nomods <- rma.mv(yi = effect_size, 
+                                     V = V_list, 
+                                     random = ~ 1 | record_id/contrast_name/domain/es_id,
+                                     test =  "t", 
+                                     data = NNMA_Data_Subset_grpID, 
+                                     method = "REML")
+    summary(NNMA_MVmod_model_nomods)
+    
+    NNMA_MVmod_model_NL_TX <- rma.mv(yi = effect_size, 
+                                     V = V_list, 
+                                     random = ~ 1 | record_id/contrast_name/domain/es_id,
+                                     mods = ~ NL_TX - 1,
+                                     test =  "t", 
+                                     data = NNMA_Data_Subset_grpID, 
+                                     method = "REML")
+    summary(NNMA_MVmod_model_NL_TX)
+    
+    NNMA_MVmod_model_VF_TX <- rma.mv(yi = effect_size, 
+                                     V = V_list, 
+                                     random = ~ 1 | record_id/contrast_name/domain/es_id,
+                                     mods = ~ VF_TX - 1,
+                                     test =  "t", 
+                                     data = NNMA_Data_Subset_grpID, 
+                                     method = "REML")
+    summary(NNMA_MVmod_model_VF_TX)   
+    
+    NNMA_MVmod_model_RS_TX <- rma.mv(yi = effect_size, 
+                                     V = V_list, 
+                                     random = ~ 1 | record_id/contrast_name/domain/es_id,
+                                     mods = ~ RS_TX - 1,
+                                     test =  "t", 
+                                     data = NNMA_Data_Subset_grpID, 
+                                     method = "REML")
+    summary(NNMA_MVmod_model_RS_TX)  
+    
+    NNMA_MVmod_model_SE_TX <- rma.mv(yi = effect_size, 
+                                     V = V_list, 
+                                     random = ~ 1 | record_id/contrast_name/domain/es_id,
+                                     mods = ~ SE_TX - 1,
+                                     test =  "t", 
+                                     data = NNMA_Data_Subset_grpID, 
+                                     method = "REML")
+    summary(NNMA_MVmod_model_SE_TX) 
+    
+    NNMA_MVmod_model_F_TX <- rma.mv(yi = effect_size, 
+                                     V = V_list, 
+                                     random = ~ 1 | record_id/contrast_name/domain/es_id,
+                                     mods = ~ F_TX - 1,
+                                     test =  "t", 
+                                     data = NNMA_Data_Subset_grpID, 
+                                     method = "REML")
+    summary.rma(NNMA_MVmod_model_F_TX)    
+    
+    ### Review variation explained in each model
+    fitstats.rma(NNMA_MVmod_model_nomods, NNMA_MVmod_model_NL_TX, NNMA_MVmod_model_VF_TX, NNMA_MVmod_model_RS_TX, NNMA_MVmod_model_SE_TX, NNMA_MVmod_model_F_TX)
+      
+      #### Note: rma.mv does not produce R-squared or related values (NA is returned). Calculate a psuedo-Rsquared
+      ####       Refer to https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2017-September/000232.html for the calculation of psuedo-R squared: psuedo-R2= (sum(res0$sigma2) - sum(res1$sigma2)) / sum(res0$sigma2). Gives the proportional reduction in variance.
+    
+      R2_NL_TX <- (sum(NNMA_MVmod_model_nomods$sigma2) - sum(NNMA_MVmod_model_NL_TX$sigma2)) / sum(NNMA_MVmod_model_nomods$sigma2)
+      R2_VF_TX <- (sum(NNMA_MVmod_model_nomods$sigma2) - sum(NNMA_MVmod_model_VF_TX$sigma2)) / sum(NNMA_MVmod_model_nomods$sigma2)
+      R2_RS_TX <- (sum(NNMA_MVmod_model_nomods$sigma2) - sum(NNMA_MVmod_model_RS_TX$sigma2)) / sum(NNMA_MVmod_model_nomods$sigma2)
+      R2_SE_TX <- (sum(NNMA_MVmod_model_nomods$sigma2) - sum(NNMA_MVmod_model_SE_TX$sigma2)) / sum(NNMA_MVmod_model_nomods$sigma2)
+      R2_F_TX  <- (sum(NNMA_MVmod_model_nomods$sigma2) - sum(NNMA_MVmod_model_F_TX$sigma2)) / sum(NNMA_MVmod_model_nomods$sigma2)
+    
+      R2_NL_TX
+      R2_VF_TX
+      R2_RS_TX
+      R2_SE_TX
+      R2_F_TX
+      
+      #### Alternate psuedo-R suqared method: 1 - (log likelihood for full model / log likelihood for constant-only model)
+      logLik_nomods <- logLik(NNMA_MVmod_model_nomods)
+      logLik_NL_TX <- logLik(NNMA_MVmod_model_NL_TX)
+      logLik_VF_TX <- logLik(NNMA_MVmod_model_VF_TX)      
+      logLik_RS_TX <- logLik(NNMA_MVmod_model_RS_TX)
+      logLik_SE_TX <- logLik(NNMA_MVmod_model_SE_TX)
+      logLik_F_TX <- logLik(NNMA_MVmod_model_F_TX)
+      
+      R2v2_NL_TX = 1 - (logLik_NL_TX / logLik_nomods)
+      R2v2_VF_TX = 1 - (logLik_VF_TX / logLik_nomods)
+      R2v2_RS_TX = 1 - (logLik_RS_TX / logLik_nomods)
+      R2v2_SE_TX = 1 - (logLik_SE_TX / logLik_nomods)
+      R2v2_F_TX = 1 - (logLik_F_TX / logLik_nomods)
+      
+      R2v2_NL_TX
+      R2v2_VF_TX
+      R2v2_RS_TX
+      R2v2_SE_TX
+      R2v2_F_TX
+      
+    ### Execute step-wise regressions 
+    ### Note: Use deviance as a proxy for variance explained for now (lower deviance = better model fit): NL_TX -> SE_TX -> RS_TX -> F_TX -> VF_TX 
+    ###       Unclear how to interpret the two versions of psuedo R-squared.
+      ### Model 1: NL_TX
+      NNMA_MVmod_Smodel1 <- rma.mv(yi = effect_size, 
+                                   V = V_list, 
+                                   random = ~ 1 | record_id/contrast_name/domain/es_id,
+                                   mods = ~ NL_TX - 1,
+                                   test =  "t", 
+                                   data = NNMA_Data_Subset_grpID, 
+                                   method = "REML")
+      summary(NNMA_MVmod_Smodel1)   
+      
+      ### Model 2: NL_TX + SE_TX 
+      NNMA_MVmod_Smodel2 <- rma.mv(yi = effect_size, 
+                                   V = V_list, 
+                                   random = ~ 1 | record_id/contrast_name/domain/es_id,
+                                   mods = ~ NL_TX + SE_TX - 1,
+                                   test =  "t", 
+                                   data = NNMA_Data_Subset_grpID, 
+                                   method = "REML")
+      summary(NNMA_MVmod_Smodel2)
+      
+      ### Model 3: NL_TX + SE_TX + RS_TX
+      NNMA_MVmod_Smodel3 <- rma.mv(yi = effect_size, 
+                                   V = V_list, 
+                                   random = ~ 1 | record_id/contrast_name/domain/es_id,
+                                   mods = ~ NL_TX + SE_TX + RS_TX - 1,
+                                   test =  "t", 
+                                   data = NNMA_Data_Subset_grpID, 
+                                   method = "REML")
+      summary(NNMA_MVmod_Smodel3)  
+      
+      ### Model 4: NL_TX + SE_TX + RS_TX + F_TX
+      NNMA_MVmod_Smodel4 <- rma.mv(yi = effect_size, 
+                                   V = V_list, 
+                                   random = ~ 1 | record_id/contrast_name/domain/es_id,
+                                   mods = ~ NL_TX + SE_TX + RS_TX + F_TX - 1,
+                                   test =  "t", 
+                                   data = NNMA_Data_Subset_grpID, 
+                                   method = "REML")
+      summary(NNMA_MVmod_Smodel4)
+      
+      ### Model 5: NL_TX + SE_TX + RS_TX + F_TX + VF_TX
+      NNMA_MVmod_Smodel5 <- rma.mv(yi = effect_size, 
+                                   V = V_list, 
+                                   random = ~ 1 | record_id/contrast_name/domain/es_id,
+                                   mods = ~ NL_TX + SE_TX + RS_TX + F_TX + VF_TX - 1,
+                                   test =  "t", 
+                                   data = NNMA_Data_Subset_grpID, 
+                                   method = "REML")
+      summary(NNMA_MVmod_Smodel5)
     
   ## Multi-model inference: model selection using glmulti
     ### Notes: Use glmulti package to run models of all possible combinations of the moderators
@@ -236,7 +368,7 @@
                                        level=1, fitfunction=rma.glmulti, crit="aicc", confsetsize=32)) # With level = 1, we stick to models with main effects only. This implies that there are 2^5= 32 possible models in the candidate set to consider. 
     ### Review results
     print(res_glmulti)
-    plot(res_glmulti) # "The horizontal red line differentiates between models whose AICc value is less versus more than 2 units away from that of the "best" model (i.e., the model with the lowest AICc). The output above shows that there are 10 such models. Sometimes this is taken as a cutoff, so that models with values more than 2 units away are considered substantially less plausible than those with AICc values closer to that of the best model. However, we should not get too hung up about such (somewhat arbitrary) divisions (and there are critiques of this rule; e.g., Anderson, 2008)."
+    plot(res_glmulti) 
     
     ### Look at the top models
     top <- weightable(res_glmulti)
