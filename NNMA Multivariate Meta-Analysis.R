@@ -1,3 +1,5 @@
+
+
 #Load libraries
   library(googlesheets4)
   library(tidyverse)
@@ -15,13 +17,13 @@
   NNMA_Data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_mN43K7HH3C7WhsPMnPsB1HDuRLE4/edit#gid=0")
   NNMA_Data <- subset(NNMA_Data, !is.na(record_id)) #There are no true rows after row 608 (not counting the headers/column names as row 1). Those after row 608 are loaded in despite having no record IDs because column C is incorrectly filled out with "FALSE" after row 608.
   
-  ##This subset is specific to the meta-regression model. It is a preliminary subset that includes only BAU controls.
+  ##This subset is specific to the meta-regression model. It is a preliminary subset that includes only non-TvsT studies.
   NNMA_Data_Subset <- subset(NNMA_Data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") &
                              aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") &
-                             comparison_prelim=="BAU")
+                             TvsT==0)
   
   ##Replace all NA values in the moderators with 0 to avoid the "Processing terminated since k <= 1" error
-  NNMA_Data_Subset <- NNMA_Data_Subset %>% replace_na(list(NL_TX = 0, SE_TX = 0, VF_TX = 0, F_TX = 0, BX_TX = 0, RS_TX = 0, TE_TX = 0))
+  NNMA_Data_Subset <- NNMA_Data_Subset %>% replace_na(list(NL_TX = 0, SE_TX = 0, VF_TX = 0, F_TX = 0, F_TX = 0, RS_TX = 0, TE_TX = 0))
 
 #Create unique group ID for each independent group within a study (record ID)
 
@@ -106,20 +108,78 @@
 #Create covariance matrix
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NNMA_Data_Subset_grpID)
 
-#Run multivariate meta-regression
-  NNMA_MVmodel <- rma.mv(yi = effect_size, 
+#Run multivariate meta-regression with 4 levels of nesting
+  NNMA_MVmodel_4levels <- rma.mv(yi = effect_size, 
                           V = V_list, 
                           random = ~ 1 | record_id/contrast_name/domain/es_id,
                           test =  "t", 
                           data = NNMA_Data_Subset_grpID, 
                           method = "REML")
-  summary(NNMA_MVmodel)  
+  summary(NNMA_MVmodel_4levels)  
 
   ##Use RVE for robustness
-  mvcf <- coef_test(NNMA_MVmodel,
+  mvcf <- coef_test(NNMA_MVmodel_4levels,
                     cluster = NNMA_Data_Subset_grpID$record_id, 
                     vcov = "CR2")
   mvcf
+  
+  
+  #Run multivariate meta-regression with 3 levels of nesting
+  NNMA_MVmodel_3levels <- rma.mv(yi = effect_size, 
+                                 V = V_list, 
+                                 random = ~ 1 | record_id/contrast_name/es_id,
+                                 test =  "t", 
+                                 data = NNMA_Data_Subset_grpID, 
+                                 method = "REML")
+  summary(NNMA_MVmodel_3levels)  
+  
+  ##Use RVE for robustness
+  mvcf <- coef_test(NNMA_MVmodel_3levels,
+                    cluster = NNMA_Data_Subset_grpID$record_id, 
+                    vcov = "CR2")
+  mvcf
+  
+  #Run multivariate meta-regression with 2a levels of nesting
+  NNMA_MVmodel_2alevels <- rma.mv(yi = effect_size, 
+                                 V = V_list, 
+                                 random = ~ 1 | record_id/es_id,
+                                 test =  "t", 
+                                 data = NNMA_Data_Subset_grpID, 
+                                 method = "REML")
+  summary(NNMA_MVmodel_2alevels)  
+  
+  ##Use RVE for robustness
+  mvcf <- coef_test(NNMA_MVmodel_2alevels,
+                    cluster = NNMA_Data_Subset_grpID$record_id, 
+                    vcov = "CR2")
+  mvcf
+  
+  
+  #Run multivariate meta-regression with 2b levels of nesting
+  NNMA_MVmodel_2blevels <- rma.mv(yi = effect_size, 
+                                 V = V_list, 
+                                 random = ~ 1 | contrast_name/es_id,
+                                 test =  "t", 
+                                 data = NNMA_Data_Subset_grpID, 
+                                 method = "REML")
+  summary(NNMA_MVmodel_2blevels)  
+  
+  ##Use RVE for robustness
+  mvcf <- coef_test(NNMA_MVmodel_2blevels,
+                    cluster = NNMA_Data_Subset_grpID$contrast_name, 
+                    vcov = "CR2")
+  mvcf
+  
+  #Run multivariate meta-regression with 1 level
+  NNMA_MVmodel_1level <- rma.mv(yi = effect_size, 
+                                  V = V_list, 
+                                  random = ~ 1 | es_id,
+                                  test =  "t", 
+                                  data = NNMA_Data_Subset_grpID, 
+                                  method = "REML")
+  summary(NNMA_MVmodel_1level)  
+  
+
   
   ##Find prediction interval
   (PI_low <- coef(NNMA_MVmodel) - 1.96*sqrt(NNMA_MVmodel$sigma2[1] + NNMA_MVmodel$sigma2[2]))
