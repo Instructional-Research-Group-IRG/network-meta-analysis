@@ -20,14 +20,14 @@
   NMA_data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_mN43K7HH3C7WhsPMnPsB1HDuRLE4/edit#gid=0") #Full data set
   NMA_data %>% count()
   tabyl(NMA_data$record_id)
-  NMA_data <- subset(NMA_data, !is.na(record_id)) #There are no true rows after row 608 (not counting the headers/column names as row 1). Those after row 608 are loaded in despite having no record IDs because column C is filled out with "FALSE" after row 608 (artifact of the Excel function in the cells of that column).
-  NMA_data %>% count()
-  assert_values(NMA_data, colnames= c("record_id"), test = "not_na", test_val = "NA")
+  ##NMA_data <- subset(NMA_data, !is.na(record_id)) #There are no true rows after row 608 (not counting the headers/column names as row 1). Those after row 608 are loaded in despite having no record IDs because column C is filled out with "FALSE" after row 608 (artifact of the Excel function in the cells of that column).
+  ##NMA_data %>% count()
+  ##assert_values(NMA_data, colnames= c("record_id"), test = "not_na", test_val = "NA")
   
   ## Subset data for analysis 
   NMA_data_analysis_subset <- subset(NMA_data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") &
                                        aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") &
-                                       comparison_prelim=="BAU" & (NL_TX==1 | SE_TX==1 | VF_TX==1 | F_TX==1 | BX_TX==1 | RS_TX==1 )) 
+                                       comparison_prelim=="BAU" & (NL_TX==1 | EX_TX==1 | VF_TX==1 | FF_TX==1 | RS_TX==1 )) 
 
 # Create network graph
   

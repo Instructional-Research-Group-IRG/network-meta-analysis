@@ -19,9 +19,9 @@
   NMA_data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_mN43K7HH3C7WhsPMnPsB1HDuRLE4/edit#gid=0") #Full data set
   NMA_data %>% count()
   tabyl(NMA_data$record_id)
-  NMA_data <- subset(NMA_data, !is.na(record_id)) #There are no true rows after row 608 (not counting the headers/column names as row 1). Those after row 608 are loaded in despite having no record IDs because column C is filled out with "FALSE" after row 608 (artifact of the Excel function in the cells of that column).
-  NMA_data %>% count()
-  assert_values(NMA_data, colnames= c("record_id"), test = "not_na", test_val = "NA")
+  ##NMA_data <- subset(NMA_data, !is.na(record_id)) #There are no true rows after row 608 (not counting the headers/column names as row 1). Those after row 608 are loaded in despite having no record IDs because column C is filled out with "FALSE" after row 608 (artifact of the Excel function in the cells of that column).
+  ##NMA_data %>% count()
+  ##assert_values(NMA_data, colnames= c("record_id"), test = "not_na", test_val = "NA")
   
 # Explore data  
   head(NMA_data)
@@ -39,7 +39,7 @@
   NMA_data %>% group_by(domain, wwc_rating) %>% count() %>% ungroup() %>% print(n= Inf)
   
   ##Replace all NA values in the moderators with 0 to avoid the "Processing terminated since k <= 1" error when including as moderators in the rma.mv function below executing the NMA.
-  NMA_data <- NMA_data %>% replace_na(list(NL_TX = 0, SE_TX = 0, VF_TX = 0, F_TX = 0, BX_TX = 0, RS_TX = 0, TE_TX = 0))
+  NMA_data <- NMA_data %>% replace_na(list(NL_TX = 0, EX_TX = 0, VF_TX = 0, FF_TX = 0, RS_TX = 0))
   
 # Subset data following NMA analysis specifications
   
@@ -53,7 +53,7 @@
   ## Subset data for analysis 
   NMA_data_analysis_subset <- subset(NMA_data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") &
                                aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") &
-                               comparison_prelim=="BAU" & (NL_TX==1 | SE_TX==1 | VF_TX==1 | F_TX==1 | BX_TX==1 | RS_TX==1 )) 
+                               comparison_prelim=="BAU" & (NL_TX==1 | EX_TX==1 | VF_TX==1 | FF_TX==1 | RS_TX==1 )) 
   
   ## Retabulate variables upon which to subset data to verify correct subset
   tabyl(NMA_data_analysis_subset$aggregated)
@@ -66,12 +66,12 @@
   tabyl(NMA_data_analysis_subset$intervention_prelim) #n=2 with intervention_prelim == <NA>
   NMA_data_analysis_subset %>% count()  # n= 273
 
-  NMA_data_analysis_subset_check <- subset(NMA_data_analysis_subset, is.na(intervention_prelim), select = c(sortcode, es_id, simple_number, record_id, contrast_id, intervention_prelim, comparison_prelim, intervention_n, comparison_n, NL_TX, SE_TX, VF_TX, F_TX, BX_TX, RS_TX))
+  NMA_data_analysis_subset_check <- subset(NMA_data_analysis_subset, is.na(intervention_prelim), select = c(sortcode, es_id, simple_number, record_id, contrast_id, intervention_prelim, comparison_prelim, intervention_n, comparison_n, NL_TX, EX_TX, VF_TX, F_TX, BX_TX, RS_TX))
   print(NMA_data_analysis_subset_check, n=Inf) 
 
   NMA_data_analysis_subset2 <- subset(NMA_data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") &
                                         aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") &
-                                        comparison_prelim=="BAU" & (NL_TX==1 | SE_TX==1 | VF_TX==1 | F_TX==1 | BX_TX==1 | RS_TX==1 ) &
+                                        comparison_prelim=="BAU" & (NL_TX==1 | EX_TX==1 | VF_TX==1 | FF_TX==1 | RS_TX==1) &
                                         !is.na(intervention_prelim))
   tabyl(NMA_data_analysis_subset2$intervention_prelim) #n=0 with intervention_prelim == <NA>
   NMA_data_analysis_subset2 %>% count() # n= 271
@@ -182,7 +182,7 @@
   
   ##Run preliminary standard NMA without moderators
   res <- rma.mv(effect_size, V_list,
-         random = ~ 1 | record_id/contrast_name/domain/es_id, 
+         random = ~ 1 | record_id/es_id, 
          rho=0.60, 
          data=NMA_data_analysis_subset_grpID)
   summary(res)
@@ -192,7 +192,7 @@
   ##Run standard NMA with the unique interventions bundles as moderators  
   res_mod <- rma.mv(effect_size, V_list, 
                      mods = ~ intervention_prelim - 1,
-                     random = ~ 1 | record_id/contrast_name/domain/es_id, 
+                     random = ~ 1 | record_id/es_id, 
                      rho=0.60, 
                      data=NMA_data_analysis_subset_grpID)
   summary(res_mod)
