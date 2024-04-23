@@ -1,6 +1,6 @@
 # network-meta-analysis
 
-![alt text](admin/photos/IRG logo.jpg)
+![alt text](admin/photos/IRG_logo.jpg)
 
 *IRG repository for multivariate meta-analyses, including standard NMAs and cNMAs
 
