@@ -196,7 +196,6 @@
   forest(res)
 
   ##Run standard NMA with the unique interventions bundles as moderators  
-  NMA_data_analysis_subset_grpID$intervention_prelim <- as.factor(NMA_data_analysis_subset_grpID$intervention_prelim)
   res_mod <- rma.mv(effect_size, V_list, 
                      mods = ~ intervention_prelim - 1,
                      random = ~ 1 | record_id/es_id, 
