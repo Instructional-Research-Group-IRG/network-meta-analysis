@@ -161,8 +161,7 @@
   convert_to_factor <- function(x) {
     as.factor(x)
   }    
-  NMA_data_analysis_subset_grpID[c("group_size_category","grade_level","ongoing_training","research_lab","publication_year")] <- lapply(NMA_data_analysis_subset_grpID[c("group_size_category","grade_level","ongoing_training","research_lab","publication_year")], convert_to_factor)
-  
+  NMA_data_analysis_subset_grpID[c("intervention_prelim","comparison_prelim")] <- lapply(NMA_data_analysis_subset_grpID[c("intervention_prelim","comparison_prelim")], convert_to_factor)
   
 # calculate the variance-covariance matrix for multi-treatment studies
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID)
