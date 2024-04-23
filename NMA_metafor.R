@@ -157,6 +157,13 @@
   tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)
   
+  ## Correct variable types
+  convert_to_factor <- function(x) {
+    as.factor(x)
+  }    
+  NMA_data_analysis_subset_grpID[c("group_size_category","grade_level","ongoing_training","research_lab","publication_year")] <- lapply(NMA_data_analysis_subset_grpID[c("group_size_category","grade_level","ongoing_training","research_lab","publication_year")], convert_to_factor)
+  
+  
 # calculate the variance-covariance matrix for multi-treatment studies
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID)
   V_list 
@@ -190,6 +197,7 @@
   forest(res)
 
   ##Run standard NMA with the unique interventions bundles as moderators  
+  NMA_data_analysis_subset_grpID$intervention_prelim <- as.factor(NMA_data_analysis_subset_grpID$intervention_prelim)
   res_mod <- rma.mv(effect_size, V_list, 
                      mods = ~ intervention_prelim - 1,
                      random = ~ 1 | record_id/es_id, 
