@@ -12,7 +12,7 @@
   
   ## Install and load other required packages
   ##install.packages("pacman") 
-  pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr, janitor, naniar, igraph)
+  pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr, janitor, naniar, igraph, multcomp)
 
 # Load (read) data (i.e., copy data to 'dat')
   #dat <- read_sheet("https://docs.google.com/spreadsheets/d/1bWugw06yFyetIVYlhAHHzM_d3KGhegxxLBm-5463j2Q/edit#gid=0") #Test data
@@ -38,7 +38,7 @@
   NMA_data %>% group_by(wwc_rating) %>% count() %>% ungroup()
   NMA_data %>% group_by(domain, wwc_rating) %>% count() %>% ungroup() %>% print(n= Inf)
   
-  ##Replace all NA values in the moderators with 0 to avoid the "Processing terminated since k <= 1" error when including as moderators in the rma.mv function below executing the NMA.
+  ## Replace all NA values in the moderators with 0 to avoid the "Processing terminated since k <= 1" error when including as moderators in the rma.mv function below executing the NMA.
   NMA_data <- NMA_data %>% replace_na(list(NL_TX = 0, EX_TX = 0, VF_TX = 0, FF_TX = 0, RS_TX = 0))
   
 # Subset data following NMA analysis specifications
@@ -62,7 +62,7 @@
   tabyl(NMA_data_analysis_subset$intervention_prelim)    
   tabyl(NMA_data_analysis_subset$comparison_prelim) 
   
-  ##Check <NA> values in character variable intervention_prelim 
+  ## Check <NA> values in character variable intervention_prelim 
   tabyl(NMA_data_analysis_subset$intervention_prelim) #n=2 with intervention_prelim == <NA>
   NMA_data_analysis_subset %>% count()  # n= 273
 
@@ -78,8 +78,8 @@
 
 # Create unique group ID for each independent group within a study (record ID)
   
-  ##Keep only record ID, intervention/comparison bundle, intervention/comparison sample size 
-  NMA_data_grpID <- NMA_data_analysis_subset %>% select(record_id, intervention = intervention_prelim, comparison = comparison_prelim, intervention_n, comparison_n)
+  ## Keep only record ID, intervention/comparison bundle, intervention/comparison sample size 
+  NMA_data_grpID <- NMA_data_analysis_subset %>% dplyr::select(record_id, intervention = intervention_prelim, comparison = comparison_prelim, intervention_n, comparison_n)
   str(NMA_data_grpID)
   
   ## For each assignment group, combine component bundle and sample size into a single character variable to distinguish groups with the same sample sizes but different component bundles. 
@@ -93,7 +93,7 @@
   str(NMA_data_grpID)
   NMA_data_grpID
   
-  NMA_data_grpID <- NMA_data_grpID %>% select(record_id, int_n_chr_bundle, com_n_chr_bundle)
+  NMA_data_grpID <- NMA_data_grpID %>% dplyr::select(record_id, int_n_chr_bundle, com_n_chr_bundle)
   NMA_data_grpID
   
   ## Reshape long so that total number of unique groups within each record ID can be counted and assigned a unique group ID 
@@ -105,7 +105,7 @@
   ## For example, one combination of bundle + sample size could have been assigned to intervention for one contrast but to comparison for another contrast of the same record ID. 
   ## In this case, this would be the same unique group of individuals in both contrasts despite the different group assignments and therefore should have the same group ID (not two different ones) to capture all dependencies.
   ## There may be no cases of this in the data but let's control for it just in case by removing bundle + group sample size duplicates within each study regardless of group assignment.
-  NMA_data_grpID_long_unique <- NMA_data_grpID_long %>% group_by(record_id) %>% distinct(bundle_samplesize, .keep_all = TRUE) %>% select(-assignment) %>% ungroup()
+  NMA_data_grpID_long_unique <- NMA_data_grpID_long %>% group_by(record_id) %>% distinct(bundle_samplesize, .keep_all = TRUE) %>% dplyr::select(-assignment) %>% ungroup()
   NMA_data_grpID_long_unique
 
   ##Create unique group ID for each combination of bundle + sample size, by record ID (study)
@@ -147,7 +147,7 @@
   ## Validate merge results
   assert_values(NMA_data_analysis_subset_grpID, colnames= c("group1_id","group2_id"), test = "not_na", test_val = NA)
   assert_values(NMA_data_analysis_subset_grpID, colnames= "group1_id", test="not_equal", test_val= "group2_id")
-  NMA_data_analysis_subset_grpID_check <- NMA_data_analysis_subset_grpID %>% select(record_id, contrast_id, aggregated, measure_type, measure_name, wwc_rating, intervention_prelim, intervention_n, group1_id, comparison_prelim, comparison_n, group2_id)
+  NMA_data_analysis_subset_grpID_check <- NMA_data_analysis_subset_grpID %>% dplyr::select(record_id, contrast_id, aggregated, measure_type, measure_name, wwc_rating, intervention_prelim, intervention_n, group1_id, comparison_prelim, comparison_n, group2_id)
   NMA_data_analysis_subset_grpID_check %>% print(n = Inf) 
   
   ## Restore "NA" (non-missing) values to their true <NA> (missing) values because the unite then separate functions used above changed the values from <NA> to "NA"
@@ -163,13 +163,15 @@
   }    
   NMA_data_analysis_subset_grpID[c("intervention_prelim","comparison_prelim")] <- lapply(NMA_data_analysis_subset_grpID[c("intervention_prelim","comparison_prelim")], convert_to_factor)
   
-# calculate the variance-covariance matrix for multi-treatment studies
-  V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID)
-  V_list 
-
   ## Add contrast matrix to dataset
-  NMA_data_analysis_subset_grpID <- contrmat(NMA_data_analysis_subset_grpID, grp1="group1_id", grp2="group2_id")
-  NMA_data_analysis_subset_grpID
+  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% drop_na(c(intervention_prelim, comparison_prelim)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
+  NMA_data_analysis_subset_grpID <- contrmat(NMA_data_analysis_subset_grpID, grp1="intervention_prelim", grp2="comparison_prelim")
+  contrast_matrix_check <- NMA_data_analysis_subset_grpID %>% dplyr::select(intervention_prelim,comparison_prelim,EX:BAU)
+  print(contrast_matrix_check)
+  
+  ## Calculate the variance-covariance matrix for multi-treatment studies
+  V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID)
+  V_list   
    
   ##Additional modifications to data to facilitate running NMA with metafor
   class(NMA_data_analysis_subset_grpID$contrast_id) 
@@ -196,8 +198,10 @@
   forest(res)
 
   ##Run standard NMA with the unique interventions bundles as moderators  
+  tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
   res_mod <- rma.mv(effect_size, V_list, 
-                     mods = ~ intervention_prelim - 1,
+                     #mods = ~ intervention_prelim - 1,
+                     mods = ~ EX + EX.FF + EX.FF.RS + EX.RS + EX.VF.FF.RS + EX.VF.RS + FF + FF.RS + NL.EX.FF.RS + NL.EX.RS + NL.EX.VF.RS + NL.FF.RS + NL.RS + RS + VF.RSF - 1, 
                      random = ~ 1 | record_id/es_id, 
                      rho=0.60, 
                      data=NMA_data_analysis_subset_grpID)
@@ -209,3 +213,25 @@
          xlab="Difference in Standardized Mean Change (compared to BAU)")
   #weights.rma.mv(res_mod)
   forest(res_mod)
+    
+    ### estimate all pairwise differences between treatments
+    contr <- data.frame(t(combn(names(coef(res_mod)), 2)))
+    contr <- contrmat(contr, "X1", "X2")
+    rownames(contr) <- paste(contr$X1, "-", contr$X2)
+    contr <- as.matrix(contr[-c(1:2)])
+    sav <- predict(res_mod, newmods=contr)
+    sav[["slab"]] <- rownames(contr)
+    sav
+  
+    ###Compute p-scores
+    contr <- data.frame(t(combn(c(names(coef(res_mod)),"BAU"), 2))) # add "BAU" to contrast matrix
+    contr <- contrmat(contr, "X1", "X2", last="BAU", append=FALSE)
+    b <- c(coef(res_mod),0) # add 0 for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
+    vb <- bldiag(vcov(res_mod),0) # add 0 row/column for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
+    pvals <- apply(contr, 1, function(x) pnorm((x%*%b) / sqrt(t(x)%*%vb%*%x)))
+    
+    ###Create table for publication
+    tab <- vec2mat(pvals, corr=FALSE)
+    tab[upper.tri(tab)] <- t((1 - tab)[upper.tri(tab)])
+    rownames(tab) <- colnames(tab) <- colnames(contr)
+    round(tab, 2) # like Table 2 in the following article: https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/s12874-015-0060-8/tables/2
