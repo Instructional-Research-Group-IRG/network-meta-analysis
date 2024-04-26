@@ -108,7 +108,7 @@
   NMA_data_grpID_long_unique <- NMA_data_grpID_long %>% group_by(record_id) %>% distinct(bundle_samplesize, .keep_all = TRUE) %>% dplyr::select(-assignment) %>% ungroup()
   NMA_data_grpID_long_unique
 
-  ##Create unique group ID for each combination of bundle + sample size, by record ID (study)
+  ## Create unique group ID for each combination of bundle + sample size, by record ID (study)
   NMA_data_grpID_long_unique_withids <- NMA_data_grpID_long_unique %>% group_by(record_id) %>% mutate(group_id=row_number()) %>% ungroup()
   NMA_data_grpID_long_unique_withids
   
@@ -184,7 +184,7 @@
   tabyl(NMA_data_analysis_subset_grpID$dosage_weekly_freq)
   class(NMA_data_analysis_subset_grpID$dosage_weekly_freq) 
   
-# execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition 
+# Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition 
   
   ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
   
@@ -214,7 +214,7 @@
   #weights.rma.mv(res_mod)
   forest(res_mod)
     
-    ### estimate all pairwise differences between treatments
+    ### Estimate all pairwise differences between treatments
     contr <- data.frame(t(combn(names(coef(res_mod)), 2)))
     contr <- contrmat(contr, "X1", "X2")
     rownames(contr) <- paste(contr$X1, "-", contr$X2)
@@ -223,15 +223,15 @@
     sav[["slab"]] <- rownames(contr)
     sav
   
-    ###Compute p-scores
+    ### Compute p-scores
     contr <- data.frame(t(combn(c(names(coef(res_mod)),"BAU"), 2))) # add "BAU" to contrast matrix
     contr <- contrmat(contr, "X1", "X2", last="BAU", append=FALSE)
     b <- c(coef(res_mod),0) # add 0 for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
     vb <- bldiag(vcov(res_mod),0) # add 0 row/column for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
     pvals <- apply(contr, 1, function(x) pnorm((x%*%b) / sqrt(t(x)%*%vb%*%x)))
     
-    ###Create table for publication
+    ### Create table for publication
     tab <- vec2mat(pvals, corr=FALSE)
     tab[upper.tri(tab)] <- t((1 - tab)[upper.tri(tab)])
     rownames(tab) <- colnames(tab) <- colnames(contr)
-    round(tab, 2) # like Table 2 in the following article: https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/s12874-015-0060-8/tables/2
+    round(tab, 2) # Like Table 2 in the following: https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/s12874-015-0060-8/tables/2
