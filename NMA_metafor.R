@@ -224,7 +224,7 @@
     sav
   
     ### Compute p-scores
-    contr <- data.frame(t(combn(c(names(coef(res_mod)),"BAU"), 2))) # add "BAU" to contrast matrix
+    contr <- data.frame(t(combn(c(names(coef(res_mod)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
     contr <- contrmat(contr, "X1", "X2", last="BAU", append=FALSE)
     b <- c(coef(res_mod),0) # add 0 for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
     vb <- bldiag(vcov(res_mod),0) # add 0 row/column for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
