@@ -229,9 +229,13 @@
     b <- c(coef(res_mod),0) # add 0 for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
     vb <- bldiag(vcov(res_mod),0) # add 0 row/column for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
     pvals <- apply(contr, 1, function(x) pnorm((x%*%b) / sqrt(t(x)%*%vb%*%x)))
+    pvals
     
     ### Create table for publication
     tab <- vec2mat(pvals, corr=FALSE)
     tab[upper.tri(tab)] <- t((1 - tab)[upper.tri(tab)])
     rownames(tab) <- colnames(tab) <- colnames(contr)
     round(tab, 2) # Like Table 2 in the following: https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/s12874-015-0060-8/tables/2
+    
+    ###Finally, we can get the P-scores with:
+    cbind(round(sort(apply(tab, 1, mean, na.rm=TRUE), decreasing=TRUE), 3))
