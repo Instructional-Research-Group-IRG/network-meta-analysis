@@ -239,3 +239,5 @@
     
     ###Finally, we can get the P-scores with:
     cbind(round(sort(apply(tab, 1, mean, na.rm=TRUE), decreasing=TRUE), 3))
+    
+    ###To-do: append p-scores to model output in single object
