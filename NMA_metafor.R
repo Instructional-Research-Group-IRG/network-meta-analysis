@@ -12,7 +12,7 @@
   
   ## Install and load other required packages
   ##install.packages("pacman") 
-  pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr, janitor, naniar, igraph, multcomp)
+  pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr, janitor, naniar, igraph, multcomp, broom)
 
 # Load (read) data (i.e., copy data to 'dat')
   #dat <- read_sheet("https://docs.google.com/spreadsheets/d/1bWugw06yFyetIVYlhAHHzM_d3KGhegxxLBm-5463j2Q/edit#gid=0") #Test data
@@ -39,7 +39,7 @@
   NMA_data %>% group_by(domain, wwc_rating) %>% count() %>% ungroup() %>% print(n= Inf)
   
   ## Replace all NA values in the moderators with 0 to avoid the "Processing terminated since k <= 1" error when including as moderators in the rma.mv function below executing the NMA.
-  NMA_data <- NMA_data %>% replace_na(list(NL_TX = 0, EX_TX = 0, VF_TX = 0, FF_TX = 0, RS_TX = 0))
+  NMA_data <- NMA_data %>% replace_na(list(NL_TX = 0, EX_TX...39 = 0, VF_TX = 0, FF_TX...61 = 0, RS_TX = 0))
   
 # Subset data following NMA analysis specifications
   
@@ -53,7 +53,7 @@
   ## Subset data for analysis 
   NMA_data_analysis_subset <- subset(NMA_data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") &
                                aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") &
-                               comparison_prelim=="BAU" & (NL_TX==1 | EX_TX==1 | VF_TX==1 | FF_TX==1 | RS_TX==1 )) 
+                               comparison_prelim=="BAU" & (NL_TX==1 | EX_TX...39==1 | VF_TX==1 | FF_TX...61 ==1 | RS_TX==1 )) 
   
   ## Retabulate variables upon which to subset data to verify correct subset
   tabyl(NMA_data_analysis_subset$aggregated)
@@ -66,12 +66,12 @@
   tabyl(NMA_data_analysis_subset$intervention_prelim) #n=2 with intervention_prelim == <NA>
   NMA_data_analysis_subset %>% count()  # n= 273
 
-  NMA_data_analysis_subset_check <- subset(NMA_data_analysis_subset, is.na(intervention_prelim), select = c(sortcode, es_id, simple_number, record_id, contrast_id, intervention_prelim, comparison_prelim, intervention_n, comparison_n, NL_TX, EX_TX, VF_TX, F_TX, BX_TX, RS_TX))
+  NMA_data_analysis_subset_check <- subset(NMA_data_analysis_subset, is.na(intervention_prelim), select = c(sortcode, es_id, simple_number, record_id, contrast_id, intervention_prelim, comparison_prelim, intervention_n, comparison_n, NL_TX, EX_TX...39, VF_TX, F_TX, BX_TX, RS_TX))
   print(NMA_data_analysis_subset_check, n=Inf) 
 
   NMA_data_analysis_subset2 <- subset(NMA_data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") &
                                         aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") &
-                                        comparison_prelim=="BAU" & (NL_TX==1 | EX_TX==1 | VF_TX==1 | FF_TX==1 | RS_TX==1) &
+                                        comparison_prelim=="BAU" & (NL_TX==1 | EX_TX...39==1 | VF_TX==1 | FF_TX...61==1 | RS_TX==1) &
                                         !is.na(intervention_prelim))
   tabyl(NMA_data_analysis_subset2$intervention_prelim) #n=0 with intervention_prelim == <NA>
   NMA_data_analysis_subset2 %>% count() # n= 271
@@ -214,7 +214,7 @@
   #weights.rma.mv(res_mod)
   forest(res_mod)
     
-    ### Estimate all pairwise differences between treatments
+    ### Estimate all pairwise differences between treatments (create league table)
     contr <- data.frame(t(combn(names(coef(res_mod)), 2)))
     contr <- contrmat(contr, "X1", "X2")
     rownames(contr) <- paste(contr$X1, "-", contr$X2)
@@ -223,7 +223,7 @@
     sav[["slab"]] <- rownames(contr)
     sav
   
-    ### Compute p-scores
+    ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
     contr <- contrmat(contr, "X1", "X2", last="BAU", append=FALSE)
     b <- c(coef(res_mod),0) # add 0 for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
@@ -231,13 +231,21 @@
     pvals <- apply(contr, 1, function(x) pnorm((x%*%b) / sqrt(t(x)%*%vb%*%x)))
     pvals
     
-    ### Create table for publication
+    ### Create table of p-values
     tab <- vec2mat(pvals, corr=FALSE)
     tab[upper.tri(tab)] <- t((1 - tab)[upper.tri(tab)])
     rownames(tab) <- colnames(tab) <- colnames(contr)
     round(tab, 2) # Like Table 2 in the following: https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/s12874-015-0060-8/tables/2
     
-    ###Finally, we can get the P-scores with:
-    cbind(round(sort(apply(tab, 1, mean, na.rm=TRUE), decreasing=TRUE), 3))
+    ### Compute the P-scores:
+    pscores <- cbind(round(sort(apply(tab, 1, mean, na.rm=TRUE), decreasing=TRUE), 3))
+    pscores
     
-    ###To-do: append p-scores to model output in single object
+    ### Append p-scores to model output in single object
+    res_mod_df <- tidy(res_mod, conf.int = TRUE)
+    #pscores_df <- as_tibble(pscores) %>% setNames(c('comp','value'))
+    pscores_df <- as.data.frame(res_mod_df)
+    pscores_df <- cbind(term = rownames(pscores), as.data.frame(pscores))
+    res_mod_pscore <- res_mod_df %>% left_join(pscores_df, by = c("term"))
+    res_mod_pscore <- res_mod_pscore %>% rename(intervention = term, se = std.error, zval = statistic, pval = p.value, ci.lb = conf.low, ci.ub = conf.high,  Pscore = V1)
+    res_mod_pscore
