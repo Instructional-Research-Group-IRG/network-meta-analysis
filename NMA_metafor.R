@@ -241,10 +241,8 @@
     pscores <- cbind(round(sort(apply(tab, 1, mean, na.rm=TRUE), decreasing=TRUE), 3))
     pscores
     
-    ### Append p-scores to model output in single object
+    ### Add p-scores to model output object
     res_mod_df <- tidy(res_mod, conf.int = TRUE)
-    #pscores_df <- as_tibble(pscores) %>% setNames(c('comp','value'))
-    pscores_df <- as.data.frame(res_mod_df)
     pscores_df <- cbind(term = rownames(pscores), as.data.frame(pscores))
     res_mod_pscore <- res_mod_df %>% left_join(pscores_df, by = c("term"))
     res_mod_pscore <- res_mod_pscore %>% rename(intervention = term, se = std.error, zval = statistic, pval = p.value, ci.lb = conf.low, ci.ub = conf.high,  Pscore = V1)
