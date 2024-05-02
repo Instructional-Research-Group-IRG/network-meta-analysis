@@ -27,7 +27,7 @@
   ## Subset data for analysis 
   NMA_data_analysis_subset <- subset(NMA_data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") &
                                        aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") &
-                                       comparison_prelim=="BAU" & (NL_TX==1 | EX_TX==1 | VF_TX==1 | FF_TX==1 | RS_TX==1 )) 
+                                       comparison_prelim=="BAU" & (NL_TX==1 | EX_TX...39==1 | VF_TX==1 | FF_TX...61==1 | RS_TX==1 )) 
 
 # Create network graph
   
