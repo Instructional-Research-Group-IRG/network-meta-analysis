@@ -214,7 +214,7 @@
   #weights.rma.mv(res_mod)
   forest(res_mod)
     
-    ### Estimate all pairwise differences between treatments (create league table)
+    ### Estimate all pairwise differences between treatments
     contr <- data.frame(t(combn(names(coef(res_mod)), 2)))
     contr <- contrmat(contr, "X1", "X2")
     rownames(contr) <- paste(contr$X1, "-", contr$X2)
@@ -222,6 +222,9 @@
     sav <- predict(res_mod, newmods=contr)
     sav[["slab"]] <- rownames(contr)
     sav
+    
+    ### To-do: Create league table (create diagonal matrix from output sav)
+    lt_info_df <- as.data.frame(sav)
   
     ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
