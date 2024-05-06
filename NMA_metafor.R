@@ -12,7 +12,7 @@
   
   ## Install and load other required packages
   ##install.packages("pacman") 
-  pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr, janitor, naniar, igraph, multcomp, broom)
+  pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr, janitor, naniar, igraph, multcomp, broom, gridExtra)
 
 # Load (read) data (i.e., copy data to 'dat')
   #dat <- read_sheet("https://docs.google.com/spreadsheets/d/1bWugw06yFyetIVYlhAHHzM_d3KGhegxxLBm-5463j2Q/edit#gid=0") #Test data
@@ -39,7 +39,8 @@
   NMA_data %>% group_by(domain, wwc_rating) %>% count() %>% ungroup() %>% print(n= Inf)
   
   ## Replace all NA values in the moderators with 0 to avoid the "Processing terminated since k <= 1" error when including as moderators in the rma.mv function below executing the NMA.
-  NMA_data <- NMA_data %>% replace_na(list(NL_TX = 0, EX_TX...39 = 0, VF_TX = 0, FF_TX...61 = 0, RS_TX = 0))
+  #NMA_data <- NMA_data %>% replace_na(list(NL_TX = 0, EX_TX...39 = 0, VF_TX = 0, FF_TX...61 = 0, RS_TX = 0))
+  NMA_data <- NMA_data %>% replace_na(list(NL_TX = 0, VF_TX = 0, RS_TX = 0)) #To-do: Update once binary columns are finalized in sheet data.
   
 # Subset data following NMA analysis specifications
   
@@ -53,7 +54,8 @@
   ## Subset data for analysis 
   NMA_data_analysis_subset <- subset(NMA_data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") &
                                aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") &
-                               comparison_prelim=="BAU" & (NL_TX==1 | EX_TX...39==1 | VF_TX==1 | FF_TX...61 ==1 | RS_TX==1 )) 
+                               #comparison_prelim=="BAU" & (NL_TX==1 | EX_TX...39==1 | VF_TX==1 | FF_TX...61 ==1 | RS_TX==1 )) 
+                               comparison_prelim=="BAU" & (NL_TX ==1 | VF_TX ==1 | RS_TX ==1 )) #To-do: Update once binary columns are finalized in sheet data.
   
   ## Retabulate variables upon which to subset data to verify correct subset
   tabyl(NMA_data_analysis_subset$aggregated)
@@ -66,12 +68,14 @@
   tabyl(NMA_data_analysis_subset$intervention_prelim) #n=2 with intervention_prelim == <NA>
   NMA_data_analysis_subset %>% count()  # n= 273
 
-  NMA_data_analysis_subset_check <- subset(NMA_data_analysis_subset, is.na(intervention_prelim), select = c(sortcode, es_id, simple_number, record_id, contrast_id, intervention_prelim, comparison_prelim, intervention_n, comparison_n, NL_TX, EX_TX...39, VF_TX, F_TX, BX_TX, RS_TX))
+  #NMA_data_analysis_subset_check <- subset(NMA_data_analysis_subset, is.na(intervention_prelim), select = c(sortcode, es_id, simple_number, record_id, contrast_id, intervention_prelim, comparison_prelim, intervention_n, comparison_n, NL_TX, EX_TX...39, VF_TX, F_TX, BX_TX, RS_TX)) #To-do: Update once binary columns are finalized in sheet data.
+  NMA_data_analysis_subset_check <- subset(NMA_data_analysis_subset, is.na(intervention_prelim), select = c(sortcode, es_id, simple_number, record_id, contrast_id, intervention_prelim, comparison_prelim, intervention_n, comparison_n, NL_TX, VF_TX, F_TX, BX_TX, RS_TX))
   print(NMA_data_analysis_subset_check, n=Inf) 
 
   NMA_data_analysis_subset2 <- subset(NMA_data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") &
                                         aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") &
-                                        comparison_prelim=="BAU" & (NL_TX==1 | EX_TX...39==1 | VF_TX==1 | FF_TX...61==1 | RS_TX==1) &
+                                        #comparison_prelim=="BAU" & (NL_TX==1 | EX_TX...39==1 | VF_TX==1 | FF_TX...61==1 | RS_TX==1) &
+                                        comparison_prelim=="BAU" & (NL_TX ==1 | VF_TX ==1 | RS_TX ==1 ) & #To-do: Update once binary columns are finalized in sheet data.
                                         !is.na(intervention_prelim))
   tabyl(NMA_data_analysis_subset2$intervention_prelim) #n=0 with intervention_prelim == <NA>
   NMA_data_analysis_subset2 %>% count() # n= 271
@@ -166,7 +170,8 @@
   ## Add contrast matrix to dataset
   NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% drop_na(c(intervention_prelim, comparison_prelim)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
   NMA_data_analysis_subset_grpID <- contrmat(NMA_data_analysis_subset_grpID, grp1="intervention_prelim", grp2="comparison_prelim")
-  contrast_matrix_check <- NMA_data_analysis_subset_grpID %>% dplyr::select(intervention_prelim,comparison_prelim,EX:BAU)
+  #contrast_matrix_check <- NMA_data_analysis_subset_grpID %>% dplyr::select(intervention_prelim,comparison_prelim,EX:BAU)
+  contrast_matrix_check <- NMA_data_analysis_subset_grpID %>% dplyr::select(intervention_prelim,comparison_prelim,NL_TX:BAU) #To-do: Update once binary columns are finalized in sheet data.
   print(contrast_matrix_check)
   
   ## Calculate the variance-covariance matrix for multi-treatment studies
@@ -201,18 +206,12 @@
   tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
   res_mod <- rma.mv(effect_size, V_list, 
                      #mods = ~ intervention_prelim - 1,
-                     mods = ~ EX + EX.FF + EX.FF.RS + EX.RS + EX.VF.FF.RS + EX.VF.RS + FF + FF.RS + NL.EX.FF.RS + NL.EX.RS + NL.EX.VF.RS + NL.FF.RS + NL.RS + RS + VF.RSF - 1, 
+                     mods = ~ EX.FF.RS + EX.RS + EX.VF.FF.RS + EX.VF.RS + FF.RS + NL.EX.FF.RS + NL.EX.RS + NL.EX.VF.RS + NL.FF.RS + NL.RS + RS + VF.RS - 1, 
                      random = ~ 1 | record_id/es_id, 
                      rho=0.60, 
                      data=NMA_data_analysis_subset_grpID)
   summary(res_mod)
   #weights.rma.mv(res_mod)
-  forest(coef(res_mod), diag(vcov(res_mod)), slab=sub(".", " ", names(coef(res_mod)), fixed=TRUE),
-         #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention", top=2,
-         header="Intervention",
-         xlab="Difference in Standardized Mean Change (compared to BAU)")
-  #weights.rma.mv(res_mod)
-  forest(res_mod)
     
     ### Estimate all pairwise differences between treatments
     contr <- data.frame(t(combn(names(coef(res_mod)), 2)))
@@ -236,7 +235,8 @@
     
     ### Create table of p-values
     tab <- vec2mat(pvals, corr=FALSE)
-    tab[upper.tri(tab)] <- t((1 - tab)[upper.tri(tab)])
+    #tab[upper.tri(tab)] <- t((1 - tab)[upper.tri(tab)])
+    tab[lower.tri(tab)] <- t((1 - tab)[lower.tri(tab)])
     rownames(tab) <- colnames(tab) <- colnames(contr)
     round(tab, 2) # Like Table 2 in the following: https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/s12874-015-0060-8/tables/2
     
@@ -250,3 +250,55 @@
     res_mod_pscore <- res_mod_df %>% left_join(pscores_df, by = c("term"))
     res_mod_pscore <- res_mod_pscore %>% rename(intervention = term, se = std.error, zval = statistic, pval = p.value, ci.lb = conf.low, ci.ub = conf.high,  Pscore = V1)
     res_mod_pscore
+    
+    ### Create forest plot using metafor's built-in function
+    forest(coef(res_mod), diag(vcov(res_mod)), slab=sub(".", " ", names(coef(res_mod)), fixed=TRUE),
+           #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention", top=2,
+           header="Intervention",
+           xlab="Difference in Standardized Mean Change (compared to BAU)")
+    
+    ### Create forest plot using ggplot and add estimates, confidence intervals and Pscores
+    res_mod_pscore$colour <- rep(c("white", "gray95"), 6)
+    res_mod_pscore
+    res_mod_pscore_forest <- ggplot(res_mod_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
+      geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
+      geom_pointrange(shape = 22, fill = "black") +
+      geom_vline(xintercept = 1, linetype = 3) +
+      xlab("Difference in Standardized Mean Change (compared to BAU)") +
+      ylab("Intervention Bundle") +
+      theme_classic() +
+      scale_colour_identity() +
+      scale_y_discrete(limits = rev(res_mod_pscore$intervention)) +
+      #scale_x_log10(limits = c(-1.25, 2.25), 
+                    #breaks = c(0.25, 0.5, 1, 2, 4), 
+                    #labels = c("0.25", "0.5", "1", "2", "4"), expand = c(0,0)) +
+      theme(axis.text.y = element_blank(), axis.title.y = element_blank())
+    res_mod_pscore_forest
+    
+    res_mod_pscore2 <- res_mod_pscore
+    round_digits <- function(x) {
+      round(x, digits = 2)
+    }
+    convert_to_character <- function(x) {
+      as.character(x)
+    }
+    res_mod_pscore2[c("estimate","Pscore","ci.lb","ci.ub")] <- lapply(res_mod_pscore2[c("estimate","Pscore","ci.lb","ci.ub")], round_digits)
+    res_mod_pscore2[c("estimate","Pscore","ci.lb","ci.ub")] <- lapply(res_mod_pscore2[c("estimate","Pscore","ci.lb","ci.ub")], as.character)
+    res_mod_pscore2$ci.lb <- paste("(", res_mod_pscore2$ci.lb, " -", sep= "")
+    res_mod_pscore2$ci.ub <- paste(res_mod_pscore2$ci.ub, ")", sep= "")
+    res_mod_pscore2 <- res_mod_pscore2 %>% unite(estimate_cis, estimate, ci.lb, ci.ub, sep= " ", remove = FALSE )
+    res_mod_pscore2
+    
+    data_table <- ggplot(data = res_mod_pscore2, aes(y = intervention)) +
+      geom_hline(aes(yintercept = intervention, colour = colour), size = 7) +
+      geom_text(aes(x = 0, label = intervention), hjust = 0) +
+      geom_text(aes(x = 5, label = estimate_cis)) +
+      geom_text(aes(x = 7, label = Pscore), hjust = 1) +
+      scale_colour_identity() +
+      theme_void() + 
+      theme(plot.margin = margin(5, 0, 35, 0)) +
+      scale_y_discrete(limits = rev(res_mod_pscore$intervention)) 
+    data_table
+    
+    final_fp_nma <- grid.arrange(data_table, res_mod_pscore_forest, ncol=2)
+    final_fp_nma
