@@ -28,12 +28,16 @@ library(MuMIn)
   convert_to_character <- function(x) {
     as.character(x)
   }
-  NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab","publication_year")] <- lapply(NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab","publication_year")], convert_to_character)
+  NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab")] <- lapply(NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab")], convert_to_character)
   convert_to_factor <- function(x) {
     as.factor(x)
   }    
-  NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab","publication_year")] <- lapply(NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab","publication_year")], convert_to_factor)
-  
+  NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab")] <- lapply(NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab")], convert_to_factor)
+  tab_list_to_factor <- function(x) {
+    tabyl(x)
+  }
+  lapply(NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab")], tab_list_to_factor)
+
 #Create unique group ID for each independent group within a study (record ID)
 
   ##Keep only record ID, intervention/comparison bundle, intervention/comparison sample size 
