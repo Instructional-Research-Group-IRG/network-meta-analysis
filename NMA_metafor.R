@@ -206,9 +206,26 @@
     sav[["slab"]] <- rownames(contr)
     sav
     
-    ### To-do: Create league table (create diagonal matrix from output sav)
-    lt_info_df <- as.data.frame(sav)
-  
+    ### Create league table (create diagonal matrix from output sav)
+    lt_info_df <- as.data.frame(sav, optional = TRUE)
+    lt_info_df <- cbind(Comparison = rownames(lt_info_df), lt_info_df)
+    lt_info_df2 <- lt_info_df %>% separate_wider_delim(Comparison, delim = ' - ', names = c('comp1', 'comp2'))
+    round_digits <- function(x) {
+      round(x, digits = 2)
+    }
+    convert_to_character <- function(x) {
+      as.character(x)
+    }
+    lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], round_digits)
+    lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], as.character)
+    lt_info_df2$ci.lb <- paste("(", lt_info_df2$ci.lb, " -", sep= "")
+    lt_info_df2$ci.ub <- paste(lt_info_df2$ci.ub, ")", sep= "")
+    lt_info_df2 <- lt_info_df2 %>% unite(pred_cis, pred, ci.lb, ci.ub, sep= " ", remove = FALSE )
+    print(lt_info_df2)
+    lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis")
+    lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
+    print(lt_info_df3)
+    
     ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
     contr <- contrmat(contr, "X1", "X2", last="BAU", append=FALSE)
@@ -223,11 +240,11 @@
     rownames(tab) <- colnames(tab) <- colnames(contr)
     round(tab, 2) # Like Table 2 in the following: https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/s12874-015-0060-8/tables/2
     
-    ### Compute the P-scores:
+    ### Compute the P-scores
     pscores <- cbind(round(sort(apply(tab, 1, mean, na.rm=TRUE), decreasing=TRUE), 3))
     pscores
     
-    ### Add p-scores to model output object
+    ### Add P-scores to model output object
     res_mod_df <- tidy(res_mod, conf.int = TRUE)
     pscores_df <- cbind(term = rownames(pscores), as.data.frame(pscores))
     res_mod_pscore <- res_mod_df %>% left_join(pscores_df, by = c("term"))
