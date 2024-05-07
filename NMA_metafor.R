@@ -226,7 +226,7 @@
     lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
     print(lt_info_df3)
     write_csv(lt_info_df3, 'league_table.csv')
-    write_xlsx(lt_info_df3, 'league_table.xlsx')
+    #write_xlsx(lt_info_df3, 'league_table.xlsx')
     
     ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
