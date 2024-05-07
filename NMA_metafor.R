@@ -12,7 +12,7 @@
   
   ## Install and load other required packages
   ##install.packages("pacman") 
-  pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr, janitor, naniar, igraph, multcomp, broom, gridExtra)
+  pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr, janitor, naniar, igraph, multcomp, broom, gridExtra, ggplot2)
 
 # Load (read) data (i.e., copy data to 'dat')
   #dat <- read_sheet("https://docs.google.com/spreadsheets/d/1bWugw06yFyetIVYlhAHHzM_d3KGhegxxLBm-5463j2Q/edit#gid=0") #Test data
@@ -54,7 +54,7 @@
   ## Subset data for analysis 
   NMA_data_analysis_subset <- subset(NMA_data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") &
                                aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") &
-                               #comparison_prelim=="BAU" & (NL_TX==1 | EX_TX...39==1 | VF_TX==1 | FF_TX...61 ==1 | RS_TX==1 )) 
+                               #comparison_prelim=="BAU" & (NL_TX==1 | EX_TX==1 | VF_TX==1 | FF_TX...61 ==1 | RS_TX==1 )) 
                                comparison_prelim=="BAU" & (NL_TX ==1 | VF_TX ==1 | RS_TX ==1 )) #To-do: Update once binary columns are finalized in sheet data.
   
   ## Retabulate variables upon which to subset data to verify correct subset
@@ -63,22 +63,6 @@
   tabyl(NMA_data_analysis_subset$wwc_rating)  
   tabyl(NMA_data_analysis_subset$intervention_prelim)    
   tabyl(NMA_data_analysis_subset$comparison_prelim) 
-  
-  ## Check <NA> values in character variable intervention_prelim 
-  tabyl(NMA_data_analysis_subset$intervention_prelim) #n=2 with intervention_prelim == <NA>
-  NMA_data_analysis_subset %>% count()  # n= 273
-
-  #NMA_data_analysis_subset_check <- subset(NMA_data_analysis_subset, is.na(intervention_prelim), select = c(sortcode, es_id, simple_number, record_id, contrast_id, intervention_prelim, comparison_prelim, intervention_n, comparison_n, NL_TX, EX_TX...39, VF_TX, F_TX, BX_TX, RS_TX)) #To-do: Update once binary columns are finalized in sheet data.
-  NMA_data_analysis_subset_check <- subset(NMA_data_analysis_subset, is.na(intervention_prelim), select = c(sortcode, es_id, simple_number, record_id, contrast_id, intervention_prelim, comparison_prelim, intervention_n, comparison_n, NL_TX, VF_TX, F_TX, BX_TX, RS_TX))
-  print(NMA_data_analysis_subset_check, n=Inf) 
-
-  NMA_data_analysis_subset2 <- subset(NMA_data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") &
-                                        aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") &
-                                        #comparison_prelim=="BAU" & (NL_TX==1 | EX_TX...39==1 | VF_TX==1 | FF_TX...61==1 | RS_TX==1) &
-                                        comparison_prelim=="BAU" & (NL_TX ==1 | VF_TX ==1 | RS_TX ==1 ) & #To-do: Update once binary columns are finalized in sheet data.
-                                        !is.na(intervention_prelim))
-  tabyl(NMA_data_analysis_subset2$intervention_prelim) #n=0 with intervention_prelim == <NA>
-  NMA_data_analysis_subset2 %>% count() # n= 271
 
 # Create unique group ID for each independent group within a study (record ID)
   
@@ -235,7 +219,6 @@
     
     ### Create table of p-values
     tab <- vec2mat(pvals, corr=FALSE)
-    #tab[upper.tri(tab)] <- t((1 - tab)[upper.tri(tab)])
     tab[lower.tri(tab)] <- t((1 - tab)[lower.tri(tab)])
     rownames(tab) <- colnames(tab) <- colnames(contr)
     round(tab, 2) # Like Table 2 in the following: https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/s12874-015-0060-8/tables/2
@@ -257,48 +240,58 @@
            header="Intervention",
            xlab="Difference in Standardized Mean Change (compared to BAU)")
     
-    ### Create forest plot using ggplot and add estimates, confidence intervals and Pscores
-    res_mod_pscore$colour <- rep(c("white", "gray95"), 6)
-    res_mod_pscore
-    res_mod_pscore_forest <- ggplot(res_mod_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
-      geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
-      geom_pointrange(shape = 22, fill = "black") +
-      geom_vline(xintercept = 1, linetype = 3) +
-      xlab("Difference in Standardized Mean Change (compared to BAU)") +
-      ylab("Intervention Bundle") +
-      theme_classic() +
-      scale_colour_identity() +
-      scale_y_discrete(limits = rev(res_mod_pscore$intervention)) +
-      #scale_x_log10(limits = c(-1.25, 2.25), 
-                    #breaks = c(0.25, 0.5, 1, 2, 4), 
-                    #labels = c("0.25", "0.5", "1", "2", "4"), expand = c(0,0)) +
-      theme(axis.text.y = element_blank(), axis.title.y = element_blank())
-    res_mod_pscore_forest
+    ### Create forest plot using ggplot
+      
+      #### First create plot of estimates and confidence intervals
+      res_mod_pscore$colour <- rep(c("white", "gray95"), 6)
+      res_mod_pscore
+      res_mod_pscore_forest <- ggplot(res_mod_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
+        geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
+        geom_pointrange(shape = 22, fill = "black") +
+        geom_vline(xintercept = 1, linetype = 3) +
+        xlab("Difference in Standardized Mean Change (compared to BAU) with 95% Confidence Interval") +
+        ylab("Intervention Bundle") +
+        theme_classic() +
+        scale_colour_identity() +
+        scale_y_discrete(limits = rev(res_mod_pscore$intervention)) +
+        #scale_x_log10(limits = c(-1.25, 2.25), 
+                      #breaks = c(0.25, 0.5, 1, 2, 4), 
+                      #labels = c("0.25", "0.5", "1", "2", "4"), expand = c(0,0)) +
+        theme(axis.text.y = element_blank(), axis.title.y = element_blank())
+      res_mod_pscore_forest
+      
+      #### Next create data table for merging with above plot with estimates and confidence intervals combined in one column
+      res_mod_pscore2 <- res_mod_pscore
+      round_digits <- function(x) {
+        round(x, digits = 2)
+      }
+      convert_to_character <- function(x) {
+        as.character(x)
+      }
+      res_mod_pscore2[c("estimate","Pscore","ci.lb","ci.ub")] <- lapply(res_mod_pscore2[c("estimate","Pscore","ci.lb","ci.ub")], round_digits)
+      res_mod_pscore2[c("estimate","Pscore","ci.lb","ci.ub")] <- lapply(res_mod_pscore2[c("estimate","Pscore","ci.lb","ci.ub")], as.character)
+      
+      res_mod_pscore2$ci.lb <- paste("(", res_mod_pscore2$ci.lb, " -", sep= "")
+      res_mod_pscore2$ci.ub <- paste(res_mod_pscore2$ci.ub, ")", sep= "")
+      res_mod_pscore2 <- res_mod_pscore2 %>% unite(estimate_cis, estimate, ci.lb, ci.ub, sep= " ", remove = FALSE )
+      print(res_mod_pscore2)
     
-    res_mod_pscore2 <- res_mod_pscore
-    round_digits <- function(x) {
-      round(x, digits = 2)
-    }
-    convert_to_character <- function(x) {
-      as.character(x)
-    }
-    res_mod_pscore2[c("estimate","Pscore","ci.lb","ci.ub")] <- lapply(res_mod_pscore2[c("estimate","Pscore","ci.lb","ci.ub")], round_digits)
-    res_mod_pscore2[c("estimate","Pscore","ci.lb","ci.ub")] <- lapply(res_mod_pscore2[c("estimate","Pscore","ci.lb","ci.ub")], as.character)
-    res_mod_pscore2$ci.lb <- paste("(", res_mod_pscore2$ci.lb, " -", sep= "")
-    res_mod_pscore2$ci.ub <- paste(res_mod_pscore2$ci.ub, ")", sep= "")
-    res_mod_pscore2 <- res_mod_pscore2 %>% unite(estimate_cis, estimate, ci.lb, ci.ub, sep= " ", remove = FALSE )
-    res_mod_pscore2
-    
-    data_table <- ggplot(data = res_mod_pscore2, aes(y = intervention)) +
-      geom_hline(aes(yintercept = intervention, colour = colour), size = 7) +
-      geom_text(aes(x = 0, label = intervention), hjust = 0) +
-      geom_text(aes(x = 5, label = estimate_cis)) +
-      geom_text(aes(x = 7, label = Pscore), hjust = 1) +
-      scale_colour_identity() +
-      theme_void() + 
-      theme(plot.margin = margin(5, 0, 35, 0)) +
-      scale_y_discrete(limits = rev(res_mod_pscore$intervention)) 
-    data_table
-    
-    final_fp_nma <- grid.arrange(data_table, res_mod_pscore_forest, ncol=2)
-    final_fp_nma
+      LfLabels<-data.frame(x=c(0,4.5,6.75),
+                           y=c(rep(length(unique(res_mod_pscore2$estimate))-0.2,times=3)),
+                           lab=c("Intervention","Estimate (95% CI)","P-score"))
+      
+      data_table <- ggplot(data = res_mod_pscore2, aes(y = intervention)) +
+        geom_hline(aes(yintercept = intervention, colour = colour), size = 7) +
+        geom_text(aes(x = 0, label = intervention), hjust = 0) +
+        geom_text(aes(x = 5, label = estimate_cis)) +
+        geom_text(aes(x = 7, label = Pscore), hjust = 1) +
+        geom_text(data=LfLabels,aes(x,y,label=lab, fontface="bold"), vjust=-10, hjust=0, size=4, size=4) +
+        scale_colour_identity() +
+        theme_void() + 
+        theme(plot.margin = margin(5, 0, 35, 0)) +
+        scale_y_discrete(limits = rev(res_mod_pscore$intervention)) 
+      data_table
+      
+      #### Finally, merge plot and datatable for final forest plot
+      final_fp_nma <- grid.arrange(data_table, res_mod_pscore_forest, ncol=2)
+      final_fp_nma
