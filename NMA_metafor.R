@@ -276,9 +276,10 @@
       res_mod_pscore2 <- res_mod_pscore2 %>% unite(estimate_cis, estimate, ci.lb, ci.ub, sep= " ", remove = FALSE )
       print(res_mod_pscore2)
     
-      LfLabels<-data.frame(x=c(0,4.5,6.75),
+      LfLabels<-data.frame(x=c(0,4.1,6.5),
                            y=c(rep(length(unique(res_mod_pscore2$estimate))-0.2,times=3)),
                            lab=c("Intervention","Estimate (95% CI)","P-score"))
+      LfLabels
       
       data_table <- ggplot(data = res_mod_pscore2, aes(y = intervention)) +
         geom_hline(aes(yintercept = intervention, colour = colour), size = 7) +
