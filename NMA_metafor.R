@@ -259,11 +259,10 @@
     ### Create forest plot using ggplot
       
       #### First create plot of estimates and confidence intervals
-      #res_mod_pscore$colour <- rep(c("white", "gray95"), 5.5)
+      res_mod_pscore$colour <- rep(c("white", "gray95","white", "gray95","white", "gray95","white", "gray95","white", "gray95","white"))
       res_mod_pscore
       res_mod_pscore_forest <- ggplot(res_mod_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
-        #geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
-        geom_hline(aes(yintercept = intervention), size=7) +
+        geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
         geom_pointrange(shape = 22, fill = "black") +
         geom_vline(xintercept = 1, linetype = 3) +
         xlab("Difference in Standardized Mean Change (compared to BAU) with 95% Confidence Interval") +
@@ -298,12 +297,11 @@
       LfLabels
       
       data_table <- ggplot(data = res_mod_pscore2, aes(y = intervention)) +
-        #geom_hline(aes(yintercept = intervention, colour = colour), size = 7) +
-        geom_hline(aes(yintercept = intervention), size = 7) +
+        geom_hline(aes(yintercept = intervention, colour = colour), size = 7) +
         geom_text(aes(x = 0, label = intervention), hjust = 0) +
         geom_text(aes(x = 5, label = estimate_cis)) +
         geom_text(aes(x = 7, label = Pscore), hjust = 1) +
-        geom_text(data=LfLabels,aes(x,y,label=lab, fontface="bold"), vjust=-10, hjust=0, size=4, size=4) +
+        geom_text(data=LfLabels,aes(x,y,label=lab, fontface="bold"), vjust=-3, hjust=0, size=4, size=4) +
         scale_colour_identity() +
         theme_void() + 
         theme(plot.margin = margin(5, 0, 35, 0)) +
