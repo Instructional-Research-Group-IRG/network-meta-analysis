@@ -51,7 +51,7 @@
   tabyl(NNMA_Data$comparison_prelim) 
   
   ## Subset data for analysis 
-  NMA_data_analysis_subset <- subset(NNMA_Data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") & aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") & TvsT==0)
+  NMA_data_analysis_subset <- subset(NNMA_Data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") & aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR"))
   
   ## Retabulate variables upon which to subset data to verify correct subset
   tabyl(NMA_data_analysis_subset$aggregated)
@@ -200,8 +200,6 @@
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
   res_mod <- rma.mv(effect_size, V_list, 
-                     #mods = ~ intervention_prelim - 1,
-                     #mods = ~ EX.FF.RS + EX.RS + EX.VF.FF.RS + EX.VF.RS + FF.RS + NL.EX.FF.RS + NL.EX.RS + NL.EX.VF.RS + NL.FF.RS + NL.RS + RS + VF.RS - 1, 
                      mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + NL.TES.FF.RS + NL.TES.RS + NL.TES.VF.RS + RS + TES.VF.RS + VF.FF.RS + VF.RS - 1, 
                      random = ~ 1 | record_id/es_id, 
                      rho=0.60, 
@@ -269,7 +267,7 @@
     forest(coef(res_mod), diag(vcov(res_mod)), slab=sub(".", " ", names(coef(res_mod)), fixed=TRUE),
            #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention", top=2,
            header="Intervention",
-           xlab="Difference in Standardized Mean Change (compared to BAU)")
+           xlab="Difference in Standardized Mean Change")
     
     ### Create forest plot using ggplot
       
