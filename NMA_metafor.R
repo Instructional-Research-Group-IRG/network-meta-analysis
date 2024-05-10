@@ -199,6 +199,7 @@
 
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)  
   res_mod <- rma.mv(effect_size, V_list, 
                      mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + NL.TES.FF.RS + NL.TES.RS + NL.TES.VF.RS + RS + TES.VF.RS + VF.FF.RS + VF.RS - 1, 
                      random = ~ 1 | record_id/es_id, 
@@ -232,7 +233,7 @@
     lt_info_df2$ci.ub <- paste(lt_info_df2$ci.ub, ")", sep= "")
     lt_info_df2 <- lt_info_df2 %>% unite(pred_cis, pred, ci.lb, ci.ub, sep= " ", remove = FALSE )
     print(lt_info_df2)
-    lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis")
+    lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #To-do: possible to format ci below? + color code by sig
     lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
     print(lt_info_df3)
     write_csv(lt_info_df3, 'league_table.csv')
@@ -276,8 +277,8 @@
       res_mod_pscore
       res_mod_pscore_forest <- ggplot(res_mod_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
         geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
-        geom_pointrange(shape = 22, fill = "black") +
-        geom_vline(xintercept = 1, linetype = 3) +
+        geom_pointrange(shape = 22, fill = "black") + # To-do: add size argument
+        geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change with 95% Confidence Interval") +
         ylab("Intervention Bundle") +
         theme_classic() +
