@@ -278,7 +278,7 @@
         geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
         geom_pointrange(shape = 22, fill = "black") +
         geom_vline(xintercept = 1, linetype = 3) +
-        xlab("Difference in Standardized Mean Change (compared to BAU) with 95% Confidence Interval") +
+        xlab("Difference in Standardized Mean Change with 95% Confidence Interval") +
         ylab("Intervention Bundle") +
         theme_classic() +
         scale_colour_identity() +
