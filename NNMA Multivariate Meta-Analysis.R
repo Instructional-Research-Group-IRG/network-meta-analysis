@@ -1053,8 +1053,6 @@
   }
   lapply(NNMA_Data_Subset_grpID[c("group_size_category","grade_level","ongoing_training","research_lab")], tab_list_to_factor)  
   
-  
-
   ##Replace all NA values in the moderators with 0 to avoid observations being dropped from the analysis.
   NNMA_Data_Subset_grpID <- NNMA_Data_Subset_grpID %>% replace_na(list(NL_TX = 0, TES_TX = 0, VF_TX = 0, RS_TX = 0, FF_TX...62 = 0, N_TX = 0))
   
