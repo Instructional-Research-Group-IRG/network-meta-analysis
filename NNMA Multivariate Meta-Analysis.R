@@ -1042,7 +1042,7 @@
     as.character(x)
   }
   NNMA_Data_Subset_grpID[c("group_size_category","grade_level","ongoing_training","research_lab")] <- lapply(NNMA_Data_Subset_grpID[c("group_size_category","grade_level","ongoing_training","research_lab")], convert_to_character)
-  NNMA_Data_Subset_grpID$grade_level <- gsub("4, 5", "4", NNMA_Data_Subset_grpID$grade_level)
+  #NNMA_Data_Subset_grpID$grade_level <- gsub("4, 5", "4", NNMA_Data_Subset_grpID$grade_level)
   NNMA_Data_Subset_grpID$grade_level <- as.numeric(NNMA_Data_Subset_grpID$grade_level)
   convert_to_factor <- function(x) {
     as.factor(x)

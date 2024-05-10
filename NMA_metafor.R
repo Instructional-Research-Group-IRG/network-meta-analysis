@@ -16,42 +16,42 @@
 
 # Load (read) data (i.e., copy data to 'dat')
   #dat <- read_sheet("https://docs.google.com/spreadsheets/d/1bWugw06yFyetIVYlhAHHzM_d3KGhegxxLBm-5463j2Q/edit#gid=0") #Test data
-  NMA_data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_mN43K7HH3C7WhsPMnPsB1HDuRLE4/edit#gid=0") #Full data set
-  NMA_data %>% count()
-  tabyl(NMA_data$record_id)
-  ##NMA_data <- subset(NMA_data, !is.na(record_id)) #There are no true rows after row 608 (not counting the headers/column names as row 1). Those after row 608 are loaded in despite having no record IDs because column C is filled out with "FALSE" after row 608 (artifact of the Excel function in the cells of that column).
-  ##NMA_data %>% count()
-  ##assert_values(NMA_data, colnames= c("record_id"), test = "not_na", test_val = "NA")
+  NNMA_Data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_mN43K7HH3C7WhsPMnPsB1HDuRLE4/edit#gid=0") #Full data set
+  NNMA_Data %>% count()
+  tabyl(NNMA_Data$record_id)
+  ##NNMA_Data <- subset(NNMA_Data, !is.na(record_id)) #There are no true rows after row 608 (not counting the headers/column names as row 1). Those after row 608 are loaded in despite having no record IDs because column C is filled out with "FALSE" after row 608 (artifact of the Excel function in the cells of that column).
+  ##NNMA_Data %>% count()
+  ##assert_values(NNMA_Data, colnames= c("record_id"), test = "not_na", test_val = "NA")
   
 # Explore data  
-  head(NMA_data)
-  skim(NMA_data)
+  head(NNMA_Data)
+  skim(NNMA_Data)
   
   ## Check for full duplicates
-  dups <- anyDuplicated(NMA_data)
+  dups <- anyDuplicated(NNMA_Data)
   assert("assert no duplicate entries", dups == 0) #No full duplicates. Data already in wide format.
 
   ## Review outcome measures by domain
-  NMA_data %>% count(domain, measure_name) %>% print(n= Inf)
+  NNMA_Data %>% count(domain, measure_name) %>% print(n= Inf)
     
   ## Check ratings
-  NMA_data %>% group_by(wwc_rating) %>% count() %>% ungroup()
-  NMA_data %>% group_by(domain, wwc_rating) %>% count() %>% ungroup() %>% print(n= Inf)
+  NNMA_Data %>% group_by(wwc_rating) %>% count() %>% ungroup()
+  NNMA_Data %>% group_by(domain, wwc_rating) %>% count() %>% ungroup() %>% print(n= Inf)
   
   ## Replace all NA values in the moderators with 0 to avoid the "Processing terminated since k <= 1" error when including as moderators in the rma.mv function below executing the NMA.
-  #NMA_data <- NMA_data %>% replace_na(list(NL_TX = 0, EX_TX = 0, VF_TX = 0, FF_TX = 0, RS_TX = 0))
+  #NNMA_Data <- NNMA_Data %>% replace_na(list(NL_TX = 0, EX_TX = 0, VF_TX = 0, FF_TX = 0, RS_TX = 0))
  
 # Subset data following NMA analysis specifications
   
   ## Tabulate variables upon which to subset data
-  tabyl(NMA_data$aggregated)
-  tabyl(NMA_data$measure_type)
-  tabyl(NMA_data$wwc_rating)  
-  tabyl(NMA_data$intervention_prelim)    
-  tabyl(NMA_data$comparison_prelim) 
+  tabyl(NNMA_Data$aggregated)
+  tabyl(NNMA_Data$measure_type)
+  tabyl(NNMA_Data$wwc_rating)  
+  tabyl(NNMA_Data$intervention_prelim)    
+  tabyl(NNMA_Data$comparison_prelim) 
   
   ## Subset data for analysis 
-  NMA_data_analysis_subset <- subset(NMA_data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") & aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") & TvsT==0)
+  NMA_data_analysis_subset <- subset(NNMA_Data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") & aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") & TvsT==0)
   
   ## Retabulate variables upon which to subset data to verify correct subset
   tabyl(NMA_data_analysis_subset$aggregated)
@@ -169,6 +169,21 @@
   tabyl(NMA_data_analysis_subset_grpID$dosage_weekly_freq)
   class(NMA_data_analysis_subset_grpID$dosage_weekly_freq) 
   
+  convert_to_character <- function(x) {
+    as.character(x)
+  }
+  NMA_data_analysis_subset_grpID[c("group_size_category","grade_level","ongoing_training","research_lab")] <- lapply(NMA_data_analysis_subset_grpID[c("group_size_category","grade_level","ongoing_training","research_lab")], convert_to_character)
+  #NMA_data_analysis_subset_grpID$grade_level <- gsub("4, 5", "4", NMA_data_analysis_subset_grpID$grade_level)
+  NMA_data_analysis_subset_grpID$grade_level <- as.numeric(NMA_data_analysis_subset_grpID$grade_level)
+  convert_to_factor <- function(x) {
+    as.factor(x)
+  }    
+  NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab")] <- lapply(NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab")], convert_to_factor)
+  tab_list_to_factor <- function(x) {
+    tabyl(x)
+  }
+  lapply(NMA_data_analysis_subset_grpID[c("group_size_category","grade_level","ongoing_training","research_lab")], tab_list_to_factor) 
+  
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition 
   
   ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
@@ -180,7 +195,7 @@
          data=NMA_data_analysis_subset_grpID)
   summary(res)
   #weights.rma.mv(res)
-  forest(res)
+  #forest(res)
 
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
