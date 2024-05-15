@@ -309,8 +309,8 @@
       data_table
       
       #### Finally, merge plot and datatable for final forest plot
-      final_fp_nma <- grid.arrange(data_table, res_mod_pscore_forest, ncol=2)
-      final_fp_nma
+      final_fp_nma_dall <- grid.arrange(data_table, res_mod_pscore_forest, ncol=2)
+      final_fp_nma_dall
     
     ### Create network graph
     
@@ -321,14 +321,16 @@
     ###       groups for the creation of the (weighted) edges of the network graph.
     
       #### Review data in contrast-based wide format before reshape for comparison with data after reshape (as a desk check)
-      NMA_data_analysis_subset$contrast_id <- as.character(NMA_data_analysis_subset$contrast_id)
       NMA_data_analysis_subset2 <- NMA_data_analysis_subset_grpID %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size)
       print(NMA_data_analysis_subset2) #Example rows of the contrast-based wide format. Compare to the long format printed below.
       
-      #### Each unique contrast within each unique study should only be counted once when weighting the network connections between each unique contrast combination of intervention and comparison in the network graph.
+      #### Each unique contrast within each unique study should only be counted once when weighting the network connections between each unique contrast combination of intervention versus comparison in the network graph.
       #### Because there can be multiple measures within multiple domains within each unique contrast within each unique study, we need reduce the data set to one observation per unique contrast within each unique study 
       #### so that a contrast with more domains/measures than another contrast is not overweighted in the visualization of the network connections (re the relative thicknesses of the "edges" between the I/C nodes in the network graph).
+      NMA_data_analysis_subset_grpID %>% count(record_id, contrast_id)
       NMA_data_analysis_subset3 <- NMA_data_analysis_subset_grpID %>% distinct(record_id, contrast_id, .keep_all = TRUE)
+      NMA_data_analysis_subset3 %>% count(record_id, contrast_id)
+      NMA_data_analysis_subset3 %>% count()
       NMA_data_analysis_subset4 <- NMA_data_analysis_subset3 %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size)
       NMA_data_analysis_subset4 <- NMA_data_analysis_subset4 %>% unite("int_comp_prelim" , c(intervention_prelim,comparison_prelim), remove = FALSE)
       tabyl(NMA_data_analysis_subset4$int_comp_prelim) #The relative number of observations (n) for the intervention_BAU contrasts in this table should match the relative thicknesses of the lines (called "edges") in the network graph.
@@ -505,8 +507,8 @@
       data_table
           
       #### Finally, merge plot and datatable for final forest plot
-      final_fp_nma <- grid.arrange(data_table, res_mod_d1gma_pscore_forest, ncol=2)
-      final_fp_nma
+      final_fp_nma_d1gma <- grid.arrange(data_table, res_mod_d1gma_pscore_forest, ncol=2)
+      final_fp_nma_d1gma
         
     ### Create network graph
       
@@ -517,14 +519,16 @@
     ###       groups for the creation of the (weighted) edges of the network graph.
       
       #### Review data in contrast-based wide format before reshape for comparison with data after reshape (as a desk check)
-      NMA_data_analysis_subset$contrast_id <- as.character(NMA_data_analysis_subset$contrast_id)
       NMA_data_analysis_subset2 <- NMA_data_analysis_subset_grpID_d1gma %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size)
       print(NMA_data_analysis_subset2) #Example rows of the contrast-based wide format. Compare to the long format printed below.
       
-      #### Each unique contrast within each unique study should only be counted once when weighting the network connections between each unique contrast combination of intervention and comparison in the network graph.
+      #### Each unique contrast within each unique study should only be counted once when weighting the network connections between each unique contrast combination of intervention versus comparison in the network graph.
       #### Because there can be multiple measures within multiple domains within each unique contrast within each unique study, we need reduce the data set to one observation per unique contrast within each unique study 
       #### so that a contrast with more domains/measures than another contrast is not overweighted in the visualization of the network connections (re the relative thicknesses of the "edges" between the I/C nodes in the network graph).
+      NMA_data_analysis_subset_grpID_d1gma %>% count(record_id, contrast_id)
       NMA_data_analysis_subset3 <- NMA_data_analysis_subset_grpID_d1gma %>% distinct(record_id, contrast_id, .keep_all = TRUE)
+      NMA_data_analysis_subset3 %>% count(record_id, contrast_id)
+      NMA_data_analysis_subset3 %>% count()
       NMA_data_analysis_subset4 <- NMA_data_analysis_subset3 %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size)
       NMA_data_analysis_subset4 <- NMA_data_analysis_subset4 %>% unite("int_comp_prelim" , c(intervention_prelim,comparison_prelim), remove = FALSE)
       tabyl(NMA_data_analysis_subset4$int_comp_prelim) #The relative number of observations (n) for the intervention_BAU contrasts in this table should match the relative thicknesses of the lines (called "edges") in the network graph.
@@ -701,8 +705,8 @@
       data_table
       
       #### Finally, merge plot and datatable for final forest plot
-      final_fp_nma <- grid.arrange(data_table, res_mod_d2rn_pscore_forest, ncol=2)
-      final_fp_nma
+      final_fp_nma_d2rn <- grid.arrange(data_table, res_mod_d2rn_pscore_forest, ncol=2)
+      final_fp_nma_d2rn
       
     ### Create network graph
       
@@ -713,14 +717,16 @@
     ###       groups for the creation of the (weighted) edges of the network graph.
       
       #### Review data in contrast-based wide format before reshape for comparison with data after reshape (as a desk check)
-      NMA_data_analysis_subset$contrast_id <- as.character(NMA_data_analysis_subset$contrast_id)
       NMA_data_analysis_subset2 <- NMA_data_analysis_subset_grpID_d2rn %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size)
       print(NMA_data_analysis_subset2) #Example rows of the contrast-based wide format. Compare to the long format printed below.
       
       #### Each unique contrast within each unique study should only be counted once when weighting the network connections between each unique contrast combination of intervention and comparison in the network graph.
       #### Because there can be multiple measures within multiple domains within each unique contrast within each unique study, we need reduce the data set to one observation per unique contrast within each unique study 
       #### so that a contrast with more domains/measures than another contrast is not overweighted in the visualization of the network connections (re the relative thicknesses of the "edges" between the I/C nodes in the network graph).
+      NMA_data_analysis_subset_grpID_d2rn %>% count(record_id, contrast_id)      
       NMA_data_analysis_subset3 <- NMA_data_analysis_subset_grpID_d2rn %>% distinct(record_id, contrast_id, .keep_all = TRUE)
+      NMA_data_analysis_subset3 %>% count(record_id, contrast_id)
+      NMA_data_analysis_subset3 %>% count()
       NMA_data_analysis_subset4 <- NMA_data_analysis_subset3 %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size)
       NMA_data_analysis_subset4 <- NMA_data_analysis_subset4 %>% unite("int_comp_prelim" , c(intervention_prelim,comparison_prelim), remove = FALSE)
       tabyl(NMA_data_analysis_subset4$int_comp_prelim) #The relative number of observations (n) for the intervention_BAU contrasts in this table should match the relative thicknesses of the lines (called "edges") in the network graph.
@@ -897,8 +903,8 @@
       data_table
       
       #### Finally, merge plot and datatable for final forest plot
-      final_fp_nma <- grid.arrange(data_table, res_mod_d3wn_pscore_forest, ncol=2)
-      final_fp_nma
+      final_fp_nma_d3wn <- grid.arrange(data_table, res_mod_d3wn_pscore_forest, ncol=2)
+      final_fp_nma_d3wn
       
     ### Create network graph
       
@@ -909,14 +915,16 @@
     ###       groups for the creation of the (weighted) edges of the network graph.
       
       #### Review data in contrast-based wide format before reshape for comparison with data after reshape (as a desk check)
-      NMA_data_analysis_subset$contrast_id <- as.character(NMA_data_analysis_subset$contrast_id)
       NMA_data_analysis_subset2 <- NMA_data_analysis_subset_grpID_d3wn %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size)
       print(NMA_data_analysis_subset2) #Example rows of the contrast-based wide format. Compare to the long format printed below.
       
       #### Each unique contrast within each unique study should only be counted once when weighting the network connections between each unique contrast combination of intervention and comparison in the network graph.
       #### Because there can be multiple measures within multiple domains within each unique contrast within each unique study, we need reduce the data set to one observation per unique contrast within each unique study 
       #### so that a contrast with more domains/measures than another contrast is not overweighted in the visualization of the network connections (re the relative thicknesses of the "edges" between the I/C nodes in the network graph).
+      NMA_data_analysis_subset_grpID_d3wn %>% count(record_id, contrast_id)      
       NMA_data_analysis_subset3 <- NMA_data_analysis_subset_grpID_d3wn %>% distinct(record_id, contrast_id, .keep_all = TRUE)
+      NMA_data_analysis_subset3 %>% count(record_id, contrast_id)
+      NMA_data_analysis_subset3 %>% count()
       NMA_data_analysis_subset4 <- NMA_data_analysis_subset3 %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size)
       NMA_data_analysis_subset4 <- NMA_data_analysis_subset4 %>% unite("int_comp_prelim" , c(intervention_prelim,comparison_prelim), remove = FALSE)
       tabyl(NMA_data_analysis_subset4$int_comp_prelim) #The relative number of observations (n) for the intervention_BAU contrasts in this table should match the relative thicknesses of the lines (called "edges") in the network graph.
