@@ -17,19 +17,18 @@
 # Load (read) data (i.e., copy data to 'dat')
   #dat <- read_sheet("https://docs.google.com/spreadsheets/d/1bWugw06yFyetIVYlhAHHzM_d3KGhegxxLBm-5463j2Q/edit#gid=0") #Test data
   NNMA_Data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_mN43K7HH3C7WhsPMnPsB1HDuRLE4/edit#gid=0") #Full data set
-  NNMA_Data %>% count()
-  tabyl(NNMA_Data$record_id)
 
   ## Explore data  
+  NNMA_Data %>% count()
   head(NNMA_Data)
   skim(NNMA_Data)
+  NNMA_Data$contrast_id <- as.character(NNMA_Data$contrast_id)
+  NNMA_Data %>% count(record_id, contrast_id) %>% print(n= Inf)
+  NNMA_Data %>% count(domain, measure_name) %>% print(n= Inf)
   
   ## Check for full duplicates
   dups <- anyDuplicated(NNMA_Data)
   assert("assert no duplicate entries", dups == 0) #No full duplicates. Data already in wide format.
-
-  ## Review outcome measures by domain
-  NNMA_Data %>% count(domain, measure_name) %>% print(n= Inf)
     
   ## Check ratings
   NNMA_Data %>% group_by(wwc_rating) %>% count() %>% ungroup()
@@ -135,6 +134,7 @@
   NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% replace_with_na_at(.vars = c("intervention_prelim","comparison_prelim"), condition = ~.x %in% common_na_strings)
   tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)
+  NMA_data_analysis_subset_grpID %>% count()
 
 # Additional modifications to NMA subset analysis data for running NMA with metafor  
   
@@ -143,7 +143,7 @@
   convert_to_character <- function(x) {
     as.character(x)
   }
-  NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq","contrast_id")] <- lapply(NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq","contrast_id")], convert_to_character)
+  NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq")] <- lapply(NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq")], convert_to_character)
   convert_to_factor <- function(x) {
     as.factor(x)
   }  
@@ -167,12 +167,12 @@
   tabyl(NMA_data_analysis_subset_grpID$domain)
   class(NMA_data_analysis_subset_grpID$domain)
   
-# Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: all 3 domains 
+# Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: all domains (n=3)
   
   ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
   
   ## Add contrast matrix to dataset
-  NMA_data_analysis_subset_grpID_alldomains <- NMA_data_analysis_subset_grpID
+  NMA_data_analysis_subset_grpID_alldomains <- NMA_data_analysis_subset_grpID # Preserving the original analysis data frame for filtering by domain farther below considering we manipulate NMA_data_analysis_subset_grpID just below for the NMA including all domains.
   NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% drop_na(c(intervention_prelim, comparison_prelim)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
   NMA_data_analysis_subset_grpID <- contrmat(NMA_data_analysis_subset_grpID, grp1="intervention_prelim", grp2="comparison_prelim")
   str(NMA_data_analysis_subset_grpID)
@@ -182,6 +182,10 @@
   V_list   
 
   ##Run standard NMA with the unique interventions bundles as moderators  
+  tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)
+  check_dall <- NMA_data_analysis_subset_grpID %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
+  print(check_dall)
   res_mod <- rma.mv(effect_size, V_list, 
                     mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + NL.TES.FF.RS + NL.TES.RS + NL.TES.VF.RS + RS + TES.VF.RS + VF.FF.RS + VF.RS - 1, 
                     random = ~ 1 | record_id/es_id, 
@@ -218,8 +222,8 @@
     lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #To-do: possible to format ci below? + color code by sig
     lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
     print(lt_info_df3)
-    write_csv(lt_info_df3, 'league_table.csv')
-    #write_xlsx(lt_info_df3, 'league_table.xlsx')
+    write_csv(lt_info_df3, 'league_table_all domains.csv')
+    #write_xlsx(lt_info_df3, 'league_table_all domains.xlsx')
     
     ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
@@ -247,10 +251,10 @@
     res_mod_pscore
     
     ### Create forest plot using metafor's built-in function
-    forest(coef(res_mod), diag(vcov(res_mod)), slab=sub(".", " ", names(coef(res_mod)), fixed=TRUE),
-           #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention", top=2,
-           header="Intervention",
-           xlab="Difference in Standardized Mean Change")
+    # forest(coef(res_mod), diag(vcov(res_mod)), slab=sub(".", " ", names(coef(res_mod)), fixed=TRUE),
+    #        #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention", top=2,
+    #        header="Intervention",
+    #        xlab="Difference in Standardized Mean Change")
     
     ### Create forest plot using ggplot
     
@@ -259,7 +263,7 @@
       res_mod_pscore
       res_mod_pscore_forest <- ggplot(res_mod_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
         geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
-        geom_pointrange(shape = 22, fill = "black") + # To-do: add size argument
+        geom_pointrange(shape = 22, fill = "black", size = res_mod_pscore$estimate) +
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change with 95% Confidence Interval") +
         ylab("Intervention Bundle") +
@@ -375,6 +379,9 @@
       
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID_d1gma$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID_d1gma$comparison_prelim)
+  check_d1gma <- NMA_data_analysis_subset_grpID_d1gma %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
+  print(check_d1gma)
   res_mod_d1gma <- rma.mv(effect_size, V_list, 
                         mods = ~ FF + FF.RS + NL.RS + RS + VF.RS - 1, 
                         random = ~ 1 | record_id/es_id, 
@@ -411,8 +418,8 @@
     lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #To-do: possible to format ci below? + color code by sig
     lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
     print(lt_info_df3)
-    write_csv(lt_info_df3, 'league_table.csv')
-    #write_xlsx(lt_info_df3, 'league_table.xlsx')
+    write_csv(lt_info_df3, 'league_table_d1gma.csv')
+    #write_xlsx(lt_info_df3, 'league_table_d1gma.xlsx')
     
     ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod_d1gma)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
@@ -440,10 +447,10 @@
     res_mod_d1gma_pscore
     
     ### Create forest plot using metafor's built-in function
-    forest(coef(res_mod_d1gma), diag(vcov(res_mod_d1gma)), slab=sub(".", " ", names(coef(res_mod_d1gma)), fixed=TRUE),
-           #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention", top=2,
-           header="Intervention",
-           xlab="Difference in Standardized Mean Change")
+    # forest(coef(res_mod_d1gma), diag(vcov(res_mod_d1gma)), slab=sub(".", " ", names(coef(res_mod_d1gma)), fixed=TRUE),
+    #        #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention", top=2,
+    #        header="Intervention",
+    #        xlab="Difference in Standardized Mean Change")
         
     ### Create forest plot using ggplot
     
@@ -452,7 +459,7 @@
       res_mod_d1gma_pscore
       res_mod_d1gma_pscore_forest <- ggplot(res_mod_d1gma_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
         geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
-        geom_pointrange(shape = 22, fill = "black") + # To-do: add size argument
+        geom_pointrange(shape = 22, fill = "black", size = res_mod_d1gma_pscore$estimate) + 
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change with 95% Confidence Interval") +
         ylab("Intervention Bundle") +
@@ -569,6 +576,8 @@
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID_d2rn$comparison_prelim)
+  check_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
+  print(check_d2rn)
   res_mod_d2rn <- rma.mv(effect_size, V_list, 
                           mods = ~ NL.FF.RS + NL.RS + NL.TES.FF.RS + NL.TES.RS + NL.TES.VF.RS + RS + TES.VF.RS - 1, 
                           random = ~ 1 | record_id/es_id, 
@@ -605,8 +614,8 @@
       lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #To-do: possible to format ci below? + color code by sig
       lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
       print(lt_info_df3)
-      write_csv(lt_info_df3, 'league_table.csv')
-      #write_xlsx(lt_info_df3, 'league_table.xlsx')
+      write_csv(lt_info_df3, 'league_table_d2rn.csv')
+      #write_xlsx(lt_info_df3, 'league_table_d2rn.xlsx')
       
     ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod_d2rn)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
@@ -634,10 +643,10 @@
     res_mod_d2rn_pscore
       
     ### Create forest plot using metafor's built-in function
-    forest(coef(res_mod_d2rn), diag(vcov(res_mod_d2rn)), slab=sub(".", " ", names(coef(res_mod_d2rn)), fixed=TRUE),
-           #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention", top=2,
-           header="Intervention",
-           xlab="Difference in Standardized Mean Change")
+    # forest(coef(res_mod_d2rn), diag(vcov(res_mod_d2rn)), slab=sub(".", " ", names(coef(res_mod_d2rn)), fixed=TRUE),
+    #        #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention", top=2,
+    #        header="Intervention",
+    #        xlab="Difference in Standardized Mean Change")
       
     ### Create forest plot using ggplot
       
@@ -646,7 +655,7 @@
       res_mod_d2rn_pscore
       res_mod_d2rn_pscore_forest <- ggplot(res_mod_d2rn_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
         geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
-        geom_pointrange(shape = 22, fill = "black") + # To-do: add size argument
+        geom_pointrange(shape = 22, fill = "black", size = res_mod_d2rn_pscore$estimate) + 
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change with 95% Confidence Interval") +
         ylab("Intervention Bundle") +
@@ -763,6 +772,8 @@
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID_d3wn$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID_d3wn$comparison_prelim)
+  check_d3wn <- NMA_data_analysis_subset_grpID_d3wn %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
+  print(check_d3wn)
   res_mod_d3wn <- rma.mv(effect_size, V_list, 
                          mods = ~ FF + FF.RS + NL.FF.RS + RS + VF.FF.RS + VF.RS - 1, 
                          random = ~ 1 | record_id/es_id, 
@@ -799,8 +810,8 @@
     lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #To-do: possible to format ci below? + color code by sig
     lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
     print(lt_info_df3)
-    write_csv(lt_info_df3, 'league_table.csv')
-    #write_xlsx(lt_info_df3, 'league_table.xlsx')
+    write_csv(lt_info_df3, 'league_table_d3wn.csv')
+    #write_xlsx(lt_info_df3, 'league_table_d3wn.xlsx')
     
     ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod_d3wn)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
@@ -828,10 +839,10 @@
     res_mod_d3wn_pscore
       
     ### Create forest plot using metafor's built-in function
-    forest(coef(res_mod_d3wn), diag(vcov(res_mod_d3wn)), slab=sub(".", " ", names(coef(res_mod_d3wn)), fixed=TRUE),
-          #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention", top=2,
-          header="Intervention",
-          xlab="Difference in Standardized Mean Change")
+    # forest(coef(res_mod_d3wn), diag(vcov(res_mod_d3wn)), slab=sub(".", " ", names(coef(res_mod_d3wn)), fixed=TRUE),
+    #       #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention", top=2,
+    #       header="Intervention",
+    #       xlab="Difference in Standardized Mean Change")
       
     ### Create forest plot using ggplot
       
@@ -840,7 +851,7 @@
       res_mod_d3wn_pscore
       res_mod_d3wn_pscore_forest <- ggplot(res_mod_d3wn_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
         geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
-        geom_pointrange(shape = 22, fill = "black") + # To-do: add size argument
+        geom_pointrange(shape = 22, fill = "black", size = res_mod_d3wn_pscore$estimate) + 
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change with 95% Confidence Interval") +
         ylab("Intervention Bundle") +
