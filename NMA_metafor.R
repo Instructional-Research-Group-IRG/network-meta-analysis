@@ -172,7 +172,7 @@
   ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
   
   ## Add contrast matrix to dataset
-  NMA_data_analysis_subset_grpID_3domains <- NMA_data_analysis_subset_grpID
+  NMA_data_analysis_subset_grpID_alldomains <- NMA_data_analysis_subset_grpID
   NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% drop_na(c(intervention_prelim, comparison_prelim)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
   NMA_data_analysis_subset_grpID <- contrmat(NMA_data_analysis_subset_grpID, grp1="intervention_prelim", grp2="comparison_prelim")
   str(NMA_data_analysis_subset_grpID)
@@ -358,8 +358,8 @@
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "General Mathematics Achievement"
       
   ## Subset analysis data frame further to just the General Mathematics Achievement domain (d1gma)
-  tabyl(NMA_data_analysis_subset_grpID_3domains$domain)
-  NMA_data_analysis_subset_grpID_d1gma <- NMA_data_analysis_subset_grpID_3domains %>% filter(domain == "General Mathematics Achievement")
+  tabyl(NMA_data_analysis_subset_grpID_alldomains$domain)
+  NMA_data_analysis_subset_grpID_d1gma <- NMA_data_analysis_subset_grpID_alldomains %>% filter(domain == "General Mathematics Achievement")
   tabyl(NMA_data_analysis_subset_grpID_d1gma$domain)
       
   ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
@@ -501,13 +501,13 @@
       final_fp_nma <- grid.arrange(data_table, res_mod_d1gma_pscore_forest, ncol=2)
       final_fp_nma
         
-      ### Create network graph
+    ### Create network graph
       
-      ### Note: The data are currently in a contrast-based, "wide" format in which each contrast is an observation 
-      ###       (i.e., intervention and comparison assignments of each contrast are in separate columns of the same row.)
-      ###       Need to reshape the data "long" to an arm-based format in which the two assignment groups (intervention/comparison)
-      ###       are in separate rows of the same column grouped by contrast ID across those rows. This facilitates the pairing of intervention/comparison 
-      ###       groups for the creation of the (weighted) edges of the network graph.
+    ### Note: The data are currently in a contrast-based, "wide" format in which each contrast is an observation 
+    ###       (i.e., intervention and comparison assignments of each contrast are in separate columns of the same row.)
+    ###       Need to reshape the data "long" to an arm-based format in which the two assignment groups (intervention/comparison)
+    ###       are in separate rows of the same column grouped by contrast ID across those rows. This facilitates the pairing of intervention/comparison 
+    ###       groups for the creation of the (weighted) edges of the network graph.
       
       #### Review data in contrast-based wide format before reshape for comparison with data after reshape (as a desk check)
       NMA_data_analysis_subset$contrast_id <- as.character(NMA_data_analysis_subset$contrast_id)
@@ -547,3 +547,391 @@
            #layout=layout_nicely(g),
            #layout=layout_with_lgl(g),
            vertex.size=20, vertex.color="lightgray", vertex.label.color="black", vertex.label.font=2)  
+      
+# Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "Rational Numbers"
+      
+  ## Subset analysis data frame further to just the General Mathematics Achievement domain (d1gma)
+  tabyl(NMA_data_analysis_subset_grpID_alldomains$domain)
+  NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID_alldomains %>% filter(domain == "Rational Numbers")
+  tabyl(NMA_data_analysis_subset_grpID_d2rn$domain)
+      
+  ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
+      
+  ## Add contrast matrix to dataset
+  NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% drop_na(c(intervention_prelim, comparison_prelim)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
+  NMA_data_analysis_subset_grpID_d2rn <- contrmat(NMA_data_analysis_subset_grpID_d2rn, grp1="intervention_prelim", grp2="comparison_prelim")
+  str(NMA_data_analysis_subset_grpID_d2rn)
+      
+  ## Calculate the variance-covariance matrix for multi-treatment studies
+  V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d2rn)
+  V_list     
+      
+  ##Run standard NMA with the unique interventions bundles as moderators  
+  tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID_d2rn$comparison_prelim)
+  res_mod_d2rn <- rma.mv(effect_size, V_list, 
+                          mods = ~ NL.FF.RS + NL.RS + NL.TES.FF.RS + NL.TES.RS + NL.TES.VF.RS + RS + TES.VF.RS - 1, 
+                          random = ~ 1 | record_id/es_id, 
+                          rho=0.60, 
+                          data=NMA_data_analysis_subset_grpID_d2rn)
+  summary(res_mod_d2rn)
+  #weights.rma.mv(res_mod_d2rn)
+      
+    ### Estimate all pairwise differences between treatments
+    contr <- data.frame(t(combn(names(coef(res_mod_d2rn)), 2)))
+    contr <- contrmat(contr, "X1", "X2")
+    rownames(contr) <- paste(contr$X1, "-", contr$X2)
+    contr <- as.matrix(contr[-c(1:2)])
+    sav <- predict(res_mod_d2rn, newmods=contr)
+    sav[["slab"]] <- rownames(contr)
+    sav
+      
+    ### Create league table (create diagonal matrix from output sav)
+    lt_info_df <- as.data.frame(sav, optional = TRUE)
+    lt_info_df <- cbind(Comparison = rownames(lt_info_df), lt_info_df)
+    lt_info_df2 <- lt_info_df %>% separate_wider_delim(Comparison, delim = ' - ', names = c('comp1', 'comp2'))
+    round_digits <- function(x) {
+        round(x, digits = 2)
+      }
+      convert_to_character <- function(x) {
+        as.character(x)
+      }
+      lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], round_digits)
+      lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], as.character)
+      lt_info_df2$ci.lb <- paste("(", lt_info_df2$ci.lb, " -", sep= "")
+      lt_info_df2$ci.ub <- paste(lt_info_df2$ci.ub, ")", sep= "")
+      lt_info_df2 <- lt_info_df2 %>% unite(pred_cis, pred, ci.lb, ci.ub, sep= " ", remove = FALSE )
+      print(lt_info_df2)
+      lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #To-do: possible to format ci below? + color code by sig
+      lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
+      print(lt_info_df3)
+      write_csv(lt_info_df3, 'league_table.csv')
+      #write_xlsx(lt_info_df3, 'league_table.xlsx')
+      
+    ### Compute p-values
+    contr <- data.frame(t(combn(c(names(coef(res_mod_d2rn)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
+    contr <- contrmat(contr, "X1", "X2", last="BAU", append=FALSE)
+    b <- c(coef(res_mod_d2rn),0) # add 0 for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
+    vb <- bldiag(vcov(res_mod_d2rn),0) # add 0 row/column for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
+    pvals <- apply(contr, 1, function(x) pnorm((x%*%b) / sqrt(t(x)%*%vb%*%x)))
+    pvals
+      
+    ### Create table of p-values
+    tab <- vec2mat(pvals, corr=FALSE)
+    tab[lower.tri(tab)] <- t((1 - tab)[lower.tri(tab)])
+    rownames(tab) <- colnames(tab) <- colnames(contr)
+    round(tab, 2) # Like Table 2 in the following: https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/s12874-015-0060-8/tables/2
+      
+    ### Compute the P-scores
+    pscores <- cbind(round(sort(apply(tab, 1, mean, na.rm=TRUE), decreasing=TRUE), 3))
+    pscores
+      
+    ### Add P-scores to model output object
+    res_mod_d2rn_df <- tidy(res_mod_d2rn, conf.int = TRUE)
+    pscores_df <- cbind(term = rownames(pscores), as.data.frame(pscores))
+    res_mod_d2rn_pscore <- res_mod_d2rn_df %>% left_join(pscores_df, by = c("term"))
+    res_mod_d2rn_pscore <- res_mod_d2rn_pscore %>% rename(intervention = term, se = std.error, zval = statistic, pval = p.value, ci.lb = conf.low, ci.ub = conf.high,  Pscore = V1)
+    res_mod_d2rn_pscore
+      
+    ### Create forest plot using metafor's built-in function
+    forest(coef(res_mod_d2rn), diag(vcov(res_mod_d2rn)), slab=sub(".", " ", names(coef(res_mod_d2rn)), fixed=TRUE),
+           #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention", top=2,
+           header="Intervention",
+           xlab="Difference in Standardized Mean Change")
+      
+    ### Create forest plot using ggplot
+      
+      #### First create plot of estimates and confidence intervals
+      res_mod_d2rn_pscore$colour <- rep(c("white", "gray95","white", "gray95","white","gray95","white"))
+      res_mod_d2rn_pscore
+      res_mod_d2rn_pscore_forest <- ggplot(res_mod_d2rn_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
+        geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
+        geom_pointrange(shape = 22, fill = "black") + # To-do: add size argument
+        geom_vline(xintercept = 0, linetype = 3) +
+        xlab("Difference in Standardized Mean Change with 95% Confidence Interval") +
+        ylab("Intervention Bundle") +
+        theme_classic() +
+        scale_colour_identity() +
+        scale_y_discrete(limits = rev(res_mod_d2rn_pscore$intervention)) +
+        #scale_x_log10(limits = c(-1.25, 2.25), 
+        #breaks = c(0.25, 0.5, 1, 2, 4), 
+        #labels = c("0.25", "0.5", "1", "2", "4"), expand = c(0,0)) +
+        theme(axis.text.y = element_blank(), axis.title.y = element_blank())
+      res_mod_d2rn_pscore_forest
+      
+      #### Next create data table for merging with above plot with estimates and confidence intervals combined in one column
+      res_mod_d2rn_pscore2 <- res_mod_d2rn_pscore
+      round_digits <- function(x) {
+        round(x, digits = 2)
+      }
+      convert_to_character <- function(x) {
+        as.character(x)
+      }
+      res_mod_d2rn_pscore2[c("estimate","Pscore","ci.lb","ci.ub")] <- lapply(res_mod_d2rn_pscore2[c("estimate","Pscore","ci.lb","ci.ub")], round_digits)
+      res_mod_d2rn_pscore2[c("estimate","Pscore","ci.lb","ci.ub")] <- lapply(res_mod_d2rn_pscore2[c("estimate","Pscore","ci.lb","ci.ub")], as.character)
+      res_mod_d2rn_pscore2$ci.lb <- paste("(", res_mod_d2rn_pscore2$ci.lb, " -", sep= "")
+      res_mod_d2rn_pscore2$ci.ub <- paste(res_mod_d2rn_pscore2$ci.ub, ")", sep= "")
+      res_mod_d2rn_pscore2 <- res_mod_d2rn_pscore2 %>% unite(estimate_cis, estimate, ci.lb, ci.ub, sep= " ", remove = FALSE )
+      print(res_mod_d2rn_pscore2)
+      
+      LfLabels<-data.frame(x=c(0,4.5,6.7), 
+                           y=c(rep(length(unique(res_mod_d2rn_pscore2$estimate))-0.2,times=3)),
+                           lab=c("Intervention","Estimate (95% CI)","P-score"))
+      LfLabels
+      
+      data_table <- ggplot(data = res_mod_d2rn_pscore2, aes(y = intervention)) +
+        geom_hline(aes(yintercept = intervention, colour = colour), size = 7) +
+        geom_text(aes(x = 0, label = intervention), hjust = 0) +
+        geom_text(aes(x = 5, label = estimate_cis)) +
+        geom_text(aes(x = 7, label = Pscore), hjust = 1) +
+        geom_text(data=LfLabels,aes(x,y,label=lab, fontface="bold"), vjust=-3.5, hjust=0, size=4, size=4) +
+        scale_colour_identity() +
+        theme_void() + 
+        theme(plot.margin = margin(5, 0, 35, 0)) +
+        scale_y_discrete(limits = rev(res_mod_d2rn_pscore$intervention)) 
+      data_table
+      
+      #### Finally, merge plot and datatable for final forest plot
+      final_fp_nma <- grid.arrange(data_table, res_mod_d2rn_pscore_forest, ncol=2)
+      final_fp_nma
+      
+    ### Create network graph
+      
+    ### Note: The data are currently in a contrast-based, "wide" format in which each contrast is an observation 
+    ###       (i.e., intervention and comparison assignments of each contrast are in separate columns of the same row.)
+    ###       Need to reshape the data "long" to an arm-based format in which the two assignment groups (intervention/comparison)
+    ###       are in separate rows of the same column grouped by contrast ID across those rows. This facilitates the pairing of intervention/comparison 
+    ###       groups for the creation of the (weighted) edges of the network graph.
+      
+      #### Review data in contrast-based wide format before reshape for comparison with data after reshape (as a desk check)
+      NMA_data_analysis_subset$contrast_id <- as.character(NMA_data_analysis_subset$contrast_id)
+      NMA_data_analysis_subset2 <- NMA_data_analysis_subset_grpID_d2rn %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size)
+      print(NMA_data_analysis_subset2) #Example rows of the contrast-based wide format. Compare to the long format printed below.
+      
+      #### Each unique contrast within each unique study should only be counted once when weighting the network connections between each unique contrast combination of intervention and comparison in the network graph.
+      #### Because there can be multiple measures within multiple domains within each unique contrast within each unique study, we need reduce the data set to one observation per unique contrast within each unique study 
+      #### so that a contrast with more domains/measures than another contrast is not overweighted in the visualization of the network connections (re the relative thicknesses of the "edges" between the I/C nodes in the network graph).
+      NMA_data_analysis_subset3 <- NMA_data_analysis_subset_grpID_d2rn %>% distinct(record_id, contrast_id, .keep_all = TRUE)
+      NMA_data_analysis_subset4 <- NMA_data_analysis_subset3 %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size)
+      NMA_data_analysis_subset4 <- NMA_data_analysis_subset4 %>% unite("int_comp_prelim" , c(intervention_prelim,comparison_prelim), remove = FALSE)
+      tabyl(NMA_data_analysis_subset4$int_comp_prelim) #The relative number of observations (n) for the intervention_BAU contrasts in this table should match the relative thicknesses of the lines (called "edges") in the network graph.
+      
+      #### Reshape data to arm-based long format
+      NMA_data_analysis_subset_long <- pivot_longer(NMA_data_analysis_subset3, c(intervention_prelim, comparison_prelim), names_to = "assignment_I_C", values_to = "intervention_comparison")
+      
+      #### Review data in arm-based long format after reshape for comparison with data before reshape (as a desk check)
+      NMA_data_analysis_subset_long2 <- NMA_data_analysis_subset_long %>% dplyr::select(record_id, contrast_id, assignment_I_C, intervention_comparison, domain, measure_name, es_id, effect_size)
+      print(NMA_data_analysis_subset_long2) #Example rows of the arm-based long format. Compare to the wide format printed above.
+      
+      #### Create the table of intervention/comparison pairs for creating the network graph with igraph
+      dat_igraph <- NMA_data_analysis_subset_long
+      dat_igraph$intervention_comparison <- as.character(dat_igraph$intervention_comparison)
+      pairs <- data.frame(do.call(rbind, lapply(split(dat_igraph$intervention_comparison, dat_igraph$contrast_id), function(x) t(combn(x,2)))), stringsAsFactors=FALSE)
+      print(pairs)
+      pairs$X1 <- factor(pairs$X1, levels=sort(unique(dat_igraph$intervention_comparison)))
+      pairs$X2 <- factor(pairs$X2, levels=sort(unique(dat_igraph$intervention_comparison)))
+      tab <- table(pairs[,1], pairs[,2])
+      tab
+      
+      #### Creating the network graph with igraph
+      set.seed(3524)
+      g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
+      plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
+           layout=layout_in_circle(g),
+           #layout=layout_nicely(g),
+           #layout=layout_with_lgl(g),
+           vertex.size=20, vertex.color="lightgray", vertex.label.color="black", vertex.label.font=2)   
+      
+# Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "Whole Numbers"
+      
+  ## Subset analysis data frame further to just the General Mathematics Achievement domain (d1gma)
+  tabyl(NMA_data_analysis_subset_grpID_alldomains$domain)
+  NMA_data_analysis_subset_grpID_d3wn <- NMA_data_analysis_subset_grpID_alldomains %>% filter(domain == "Whole Numbers")
+  tabyl(NMA_data_analysis_subset_grpID_d3wn$domain)
+      
+  ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
+      
+  ## Add contrast matrix to dataset
+  NMA_data_analysis_subset_grpID_d3wn <- NMA_data_analysis_subset_grpID_d3wn %>% drop_na(c(intervention_prelim, comparison_prelim)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
+  NMA_data_analysis_subset_grpID_d3wn <- contrmat(NMA_data_analysis_subset_grpID_d3wn, grp1="intervention_prelim", grp2="comparison_prelim")
+  str(NMA_data_analysis_subset_grpID_d3wn)
+      
+  ## Calculate the variance-covariance matrix for multi-treatment studies
+  V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d3wn)
+  V_list     
+      
+  ##Run standard NMA with the unique interventions bundles as moderators  
+  tabyl(NMA_data_analysis_subset_grpID_d3wn$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID_d3wn$comparison_prelim)
+  res_mod_d3wn <- rma.mv(effect_size, V_list, 
+                         mods = ~ FF + FF.RS + NL.FF.RS + RS + VF.FF.RS + VF.RS - 1, 
+                         random = ~ 1 | record_id/es_id, 
+                         rho=0.60, 
+                         data=NMA_data_analysis_subset_grpID_d3wn)
+  summary(res_mod_d3wn)
+  #weights.rma.mv(res_mod_d3wn)
+  
+    ### Estimate all pairwise differences between treatments
+    contr <- data.frame(t(combn(names(coef(res_mod_d3wn)), 2)))
+    contr <- contrmat(contr, "X1", "X2")
+    rownames(contr) <- paste(contr$X1, "-", contr$X2)
+    contr <- as.matrix(contr[-c(1:2)])
+    sav <- predict(res_mod_d3wn, newmods=contr)
+    sav[["slab"]] <- rownames(contr)
+    sav
+      
+    ### Create league table (create diagonal matrix from output sav)
+    lt_info_df <- as.data.frame(sav, optional = TRUE)
+    lt_info_df <- cbind(Comparison = rownames(lt_info_df), lt_info_df)
+    lt_info_df2 <- lt_info_df %>% separate_wider_delim(Comparison, delim = ' - ', names = c('comp1', 'comp2'))
+    round_digits <- function(x) {
+      round(x, digits = 2)
+    }
+    convert_to_character <- function(x) {
+      as.character(x)
+    }
+    lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], round_digits)
+    lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], as.character)
+    lt_info_df2$ci.lb <- paste("(", lt_info_df2$ci.lb, " -", sep= "")
+    lt_info_df2$ci.ub <- paste(lt_info_df2$ci.ub, ")", sep= "")
+    lt_info_df2 <- lt_info_df2 %>% unite(pred_cis, pred, ci.lb, ci.ub, sep= " ", remove = FALSE )
+    print(lt_info_df2)
+    lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #To-do: possible to format ci below? + color code by sig
+    lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
+    print(lt_info_df3)
+    write_csv(lt_info_df3, 'league_table.csv')
+    #write_xlsx(lt_info_df3, 'league_table.xlsx')
+    
+    ### Compute p-values
+    contr <- data.frame(t(combn(c(names(coef(res_mod_d3wn)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
+    contr <- contrmat(contr, "X1", "X2", last="BAU", append=FALSE)
+    b <- c(coef(res_mod_d3wn),0) # add 0 for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
+    vb <- bldiag(vcov(res_mod_d3wn),0) # add 0 row/column for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
+    pvals <- apply(contr, 1, function(x) pnorm((x%*%b) / sqrt(t(x)%*%vb%*%x)))
+    pvals
+    
+    ### Create table of p-values
+    tab <- vec2mat(pvals, corr=FALSE)
+    tab[lower.tri(tab)] <- t((1 - tab)[lower.tri(tab)])
+    rownames(tab) <- colnames(tab) <- colnames(contr)
+    round(tab, 2) # Like Table 2 in the following: https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/s12874-015-0060-8/tables/2
+    
+    ### Compute the P-scores
+    pscores <- cbind(round(sort(apply(tab, 1, mean, na.rm=TRUE), decreasing=TRUE), 3))
+    pscores
+    
+    ### Add P-scores to model output object
+    res_mod_d3wn_df <- tidy(res_mod_d3wn, conf.int = TRUE)
+    pscores_df <- cbind(term = rownames(pscores), as.data.frame(pscores))
+    res_mod_d3wn_pscore <- res_mod_d3wn_df %>% left_join(pscores_df, by = c("term"))
+    res_mod_d3wn_pscore <- res_mod_d3wn_pscore %>% rename(intervention = term, se = std.error, zval = statistic, pval = p.value, ci.lb = conf.low, ci.ub = conf.high,  Pscore = V1)
+    res_mod_d3wn_pscore
+      
+    ### Create forest plot using metafor's built-in function
+    forest(coef(res_mod_d3wn), diag(vcov(res_mod_d3wn)), slab=sub(".", " ", names(coef(res_mod_d3wn)), fixed=TRUE),
+          #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention", top=2,
+          header="Intervention",
+          xlab="Difference in Standardized Mean Change")
+      
+    ### Create forest plot using ggplot
+      
+      #### First create plot of estimates and confidence intervals
+      res_mod_d3wn_pscore$colour <- rep(c("white", "gray95","white", "gray95","white","gray95"))
+      res_mod_d3wn_pscore
+      res_mod_d3wn_pscore_forest <- ggplot(res_mod_d3wn_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
+        geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
+        geom_pointrange(shape = 22, fill = "black") + # To-do: add size argument
+        geom_vline(xintercept = 0, linetype = 3) +
+        xlab("Difference in Standardized Mean Change with 95% Confidence Interval") +
+        ylab("Intervention Bundle") +
+        theme_classic() +
+        scale_colour_identity() +
+        scale_y_discrete(limits = rev(res_mod_d3wn_pscore$intervention)) +
+        #scale_x_log10(limits = c(-1.25, 2.25), 
+        #breaks = c(0.25, 0.5, 1, 2, 4), 
+        #labels = c("0.25", "0.5", "1", "2", "4"), expand = c(0,0)) +
+        theme(axis.text.y = element_blank(), axis.title.y = element_blank())
+      res_mod_d3wn_pscore_forest
+      
+      #### Next create data table for merging with above plot with estimates and confidence intervals combined in one column
+      res_mod_d3wn_pscore2 <- res_mod_d3wn_pscore
+      round_digits <- function(x) {
+        round(x, digits = 2)
+      }
+      convert_to_character <- function(x) {
+        as.character(x)
+      }
+      res_mod_d3wn_pscore2[c("estimate","Pscore","ci.lb","ci.ub")] <- lapply(res_mod_d3wn_pscore2[c("estimate","Pscore","ci.lb","ci.ub")], round_digits)
+      res_mod_d3wn_pscore2[c("estimate","Pscore","ci.lb","ci.ub")] <- lapply(res_mod_d3wn_pscore2[c("estimate","Pscore","ci.lb","ci.ub")], as.character)
+      res_mod_d3wn_pscore2$ci.lb <- paste("(", res_mod_d3wn_pscore2$ci.lb, " -", sep= "")
+      res_mod_d3wn_pscore2$ci.ub <- paste(res_mod_d3wn_pscore2$ci.ub, ")", sep= "")
+      res_mod_d3wn_pscore2 <- res_mod_d3wn_pscore2 %>% unite(estimate_cis, estimate, ci.lb, ci.ub, sep= " ", remove = FALSE )
+      print(res_mod_d3wn_pscore2)
+      
+      LfLabels<-data.frame(x=c(0,4.5,6.7), 
+                           y=c(rep(length(unique(res_mod_d3wn_pscore2$estimate))-0.2,times=3)),
+                           lab=c("Intervention","Estimate (95% CI)","P-score"))
+      LfLabels
+      
+      data_table <- ggplot(data = res_mod_d3wn_pscore2, aes(y = intervention)) +
+        geom_hline(aes(yintercept = intervention, colour = colour), size = 7) +
+        geom_text(aes(x = 0, label = intervention), hjust = 0) +
+        geom_text(aes(x = 5, label = estimate_cis)) +
+        geom_text(aes(x = 7, label = Pscore), hjust = 1) +
+        geom_text(data=LfLabels,aes(x,y,label=lab, fontface="bold"), vjust=-3.5, hjust=0, size=4, size=4) +
+        scale_colour_identity() +
+        theme_void() + 
+        theme(plot.margin = margin(5, 0, 35, 0)) +
+        scale_y_discrete(limits = rev(res_mod_d3wn_pscore$intervention)) 
+      data_table
+      
+      #### Finally, merge plot and datatable for final forest plot
+      final_fp_nma <- grid.arrange(data_table, res_mod_d3wn_pscore_forest, ncol=2)
+      final_fp_nma
+      
+    ### Create network graph
+      
+    ### Note: The data are currently in a contrast-based, "wide" format in which each contrast is an observation 
+    ###       (i.e., intervention and comparison assignments of each contrast are in separate columns of the same row.)
+    ###       Need to reshape the data "long" to an arm-based format in which the two assignment groups (intervention/comparison)
+    ###       are in separate rows of the same column grouped by contrast ID across those rows. This facilitates the pairing of intervention/comparison 
+    ###       groups for the creation of the (weighted) edges of the network graph.
+      
+      #### Review data in contrast-based wide format before reshape for comparison with data after reshape (as a desk check)
+      NMA_data_analysis_subset$contrast_id <- as.character(NMA_data_analysis_subset$contrast_id)
+      NMA_data_analysis_subset2 <- NMA_data_analysis_subset_grpID_d3wn %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size)
+      print(NMA_data_analysis_subset2) #Example rows of the contrast-based wide format. Compare to the long format printed below.
+      
+      #### Each unique contrast within each unique study should only be counted once when weighting the network connections between each unique contrast combination of intervention and comparison in the network graph.
+      #### Because there can be multiple measures within multiple domains within each unique contrast within each unique study, we need reduce the data set to one observation per unique contrast within each unique study 
+      #### so that a contrast with more domains/measures than another contrast is not overweighted in the visualization of the network connections (re the relative thicknesses of the "edges" between the I/C nodes in the network graph).
+      NMA_data_analysis_subset3 <- NMA_data_analysis_subset_grpID_d3wn %>% distinct(record_id, contrast_id, .keep_all = TRUE)
+      NMA_data_analysis_subset4 <- NMA_data_analysis_subset3 %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size)
+      NMA_data_analysis_subset4 <- NMA_data_analysis_subset4 %>% unite("int_comp_prelim" , c(intervention_prelim,comparison_prelim), remove = FALSE)
+      tabyl(NMA_data_analysis_subset4$int_comp_prelim) #The relative number of observations (n) for the intervention_BAU contrasts in this table should match the relative thicknesses of the lines (called "edges") in the network graph.
+      
+      #### Reshape data to arm-based long format
+      NMA_data_analysis_subset_long <- pivot_longer(NMA_data_analysis_subset3, c(intervention_prelim, comparison_prelim), names_to = "assignment_I_C", values_to = "intervention_comparison")
+      
+      #### Review data in arm-based long format after reshape for comparison with data before reshape (as a desk check)
+      NMA_data_analysis_subset_long2 <- NMA_data_analysis_subset_long %>% dplyr::select(record_id, contrast_id, assignment_I_C, intervention_comparison, domain, measure_name, es_id, effect_size)
+      print(NMA_data_analysis_subset_long2) #Example rows of the arm-based long format. Compare to the wide format printed above.
+      
+      #### Create the table of intervention/comparison pairs for creating the network graph with igraph
+      dat_igraph <- NMA_data_analysis_subset_long
+      dat_igraph$intervention_comparison <- as.character(dat_igraph$intervention_comparison)
+      pairs <- data.frame(do.call(rbind, lapply(split(dat_igraph$intervention_comparison, dat_igraph$contrast_id), function(x) t(combn(x,2)))), stringsAsFactors=FALSE)
+      print(pairs)
+      pairs$X1 <- factor(pairs$X1, levels=sort(unique(dat_igraph$intervention_comparison)))
+      pairs$X2 <- factor(pairs$X2, levels=sort(unique(dat_igraph$intervention_comparison)))
+      tab <- table(pairs[,1], pairs[,2])
+      tab
+      
+      #### Creating the network graph with igraph
+      set.seed(3524)
+      g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
+      plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
+           layout=layout_in_circle(g),
+           #layout=layout_nicely(g),
+           #layout=layout_with_lgl(g),
+           vertex.size=20, vertex.color="lightgray", vertex.label.color="black", vertex.label.font=2)       
