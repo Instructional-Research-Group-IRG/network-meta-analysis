@@ -561,7 +561,7 @@
       
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "Rational Numbers"
       
-  ## Subset analysis data frame further to just the General Mathematics Achievement domain (d1gma)
+  ## Subset analysis data frame further to just the Rational Numbers domain (d2rn)
   tabyl(NMA_data_analysis_subset_grpID_alldomains$domain)
   NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID_alldomains %>% filter(domain == "Rational Numbers")
   tabyl(NMA_data_analysis_subset_grpID_d2rn$domain)
@@ -759,7 +759,7 @@
       
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "Whole Numbers"
       
-  ## Subset analysis data frame further to just the General Mathematics Achievement domain (d1gma)
+  ## Subset analysis data frame further to just the Whole Numbers domain (d3wn)
   tabyl(NMA_data_analysis_subset_grpID_alldomains$domain)
   NMA_data_analysis_subset_grpID_d3wn <- NMA_data_analysis_subset_grpID_alldomains %>% filter(domain == "Whole Numbers")
   tabyl(NMA_data_analysis_subset_grpID_d3wn$domain)
