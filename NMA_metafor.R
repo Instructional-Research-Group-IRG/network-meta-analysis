@@ -222,8 +222,8 @@
     lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #To-do: possible to format ci below? + color code by sig
     lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
     print(lt_info_df3)
-    write_csv(lt_info_df3, 'league_table_all domains.csv')
-    #write_xlsx(lt_info_df3, 'league_table_all domains.xlsx')
+    write_csv(lt_info_df3, 'nma_league_table_dall.csv')
+    #write_xlsx(lt_info_df3, 'nma_league_table_dall.xlsx')
     
     ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
@@ -418,8 +418,8 @@
     lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #To-do: possible to format ci below? + color code by sig
     lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
     print(lt_info_df3)
-    write_csv(lt_info_df3, 'league_table_d1gma.csv')
-    #write_xlsx(lt_info_df3, 'league_table_d1gma.xlsx')
+    write_csv(lt_info_df3, 'nma_league_table_d1gma.csv')
+    #write_xlsx(lt_info_df3, 'nma_league_table_d1gma.xlsx')
     
     ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod_d1gma)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
@@ -614,8 +614,8 @@
       lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #To-do: possible to format ci below? + color code by sig
       lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
       print(lt_info_df3)
-      write_csv(lt_info_df3, 'league_table_d2rn.csv')
-      #write_xlsx(lt_info_df3, 'league_table_d2rn.xlsx')
+      write_csv(lt_info_df3, 'nma_league_table_d2rn.csv')
+      #write_xlsx(lt_info_df3, 'nma_league_table_d2rn.xlsx')
       
     ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod_d2rn)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
@@ -810,8 +810,8 @@
     lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #To-do: possible to format ci below? + color code by sig
     lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
     print(lt_info_df3)
-    write_csv(lt_info_df3, 'league_table_d3wn.csv')
-    #write_xlsx(lt_info_df3, 'league_table_d3wn.xlsx')
+    write_csv(lt_info_df3, 'nma_league_table_d3wn.csv')
+    #write_xlsx(lt_info_df3, 'nma_league_table_d3wn.xlsx')
     
     ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod_d3wn)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
