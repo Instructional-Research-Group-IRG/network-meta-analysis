@@ -167,6 +167,25 @@
   tabyl(NMA_data_analysis_subset_grpID$domain)
   class(NMA_data_analysis_subset_grpID$domain)
   
+  ## Drop intervention versus comparison contrasts that have the same bundles
+  tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)
+  NMA_data_analysis_subset_grpID$intervention_prelim <- as.character(NMA_data_analysis_subset_grpID$intervention_prelim) #To more easily use the filter function below; otherwise the factor levels of the two columns would have to be lined up.
+  NMA_data_analysis_subset_grpID$comparison_prelim <- as.character(NMA_data_analysis_subset_grpID$comparison_prelim) #To more easily use the filter function below; otherwise the factor levels of the two columns would have to be lined up.
+  tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)
+  tabyl(NMA_data_analysis_subset_grpID$domain)
+  NMA_data_analysis_subset_grpID %>% count()
+  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% filter(intervention_prelim!=comparison_prelim) #This also removes any rows with <NA> values in columns intervention_prelim & comparison_prelim.
+  tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)  
+  tabyl(NMA_data_analysis_subset_grpID$domain)
+  NMA_data_analysis_subset_grpID %>% count()
+  NMA_data_analysis_subset_grpID$intervention_prelim <- as.factor(NMA_data_analysis_subset_grpID$intervention_prelim)
+  NMA_data_analysis_subset_grpID$comparison_prelim <- as.factor(NMA_data_analysis_subset_grpID$comparison_prelim)
+  tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)  
+  
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: all domains (n=3)
   
   ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
