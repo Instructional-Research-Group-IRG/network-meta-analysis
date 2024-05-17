@@ -159,13 +159,13 @@
   class(NMA_data_analysis_subset_grpID$comparison_prelim)   
   
   ## Correct domain names
-  tabyl(NMA_data_analysis_subset_grpID$domain)
-  NMA_data_analysis_subset_grpID$domain <- gsub("Rational Numbers", "Rational Number", NMA_data_analysis_subset_grpID$domain)
-  NMA_data_analysis_subset_grpID$domain <- gsub("Rational Number", "Rational Numbers", NMA_data_analysis_subset_grpID$domain)
-  NMA_data_analysis_subset_grpID$domain <- gsub("Whole Numbers", "Whole Number", NMA_data_analysis_subset_grpID$domain)
-  NMA_data_analysis_subset_grpID$domain <- gsub("Whole Number", "Whole Numbers", NMA_data_analysis_subset_grpID$domain)
-  tabyl(NMA_data_analysis_subset_grpID$domain)
-  class(NMA_data_analysis_subset_grpID$domain)
+  # tabyl(NMA_data_analysis_subset_grpID$domain)
+  # NMA_data_analysis_subset_grpID$domain <- gsub("Rational Numbers", "Rational Number", NMA_data_analysis_subset_grpID$domain)
+  # NMA_data_analysis_subset_grpID$domain <- gsub("Rational Number", "Rational Numbers", NMA_data_analysis_subset_grpID$domain)
+  # NMA_data_analysis_subset_grpID$domain <- gsub("Whole Numbers", "Whole Number", NMA_data_analysis_subset_grpID$domain)
+  # NMA_data_analysis_subset_grpID$domain <- gsub("Whole Number", "Whole Numbers", NMA_data_analysis_subset_grpID$domain)
+  # tabyl(NMA_data_analysis_subset_grpID$domain)
+  # class(NMA_data_analysis_subset_grpID$domain)
   
   ## Drop intervention versus comparison contrasts that have the same bundles
   tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
