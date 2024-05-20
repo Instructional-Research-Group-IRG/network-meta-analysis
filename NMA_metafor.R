@@ -200,11 +200,25 @@
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID)
   V_list   
 
-  ##Run standard NMA with the unique interventions bundles as moderators  
+  ## Calculate the number of unique contrasts in which each intervention bundle is included
   tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)
-  check_dall <- NMA_data_analysis_subset_grpID %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
-  print(check_dall)
+  num_contrasts_dall <- NMA_data_analysis_subset_grpID %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
+  print(num_contrasts_dall)
+  num_contrasts_dall_long <- num_contrasts_dall %>% pivot_longer(c(intervention_prelim, comparison_prelim ), names_to= "group_IC", values_to="group_intervention")
+  print(num_contrasts_dall_long)
+  num_contrasts_dall_long2 <- num_contrasts_dall_long %>% distinct(record_id, contrast_id, group_intervention, .keep_all = TRUE)
+  print(num_contrasts_dall_long2)
+  tabyl(num_contrasts_dall_long2$contrast_id) #Should be n=2 for each contrast if reshape and distinct steps done correctly: 1 intervention & 1 comparison per unique contrast. 
+  num_contrasts_dall_long3 <- tabyl(num_contrasts_dall_long2$group_intervention)
+  num_contrasts_dall_long3 <- num_contrasts_dall_long3 %>% dplyr::select(intervention= 'num_contrasts_dall_long2$group_intervention', num_contrasts= 'n')
+  str(num_contrasts_dall_long3)
+  num_contrasts_dall_long3$intervention <- as.character(num_contrasts_dall_long3$intervention)
+  num_contrasts_dall_long3$intervention <- gsub("\\+", ".", num_contrasts_dall_long3$intervention)
+  str(num_contrasts_dall_long3)
+  print(num_contrasts_dall_long3)
+  
+  ##Run standard NMA with the unique interventions bundles as moderators  
   res_mod <- rma.mv(effect_size, V_list, 
                     mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + NL.TES.FF.RS + NL.TES.RS + NL.TES.VF.RS + RS + TES.VF.RS + VF.FF.RS + VF.RS - 1, 
                     random = ~ 1 | record_id/es_id, 
@@ -234,7 +248,7 @@
     }
     lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], round_digits)
     lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], as.character)
-    lt_info_df2$ci.lb <- paste("(", lt_info_df2$ci.lb, " -", sep= "")
+    lt_info_df2$ci.lb <- paste("(", lt_info_df2$ci.lb, " ,", sep= "")
     lt_info_df2$ci.ub <- paste(lt_info_df2$ci.ub, ")", sep= "")
     lt_info_df2 <- lt_info_df2 %>% unite(pred_cis, pred, ci.lb, ci.ub, sep= " ", remove = FALSE )
     print(lt_info_df2)
@@ -278,13 +292,22 @@
     ### Create forest plot using ggplot
     
       #### First create plot of estimates and confidence intervals
+      res_mod_pscore <- res_mod_pscore %>% arrange(desc(Pscore))
+      str(res_mod_pscore)
+      print(res_mod_pscore)
+      print(num_contrasts_dall_long3)
+      res_mod_pscore <- res_mod_pscore %>% left_join(num_contrasts_dall_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
       res_mod_pscore$colour <- rep(c("white", "gray95","white", "gray95","white", "gray95","white", "gray95","white", "gray95","white"))
-      res_mod_pscore
+      str(res_mod_pscore)
+      print(res_mod_pscore)
+      
       res_mod_pscore_forest <- ggplot(res_mod_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
         geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
-        geom_pointrange(shape = 22, fill = "black", size = res_mod_pscore$estimate) +
+        geom_pointrange(shape = 22, fill = "black", size = res_mod_pscore$num_contrasts/7.5) +
+        geom_text(label = res_mod_pscore$num_contrasts, hjust = 0.5, vjust = -1.5, colour = "grey2", fontface="bold") +
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change with 95% Confidence Interval") +
+        labs(caption = "(Values above points are number of unique contrasts in which intervention is included)") +
         ylab("Intervention Bundle") +
         theme_classic() +
         scale_colour_identity() +
@@ -330,7 +353,7 @@
       #### Finally, merge plot and datatable for final forest plot
       final_fp_nma_dall <- grid.arrange(data_table, res_mod_pscore_forest, ncol=2)
       final_fp_nma_dall
-    
+
     ### Create network graph
     
     ### Note: The data are currently in a contrast-based, "wide" format in which each contrast is an observation 
@@ -397,7 +420,25 @@
   ## Calculate the variance-covariance matrix for multi-treatment studies
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d1gma)
   V_list     
-      
+
+  ## Calculate the number of unique contrasts in which each intervention bundle is included
+  tabyl(NMA_data_analysis_subset_grpID_d1gma$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID_d1gma$comparison_prelim)
+  num_contrasts_d1gma <- NMA_data_analysis_subset_grpID_d1gma %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
+  print(num_contrasts_d1gma)
+  num_contrasts_d1gma_long <- num_contrasts_d1gma %>% pivot_longer(c(intervention_prelim, comparison_prelim ), names_to= "group_IC", values_to="group_intervention")
+  print(num_contrasts_d1gma_long)
+  num_contrasts_d1gma_long2 <- num_contrasts_d1gma_long %>% distinct(record_id, contrast_id, group_intervention, .keep_all = TRUE)
+  print(num_contrasts_d1gma_long2)
+  tabyl(num_contrasts_d1gma_long2$contrast_id) #Should be n=2 for each contrast if reshape and distinct steps done correctly: 1 intervention & 1 comparison per unique contrast. 
+  num_contrasts_d1gma_long3 <- tabyl(num_contrasts_d1gma_long2$group_intervention)
+  num_contrasts_d1gma_long3 <- num_contrasts_d1gma_long3 %>% dplyr::select(intervention= 'num_contrasts_d1gma_long2$group_intervention', num_contrasts= 'n')
+  str(num_contrasts_d1gma_long3)
+  num_contrasts_d1gma_long3$intervention <- as.character(num_contrasts_d1gma_long3$intervention)
+  num_contrasts_d1gma_long3$intervention <- gsub("\\+", ".", num_contrasts_d1gma_long3$intervention)
+  str(num_contrasts_d1gma_long3)
+  print(num_contrasts_d1gma_long3)  
+        
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID_d1gma$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID_d1gma$comparison_prelim)
@@ -432,7 +473,7 @@
     }
     lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], round_digits)
     lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], as.character)
-    lt_info_df2$ci.lb <- paste("(", lt_info_df2$ci.lb, " -", sep= "")
+    lt_info_df2$ci.lb <- paste("(", lt_info_df2$ci.lb, " ,", sep= "")
     lt_info_df2$ci.ub <- paste(lt_info_df2$ci.ub, ")", sep= "")
     lt_info_df2 <- lt_info_df2 %>% unite(pred_cis, pred, ci.lb, ci.ub, sep= " ", remove = FALSE )
     print(lt_info_df2)
@@ -477,10 +518,17 @@
     
       #### First create plot of estimates and confidence intervals
       res_mod_d1gma_pscore$colour <- rep(c("white", "gray95","white", "gray95","white"))
-      res_mod_d1gma_pscore
+      res_mod_d1gma_pscore <- res_mod_d1gma_pscore %>% arrange(desc(Pscore))
+      str(res_mod_d1gma_pscore)
+      print(res_mod_d1gma_pscore)
+      print(num_contrasts_d1gma_long3)
+      res_mod_d1gma_pscore <- res_mod_d1gma_pscore %>% left_join(num_contrasts_d1gma_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
+      str(res_mod_d1gma_pscore)
+      print(res_mod_d1gma_pscore)
+      
       res_mod_d1gma_pscore_forest <- ggplot(res_mod_d1gma_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
         geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
-        geom_pointrange(shape = 22, fill = "black", size = res_mod_d1gma_pscore$estimate) + 
+        geom_pointrange(shape = 22, fill = "black", size = res_mod_d1gma_pscore$num_contrasts/7.5) + 
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change with 95% Confidence Interval") +
         ylab("Intervention Bundle") +
@@ -594,7 +642,25 @@
       
   ## Calculate the variance-covariance matrix for multi-treatment studies
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d2rn)
-  V_list     
+  V_list
+  
+  ## Calculate the number of unique contrasts in which each intervention bundle is included
+  tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID_d2rn$comparison_prelim)
+  num_contrasts_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
+  print(num_contrasts_d2rn)
+  num_contrasts_d2rn_long <- num_contrasts_d2rn %>% pivot_longer(c(intervention_prelim, comparison_prelim ),names_to= "group_IC", values_to="group_intervention")
+  print(num_contrasts_d2rn_long)
+  num_contrasts_d2rn_long2 <- num_contrasts_d2rn_long %>% distinct(record_id, contrast_id, group_intervention, .keep_all = TRUE)
+  print(num_contrasts_d2rn_long2)
+  tabyl(num_contrasts_d2rn_long2$contrast_id) #Should be n=2 for each contrast if reshape and distinct steps done correctly: 1 intervention & 1 comparison per unique contrast. 
+  num_contrasts_d2rn_long3 <- tabyl(num_contrasts_d2rn_long2$group_intervention)
+  num_contrasts_d2rn_long3 <- num_contrasts_d2rn_long3 %>% dplyr::select(intervention= 'num_contrasts_d2rn_long2$group_intervention', num_contrasts= 'n')
+  str(num_contrasts_d2rn_long3)
+  num_contrasts_d2rn_long3$intervention <- as.character(num_contrasts_d2rn_long3$intervention)
+  num_contrasts_d2rn_long3$intervention <- gsub("\\+", ".", num_contrasts_d2rn_long3$intervention)
+  str(num_contrasts_d2rn_long3)
+  print(num_contrasts_d2rn_long3)
       
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
@@ -630,7 +696,7 @@
       }
       lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], round_digits)
       lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], as.character)
-      lt_info_df2$ci.lb <- paste("(", lt_info_df2$ci.lb, " -", sep= "")
+      lt_info_df2$ci.lb <- paste("(", lt_info_df2$ci.lb, " ,", sep= "")
       lt_info_df2$ci.ub <- paste(lt_info_df2$ci.ub, ")", sep= "")
       lt_info_df2 <- lt_info_df2 %>% unite(pred_cis, pred, ci.lb, ci.ub, sep= " ", remove = FALSE )
       print(lt_info_df2)
@@ -675,10 +741,17 @@
       
       #### First create plot of estimates and confidence intervals
       res_mod_d2rn_pscore$colour <- rep(c("white", "gray95","white", "gray95","white","gray95","white"))
-      res_mod_d2rn_pscore
+      res_mod_d2rn_pscore <- res_mod_d2rn_pscore %>% arrange(desc(Pscore))
+      str(res_mod_d2rn_pscore)
+      print(res_mod_d2rn_pscore)
+      print(num_contrasts_d2rn_long3)
+      res_mod_d2rn_pscore <- res_mod_d2rn_pscore %>% left_join(num_contrasts_d2rn_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
+      print(res_mod_d2rn_pscore)
+      str(res_mod_d2rn_pscore)      
+      
       res_mod_d2rn_pscore_forest <- ggplot(res_mod_d2rn_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
         geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
-        geom_pointrange(shape = 22, fill = "black", size = res_mod_d2rn_pscore$estimate) + 
+        geom_pointrange(shape = 22, fill = "black", size = res_mod_d2rn_pscore$num_contrasts/7.5) + 
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change with 95% Confidence Interval") +
         ylab("Intervention Bundle") +
@@ -792,7 +865,25 @@
       
   ## Calculate the variance-covariance matrix for multi-treatment studies
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d3wn)
-  V_list     
+  V_list    
+  
+  ## Calculate the number of unique contrasts in which each intervention bundle is included
+  tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)
+  num_contrasts_d3wn <- NMA_data_analysis_subset_grpID_d3wn %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
+  print(num_contrasts_d3wn)
+  num_contrasts_d3wn_long <- num_contrasts_d3wn %>% pivot_longer(c(intervention_prelim, comparison_prelim ),names_to= "group_IC", values_to="group_intervention")
+  print(num_contrasts_d3wn_long)
+  num_contrasts_d3wn_long2 <- num_contrasts_d3wn_long %>% distinct(record_id, contrast_id, group_intervention, .keep_all = TRUE)
+  print(num_contrasts_d3wn_long2)
+  tabyl(num_contrasts_d3wn_long2$contrast_id) #Should be n=2 for each contrast if reshape and distinct steps done correctly: 1 intervention & 1 comparison per unique contrast. 
+  num_contrasts_d3wn_long3 <- tabyl(num_contrasts_d3wn_long2$group_intervention)
+  num_contrasts_d3wn_long3 <- num_contrasts_d3wn_long3 %>% dplyr::select(intervention= 'num_contrasts_d3wn_long2$group_intervention', num_contrasts= 'n')
+  str(num_contrasts_d3wn_long3)
+  num_contrasts_d3wn_long3$intervention <- as.character(num_contrasts_d3wn_long3$intervention)
+  num_contrasts_d3wn_long3$intervention <- gsub("\\+", ".", num_contrasts_d3wn_long3$intervention)
+  str(num_contrasts_d3wn_long3)
+  print(num_contrasts_d3wn_long3)  
       
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID_d3wn$intervention_prelim)
@@ -828,7 +919,7 @@
     }
     lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], round_digits)
     lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], as.character)
-    lt_info_df2$ci.lb <- paste("(", lt_info_df2$ci.lb, " -", sep= "")
+    lt_info_df2$ci.lb <- paste("(", lt_info_df2$ci.lb, " ,", sep= "")
     lt_info_df2$ci.ub <- paste(lt_info_df2$ci.ub, ")", sep= "")
     lt_info_df2 <- lt_info_df2 %>% unite(pred_cis, pred, ci.lb, ci.ub, sep= " ", remove = FALSE )
     print(lt_info_df2)
@@ -873,10 +964,17 @@
       
       #### First create plot of estimates and confidence intervals
       res_mod_d3wn_pscore$colour <- rep(c("white", "gray95","white", "gray95","white","gray95"))
-      res_mod_d3wn_pscore
+      res_mod_d3wn_pscore <- res_mod_d3wn_pscore %>% arrange(desc(Pscore))
+      str(res_mod_d3wn_pscore)
+      print(res_mod_d3wn_pscore)
+      print(num_contrasts_d3wn_long3)
+      res_mod_d3wn_pscore <- res_mod_d3wn_pscore %>% left_join(num_contrasts_d3wn_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
+      str(res_mod_d3wn_pscore)     
+      print(res_mod_d3wn_pscore)
+
       res_mod_d3wn_pscore_forest <- ggplot(res_mod_d3wn_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
         geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
-        geom_pointrange(shape = 22, fill = "black", size = res_mod_d3wn_pscore$estimate) + 
+        geom_pointrange(shape = 22, fill = "black", size = res_mod_d3wn_pscore$num_contrasts/7.5) + 
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change with 95% Confidence Interval") +
         ylab("Intervention Bundle") +
