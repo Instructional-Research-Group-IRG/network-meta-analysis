@@ -304,10 +304,10 @@
       res_mod_pscore_forest <- ggplot(res_mod_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
         geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
         geom_pointrange(shape = 22, fill = "black", size = res_mod_pscore$num_contrasts/7.5) +
-        geom_text(label = res_mod_pscore$num_contrasts, hjust = 0.5, vjust = -1.5, colour = "grey2", fontface="bold") +
+        geom_text(label = res_mod_pscore$num_contrasts, hjust = -1.25, vjust = 1, colour = "black", fontface="bold", size =3) +
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change with 95% Confidence Interval") +
-        labs(caption = "(Values above points are number of unique contrasts in which intervention is included)") +
+        labs(caption = "*Size of and values next to points indicate the number of contrasts in which intervention is included", hjust=0) +
         ylab("Intervention Bundle") +
         theme_classic() +
         scale_colour_identity() +
@@ -333,17 +333,17 @@
       res_mod_pscore2 <- res_mod_pscore2 %>% unite(estimate_cis, estimate, ci.lb, ci.ub, sep= " ", remove = FALSE )
       print(res_mod_pscore2)
       
-      LfLabels<-data.frame(x=c(0,4.5,6.7),
+      LfLabels<-data.frame(x=c(0,1,4),
                            y=c(rep(length(unique(res_mod_pscore2$estimate))-0.2,times=3)),
                            lab=c("Intervention","Estimate (95% CI)","P-score"))
       LfLabels
       
       data_table <- ggplot(data = res_mod_pscore2, aes(y = intervention)) +
         geom_hline(aes(yintercept = intervention, colour = colour), size = 7) +
-        geom_text(aes(x = 0, label = intervention), hjust = 0) +
-        geom_text(aes(x = 5, label = estimate_cis)) +
-        geom_text(aes(x = 7, label = Pscore), hjust = 1) +
-        geom_text(data=LfLabels,aes(x,y,label=lab, fontface="bold"), vjust=-3, hjust=0, size=4, size=4) +
+        geom_text(aes(x = 0, label = intervention, hjust=0)) +
+        geom_text(aes(x = 2.5, label = estimate_cis)) +
+        geom_text(aes(x = 4, label = Pscore)) +
+        geom_text(data=LfLabels,aes(x,y,label=lab, fontface="bold"), vjust=-2, hjust=0, size=4) +
         scale_colour_identity() +
         theme_void() + 
         theme(plot.margin = margin(5, 0, 35, 0)) +
