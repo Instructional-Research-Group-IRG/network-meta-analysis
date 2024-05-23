@@ -27,15 +27,20 @@ library(MuMIn)
   convert_to_character <- function(x) {
     as.character(x)
   }
-  NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab")] <- lapply(NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab")], convert_to_character)
+  NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab","FWOF_TX")] <- lapply(NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab","FWOF_TX")], convert_to_character)
   convert_to_factor <- function(x) {
     as.factor(x)
-  }    
+  } 
   NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab")] <- lapply(NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab")], convert_to_factor)
   tab_list_to_factor <- function(x) {
     tabyl(x)
   }
   lapply(NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab")], tab_list_to_factor)
+  NNMA_Data_Subset$FWOF_TX <- gsub("NULL", "0", NNMA_Data_Subset$FWOF_TX)
+  convert_to_numeric <- function(x) {
+    as.numeric(x)
+  }
+  NNMA_Data_Subset[c("FWOF_TX","grade_level","research_lab","group_size_category","ongoing_training")] <- lapply(NNMA_Data_Subset[c("FWOF_TX","grade_level","research_lab","group_size_category","ongoing_training")], convert_to_numeric)
 
 #Create unique group ID for each independent group within a study (record ID)
 
@@ -125,10 +130,17 @@ var_class <- function(x) {
   class(x)
 }
 lapply(NNMA_Data_Subset_grpID[c("NL_TX", "TES_TX", "VF_TX", "RS_TX", "FF_TX...62", "N_TX", "SEO_TX", "TV_TX", "RV_TX", "FWOF_TX")], var_class)
+lapply(NNMA_Data_Subset_grpID[c("publication_year", "domain", "control_nature", "dosage_overall_hours_avg", "group_size_category", "grade_level")], var_class)
+lapply(NNMA_Data_Subset_grpID[c("measure_developer", "interventionist", "ongoing_training", "research_lab", "intervention_content")], var_class)
+
+# cor(NNMA_Data_Subset_grpID[c("NL_TX", "TES_TX", "VF_TX", "RS_TX", "FF_TX...62", "N_TX", "SEO_TX", "TV_TX", "RV_TX", "FWOF_TX",
+#                              "publication_year", "domain", "control_nature", "dosage_overall_hours_avg", "group_size_category", "grade_level", 
+#                              "measure_developer", "interventionist", "ongoing_training", "research_lab", "intervention_content")])
+
 
 cor(NNMA_Data_Subset_grpID[c("NL_TX", "TES_TX", "VF_TX", "RS_TX", "FF_TX...62", "N_TX", "SEO_TX", "TV_TX", "RV_TX", "FWOF_TX",
-      "publication_year", "domain", "control_nature", "dosage_overall_hours_avg", "group_size_category", "grade_level", 
-      "measure_developer", "interventionist", "ongoing_training", "research_lab", "intervention_content")])
+                             "publication_year", "dosage_overall_hours_avg", "grade_level",
+                             "research_lab", "ongoing_training")])
 
 #Run meta-regressions
 
