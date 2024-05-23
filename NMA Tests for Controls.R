@@ -18,8 +18,7 @@ library(MuMIn)
   
   ##This subset is specific to the meta-regression model. It is a preliminary subset that includes only non-TvsT studies.
   NNMA_Data_Subset <- subset(NNMA_Data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") &
-                               aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") &
-                               TvsT==0)
+                               aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR"))
   
   ##Replace all NA values in the moderators with 0 to avoid the "Processing terminated since k <= 1" error
   NNMA_Data_Subset <- NNMA_Data_Subset %>% replace_na(list(NL_TX = 0, EX_TX = 0, VF_TX = 0, FF_TX = 0, RS_TX = 0))
@@ -41,7 +40,7 @@ library(MuMIn)
 #Create unique group ID for each independent group within a study (record ID)
 
   ##Keep only record ID, intervention/comparison bundle, intervention/comparison sample size 
-  NNMA_Data_grpID <- NNMA_Data_Subset %>% select(record_id, intervention = intervention_prelim, comparison = comparison_prelim, intervention_n, comparison_n)
+  NNMA_Data_grpID <- NNMA_Data_Subset %>% dplyr::select(record_id, intervention = intervention_prelim, comparison = comparison_prelim, intervention_n, comparison_n)
   str(NNMA_Data_grpID)
   
   ## For each assignment group, combine component bundle and sample size into a single character variable to distinguish groups with the same sample sizes but different component bundles. 
@@ -55,7 +54,7 @@ library(MuMIn)
   str(NNMA_Data_grpID)
   NNMA_Data_grpID
 
-  NNMA_Data_grpID <- NNMA_Data_grpID %>% select(record_id, int_n_chr_bundle, com_n_chr_bundle)
+  NNMA_Data_grpID <- NNMA_Data_grpID %>% dplyr::select(record_id, int_n_chr_bundle, com_n_chr_bundle)
   NNMA_Data_grpID
   
   ## Reshape long so that total number of unique groups within each record ID can be counted and assigned a unique group ID 
@@ -67,7 +66,7 @@ library(MuMIn)
   ## For example, one combination of bundle + sample size could have been assigned to intervention for one contrast but to comparison for another contrast of the same record ID. 
   ## In this case, this would be the same unique group of individuals in both contrasts despite the different group assignments and therefore should have the same group ID (not two different ones) to capture all dependencies.
   ## There may be no cases of this in the data but let's control for it just in case by removing bundle + group sample size duplicates within each study regardless of group assignment.
-  NNMA_Data_grpID_long_unique <- NNMA_Data_grpID_long %>% group_by(record_id) %>% distinct(bundle_samplesize, .keep_all = TRUE) %>% select(-assignment) %>% ungroup()
+  NNMA_Data_grpID_long_unique <- NNMA_Data_grpID_long %>% group_by(record_id) %>% distinct(bundle_samplesize, .keep_all = TRUE) %>% dplyr::select(-assignment) %>% ungroup()
   NNMA_Data_grpID_long_unique
   
   ##Create unique group ID for each combination of bundle + sample size, by record ID (study)
@@ -108,7 +107,7 @@ library(MuMIn)
   ## Validate merge results
   assert_values(NNMA_Data_Subset_grpID, colnames= c("group1_id","group2_id"), test = "not_na", test_val = NA)
   assert_values(NNMA_Data_Subset_grpID, colnames= "group1_id", test="not_equal", test_val= "group2_id")
-  NNMA_Data_Subset_grpID_check <- NNMA_Data_Subset_grpID %>% select(record_id, contrast_id, aggregated, measure_type, measure_name, wwc_rating, intervention_prelim, intervention_n, group1_id, comparison_prelim, comparison_n, group2_id)
+  NNMA_Data_Subset_grpID_check <- NNMA_Data_Subset_grpID %>% dplyr::select(record_id, contrast_id, aggregated, measure_type, measure_name, wwc_rating, intervention_prelim, intervention_n, group1_id, comparison_prelim, comparison_n, group2_id)
   NNMA_Data_Subset_grpID_check %>% print(n = Inf) 
   
   ## Restore "NA" (non-missing) values to their true <NA> (missing) values because the unite then separate functions used above changed the values from <NA> to "NA"
@@ -120,6 +119,16 @@ library(MuMIn)
 
 #Create covariance matrix
 V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NNMA_Data_Subset_grpID)
+
+##Calculate Correlation Matrix (i.e., bivariate correlations among moderator variables and instructional components)
+var_class <- function(x) {
+  class(x)
+}
+lapply(NNMA_Data_Subset_grpID[c("NL_TX", "TES_TX", "VF_TX", "RS_TX", "FF_TX...62", "N_TX", "SEO_TX", "TV_TX", "RV_TX", "FWOF_TX")], var_class)
+
+cor(NNMA_Data_Subset_grpID[c("NL_TX", "TES_TX", "VF_TX", "RS_TX", "FF_TX...62", "N_TX", "SEO_TX", "TV_TX", "RV_TX", "FWOF_TX",
+      "publication_year", "domain", "control_nature", "dosage_overall_hours_avg", "group_size_category", "grade_level", 
+      "measure_developer", "interventionist", "ongoing_training", "research_lab", "intervention_content")])
 
 #Run meta-regressions
 
@@ -258,3 +267,28 @@ V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, r
                     cluster = NNMA_Data_Subset_grpID$record_id, 
                     vcov = "CR2")
   mvcf
+
+  
+  
+  
+  
+  ## example of Benjamini-Hochvery adjustment for multiple comparisons
+  ## this assumes you have a dataframe with the results of each moderator analysis at each level of
+  ## all included moderators
+  
+  mod_analysis_BHcorrection <- mod_analysis %>% 
+    # this numbers each row, thus allowing you to determine how many tests you ran, for categorical
+    # model this should reflecct one test for each level of the categorical model
+    rowid_to_column(var = "order_id") %>% 
+    ## filter if needed
+    ## group_by(domain) %>% ## only use if you have multiple outcome domains, otherwise remove
+    arrange(domain, p) %>% ## only arrange by p (p-value) if no multiple outcome domains
+    mutate(rank = seq_along(p),
+           BH_val = (rank/length(rank)*.10), # specifies BH corrected level
+           p_less_BH = case_when(p < BH_val ~ "Yes",
+                                 p >= BH_val ~ "No"),
+           BH_sig = if_else(cumall(p_less_BH == "No"), "", if_else(p <= max(p[p_less_BH == "Yes"]), "*", ""))) %>% 
+    ungroup() %>% 
+    arrange(order_id)
+  # here you can select your final dataframe
+  # select(domain:moderator, df_4, coef, p, BH_sig, ES, CI_LB:CI_UB, k, nES, Comments) 
