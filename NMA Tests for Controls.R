@@ -383,7 +383,7 @@ cor(NNMA_Data_Subset_grpID[c("NL_TX", "TES_TX", "VF_TX", "RS_TX", "FF_TX...62", 
   NNMA_control_intervention_content_df
   
   mod_analysis <- rbind(NNMA_control_dosage_overall_hours_avg_df, NNMA_control_group_size_category_df, NNMA_control_grade_level_df, NNMA_control_measure_developer_df, NNMA_control_interventionist_df, NNMA_control_year_df, NNMA_control_ongoing_training_df, NNMA_control_research_lab_df, NNMA_control_domain_df, NNMA_control_control_nature_df, NNMA_control_intervention_content_df)
-  mod_analysis
+  print(mod_analysis, n=Inf) 
   
   mod_analysis_BHcorrection <- mod_analysis %>% 
     # this numbers each row, thus allowing you to determine how many tests you ran, for categorical
