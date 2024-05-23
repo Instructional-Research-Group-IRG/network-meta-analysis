@@ -134,14 +134,14 @@ lapply(NNMA_Data_Subset_grpID[c("NL_TX", "TES_TX", "VF_TX", "RS_TX", "FF_TX...62
 lapply(NNMA_Data_Subset_grpID[c("publication_year", "domain", "control_nature", "dosage_overall_hours_avg", "group_size_category", "grade_level")], var_class)
 lapply(NNMA_Data_Subset_grpID[c("measure_developer", "interventionist", "ongoing_training", "research_lab", "intervention_content")], var_class)
 
-# cor(NNMA_Data_Subset_grpID[c("NL_TX", "TES_TX", "VF_TX", "RS_TX", "FF_TX...62", "N_TX", "SEO_TX", "TV_TX", "RV_TX", "FWOF_TX",
+# cor(NNMA_Data_Subset_grpID[c("NL_TX", "TES_TX", "VF_TX", "RS_TX", "FF_TX", "N_TX", "SEO_TX", "TV_TX", "RV_TX", "FWOF_TX",
 #                              "publication_year", "domain", "control_nature", "dosage_overall_hours_avg", "group_size_category", "grade_level", 
 #                              "measure_developer", "interventionist", "ongoing_training", "research_lab", "intervention_content")])
 
 
 cor(NNMA_Data_Subset_grpID[c("NL_TX", "TES_TX", "VF_TX", "RS_TX", "FF_TX...62", "N_TX", "SEO_TX", "TV_TX", "RV_TX", "FWOF_TX",
-                             "publication_year", "dosage_overall_hours_avg", "grade_level",
-                             "research_lab", "ongoing_training")])
+                             "publication_year", "dosage_overall_hours_avg", "group_size_category", "grade_level",
+                             "ongoing_training", "research_lab")])
 
 #Run meta-regressions
 
