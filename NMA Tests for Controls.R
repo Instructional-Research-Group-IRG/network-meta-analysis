@@ -361,13 +361,13 @@ NNMA_control_grade_level_df
 
 NNMA_control_measure_developer_df <- tidy(NNMA_control_measure_developer, conf.int = TRUE)
 NNMA_control_measure_developer_df
-NNMA_control_grade_level_df$term <- gsub("overall", "measure_developer", NNMA_control_measure_developer_df$term)
-NNMA_control_grade_level_df 
+NNMA_control_measure_developer_df$term <- gsub("overall", "measure_developer", NNMA_control_measure_developer_df$term)
+NNMA_control_measure_developer_df 
 
 NNMA_control_interventionist_df <- tidy(NNMA_control_interventionist, conf.int = TRUE)
 NNMA_control_interventionist_df
-NNMA_control_grade_level_df$term <- gsub("overall", "interventionist", NNMA_control_interventionist_df$term)
-NNMA_control_grade_level_df 
+NNMA_control_interventionist_df$term <- gsub("overall", "interventionist", NNMA_control_interventionist_df$term)
+NNMA_control_interventionist_df 
 
 NNMA_control_year_df <- tidy(NNMA_control_year, conf.int = TRUE)
 NNMA_control_year_df
@@ -386,18 +386,18 @@ NNMA_control_research_lab_df
 
 NNMA_control_domain_df <- tidy(NNMA_control_domain, conf.int = TRUE)  
 NNMA_control_domain_df 
-NNMA_control_research_lab_df$term <- gsub("overall", "domain", NNMA_control_domain_df$term)
-NNMA_control_research_lab_df 
+NNMA_control_domain_df$term <- gsub("overall", "domain", NNMA_control_domain_df$term)
+NNMA_control_domain_df 
 
 NNMA_control_control_nature_df <- tidy(NNMA_control_control_nature, conf.int = TRUE)  
 NNMA_control_control_nature_df
-NNMA_control_research_lab_df$term <- gsub("overall", "control_nature", NNMA_control_control_nature_df$term)
-NNMA_control_research_lab_df 
+NNMA_control_control_nature_df$term <- gsub("overall", "control_nature", NNMA_control_control_nature_df$term)
+NNMA_control_control_nature_df 
 
 NNMA_control_intervention_content_df <- tidy(NNMA_control_intervention_content, conf.int = TRUE)  
 NNMA_control_intervention_content_df
-NNMA_control_research_lab_df$term <- gsub("overall", "intervention_content", NNMA_control_intervention_content_df$term)
-NNMA_control_research_lab_df 
+NNMA_control_intervention_content_df$term <- gsub("overall", "intervention_content", NNMA_control_intervention_content_df$term)
+NNMA_control_intervention_content_df 
 
 mod_analysis <- rbind(NNMA_control_dosage_overall_hours_avg_df, NNMA_control_group_size_category_df, NNMA_control_grade_level_df, NNMA_control_measure_developer_df, NNMA_control_interventionist_df, NNMA_control_year_df, NNMA_control_ongoing_training_df, NNMA_control_research_lab_df, NNMA_control_domain_df, NNMA_control_control_nature_df, NNMA_control_intervention_content_df)
 print(mod_analysis, n=Inf) 
