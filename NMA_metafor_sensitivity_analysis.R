@@ -619,7 +619,7 @@
         theme(plot.margin = margin(5, 0, 35, 0)) +
         scale_y_discrete(limits = rev(res_mod_d3wnSA_pscore$intervention)) 
       data_table
-      
+       
       #### Finally, merge plot and datatable for final forest plot
       final_fp_nma_d3wnSA <- grid.arrange(data_table, res_mod_d3wnSA_pscore_forest, ncol=2)
       final_fp_nma_d3wnSA

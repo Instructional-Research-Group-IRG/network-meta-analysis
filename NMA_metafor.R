@@ -9,7 +9,7 @@
   ## Install 'devel' version of metafor package
   ##install.packages("remotes") 
   ##remotes::install_github("wviechtb/metafor") 
-  
+   
   ## Install and load other required packages
   ##install.packages("pacman") 
   pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr, janitor, naniar, igraph, multcomp, broom, gridExtra, ggplot2, writexl, readr)
