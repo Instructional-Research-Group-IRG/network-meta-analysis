@@ -467,8 +467,8 @@
   V_list    
   
   ## Calculate the number of unique contrasts in which each intervention bundle is included
-  tabyl(NMA_data_analysis_subset_grpID$intervention_combo)
-  tabyl(NMA_data_analysis_subset_grpID$comparison_combo)
+  tabyl(NMA_data_analysis_subset_grpID_d3wnSA$intervention_combo)
+  tabyl(NMA_data_analysis_subset_grpID_d3wnSA$comparison_combo)
   num_contrasts_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% dplyr::select(record_id, contrast_id, intervention_combo, comparison_combo)
   print(num_contrasts_d3wnSA)
   num_contrasts_d3wnSA_long <- num_contrasts_d3wnSA %>% pivot_longer(c(intervention_combo, comparison_combo ),names_to= "group_IC", values_to="group_intervention")

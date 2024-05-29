@@ -219,6 +219,8 @@
   print(num_contrasts_dall_long3)
   
   ##Run standard NMA with the unique interventions bundles as moderators  
+  tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)  
   res_mod <- rma.mv(effect_size, V_list, 
                     mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + NL.TES.FF.RS + NL.TES.RS + NL.TES.VF.RS + RS + TES.VF.RS + VF.FF.RS + VF.RS - 1, 
                     random = ~ 1 | record_id/es_id, 
