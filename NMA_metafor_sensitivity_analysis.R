@@ -112,12 +112,12 @@
     ### Create forest plot using ggplot
     
       #### First create plot of estimates and confidence intervals
-      res_mod_d1gmaSA_pscore$colour <- rep(c("white", "gray95","white", "gray95","white","gray95","white", "gray95","white","gray95","white", "gray95","white"))
       res_mod_d1gmaSA_pscore <- res_mod_d1gmaSA_pscore %>% arrange(desc(Pscore))
       str(res_mod_d1gmaSA_pscore)
       print(res_mod_d1gmaSA_pscore)
       print(num_contrasts_d1gmaSA_long3)
       res_mod_d1gmaSA_pscore <- res_mod_d1gmaSA_pscore %>% left_join(num_contrasts_d1gmaSA_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
+      res_mod_d1gmaSA_pscore$colour <- rep(c("white", "gray95","white", "gray95","white","gray95","white", "gray95","white","gray95","white", "gray95","white"))
       str(res_mod_d1gmaSA_pscore)
       print(res_mod_d1gmaSA_pscore)
       
@@ -337,14 +337,14 @@
     ### Create forest plot using ggplot
 
       #### First create plot of estimates and confidence intervals
-      res_mod_d2rnSA_pscore$colour <- rep(c("white", "gray95","white", "gray95","white","gray95","white", "gray95","white", "gray95"))
       res_mod_d2rnSA_pscore <- res_mod_d2rnSA_pscore %>% arrange(desc(Pscore))
       str(res_mod_d2rnSA_pscore)
       print(res_mod_d2rnSA_pscore)
       print(num_contrasts_d2rnSA_long3)
       res_mod_d2rnSA_pscore <- res_mod_d2rnSA_pscore %>% left_join(num_contrasts_d2rnSA_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-      print(res_mod_d2rnSA_pscore)
+      res_mod_d2rnSA_pscore$colour <- rep(c("white", "gray95","white", "gray95","white","gray95","white", "gray95","white", "gray95"))
       str(res_mod_d2rnSA_pscore)      
+      print(res_mod_d2rnSA_pscore)
       
       res_mod_d2rnSA_pscore_forest <- ggplot(res_mod_d2rnSA_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
         geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
@@ -562,12 +562,12 @@
     ### Create forest plot using ggplot
 
       #### First create plot of estimates and confidence intervals
-      res_mod_d3wnSA_pscore$colour <- rep(c("white", "gray95","white", "gray95","white","gray95", "gray95","white", "gray95","white","gray95", "gray95","white", "gray95","white","gray95", "gray95","white", "gray95","white","gray95", "gray95","white", "gray95","white"))
       res_mod_d3wnSA_pscore <- res_mod_d3wnSA_pscore %>% arrange(desc(Pscore))
       str(res_mod_d3wnSA_pscore)
       print(res_mod_d3wnSA_pscore)
       print(num_contrasts_d3wnSA_long3)
       res_mod_d3wnSA_pscore <- res_mod_d3wnSA_pscore %>% left_join(num_contrasts_d3wnSA_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
+      res_mod_d3wnSA_pscore$colour <- rep(c("white", "gray95","white", "gray95","white","gray95", "gray95","white", "gray95","white","gray95", "gray95","white", "gray95","white","gray95", "gray95","white", "gray95","white","gray95", "gray95","white", "gray95","white"))
       str(res_mod_d3wnSA_pscore)     
       print(res_mod_d3wnSA_pscore)
       

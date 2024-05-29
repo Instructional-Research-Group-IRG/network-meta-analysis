@@ -750,8 +750,8 @@
       print(num_contrasts_d2rn_long3)
       res_mod_d2rn_pscore <- res_mod_d2rn_pscore %>% left_join(num_contrasts_d2rn_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
       res_mod_d2rn_pscore$colour <- rep(c("white", "gray95","white", "gray95","white","gray95","white"))
+      str(res_mod_d2rn_pscore)   
       print(res_mod_d2rn_pscore)
-      str(res_mod_d2rn_pscore)      
       
       res_mod_d2rn_pscore_forest <- ggplot(res_mod_d2rn_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
         geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
