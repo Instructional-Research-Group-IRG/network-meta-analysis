@@ -403,7 +403,7 @@
             layout=layout_in_circle(g),
             #layout=layout_nicely(g),
             #layout=layout_with_lgl(g),
-             vertex.size=20, vertex.color=c("lightgray","lightblue","red","yellow","green","orange","pink","violet"), vertex.label.color="black", vertex.label.font=2)  
+             vertex.size=20, vertex.color=c("lightgray","lightblue","gold","red","yellow","green","orange","pink","violet","aquamarine","royalblue1","olivedrab"), vertex.label.color="black", vertex.label.font=2)  
      
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "General Mathematics Achievement"
       
@@ -628,7 +628,7 @@
            layout=layout_in_circle(g),
            #layout=layout_nicely(g),
            #layout=layout_with_lgl(g),
-           vertex.size=20, vertex.color="lightgray", vertex.label.color="black", vertex.label.font=2)  
+           vertex.size=20, vertex.color=c("lightgray","lightblue","gold","yellow","violet","olivedrab"), vertex.label.color="black", vertex.label.font=2)  
       
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "Rational Numbers"
       
@@ -853,7 +853,7 @@
            layout=layout_in_circle(g),
            #layout=layout_nicely(g),
            #layout=layout_with_lgl(g),
-           vertex.size=20, vertex.color="lightgray", vertex.label.color="black", vertex.label.font=2)   
+           vertex.size=20, vertex.color=c("lightgray","red","yellow","green","orange","pink","violet","aquamarine"), vertex.label.color="black", vertex.label.font=2)   
       
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "Whole Numbers"
       
