@@ -1078,4 +1078,4 @@
            layout=layout_in_circle(g),
            #layout=layout_nicely(g),
            #layout=layout_with_lgl(g),
-           vertex.size=20, vertex.color="lightgray", vertex.label.color="black", vertex.label.font=2)       
+           vertex.size=20, vertex.color=c("lightgray","lightblue","gold","red","violet","royalblue1","olivedrab"), vertex.label.color="black", vertex.label.font=2)       
