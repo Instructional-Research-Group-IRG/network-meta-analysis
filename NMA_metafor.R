@@ -218,21 +218,23 @@
   str(num_contrasts_dall_long3)
   print(num_contrasts_dall_long3)
   
-  ## Calculate the number of unique contrasts in which each intervention bundle is included
-  tabyl(NMA_data_analysis_subset_grpID$intervention_n)
-  tabyl(NMA_data_analysis_subset_grpID$comparison_n)  
-  tabyl(NMA_data_analysis_subset_grpID$full_sample_size)
+  ## Calculate the number of students within each intervention bundle across all unique study-contrasts
   num_students_dall <- NMA_data_analysis_subset_grpID %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
   print(num_students_dall)
-  num_students_dall_long <- num_students_dall %>% pivot_longer(c(intervention_prelim, comparison_prelim ), names_to= "group_IC", values_to="intervention_comparison")
+  num_students_dall2 <- num_students_dall %>% distinct(record_id, contrast_id, .keep_all = TRUE) #Keep only unique entries of each unique study-contrast so that each group of students is not summed more than once (because of multiple measures within some contrasts).
+  print(num_students_dall2) 
+  num_students_dall_long <- num_students_dall2 %>% pivot_longer(c(intervention_prelim, comparison_prelim ), names_to= "group_IC", values_to="intervention_comparison") #Put intervention and comparison groups in same row for summing students receiving the same intervention bundle regardless of whether it was received in the intervention or comparison group assignment.
   print(num_students_dall_long, n=20)
-  num_students_dall_long2 <- num_students_dall_long %>% distinct(record_id, contrast_id, intervention_comparison, .keep_all = TRUE)
-  num_students_dall_long2 <- num_students_dall_long2 %>% mutate(num_students_bundle= ifelse(group_IC == "intervention_prelim", intervention_n, comparison_n))
+  num_students_dall_long2 <- num_students_dall_long %>% mutate(num_students_bundle= ifelse(group_IC == "intervention_prelim", intervention_n, comparison_n)) # Put number of students by assignment group in same column condition on the intervention/comparison group assignment.
   print(num_students_dall_long2)
-  num_students_dall_long3 <- num_students_dall_long2 %>% group_by(intervention_comparison) %>% summarize(sum_num_students_bundle= sum(num_students_bundle))
+  num_students_dall_long3 <- num_students_dall_long2 %>% group_by(intervention_comparison) %>% summarize(sum_num_students_bundle= sum(num_students_bundle)) # Sum students by intervention bundle.
+  str(num_students_dall_long3)
+  print(num_students_dall_long3)
+  target_dall <- c("BAU","FF","FF+RS","NL+FF+RS","NL+RS","NL+TES+FF+RS","NL+TES+RS","NL+TES+VF+RS","RS","TES+VF+RS","VF+FF+RS","VF+RS")
+  num_students_dall_long3 <- num_students_dall_long3[match(target_dall, num_students_dall_long3$intervention_comparison),]
+  print(num_students_dall_long3)  
   num_students_dall_long3$intervention_comparison <- as.character(num_students_dall_long3$intervention_comparison)
   str(num_students_dall_long3)
-  print(num_students_dall_long3, n=20)
   
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
@@ -416,13 +418,20 @@
       #### Creating the network graph with igraph
       set.seed(3524)
       g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
+      
       # plot.igraph(g, edge.curved=FALSE, edge.width=E(g)$weight,
       #       layout=layout_in_circle(g),
       #       #layout=layout_nicely(g),
       #       #layout=layout_with_lgl(g),
       #        vertex.size=20, vertex.color=c("lightgray","lightblue","gold","red","yellow","green","orange","pink","violet","aquamarine","royalblue1","olivedrab"), vertex.label.color="black", vertex.label.font=2)  
-       
+     
       plot.igraph(g, edge.curved=FALSE, edge.width=E(g)$weight,
+                  layout=layout_in_circle(g),
+                  #layout=layout_nicely(g),
+                  #layout=layout_with_lgl(g),
+                  vertex.size=(num_students_dall_long3$sum_num_students_bundle)/75, vertex.color=c("lightgray","lightblue","gold","red","yellow","green","orange","pink","violet","aquamarine","royalblue1","olivedrab"), vertex.label.color="black", vertex.label.font=2)  
+      
+      plot.igraph(g, edge.curved=FALSE, edge.width=E(g)$weight, #Version with log transformation
                   layout=layout_in_circle(g),
                   #layout=layout_nicely(g),
                   #layout=layout_with_lgl(g),
@@ -462,7 +471,25 @@
   num_contrasts_d1gma_long3$intervention <- as.character(num_contrasts_d1gma_long3$intervention)
   num_contrasts_d1gma_long3$intervention <- gsub("\\+", ".", num_contrasts_d1gma_long3$intervention)
   str(num_contrasts_d1gma_long3)
-  print(num_contrasts_d1gma_long3)  
+  print(num_contrasts_d1gma_long3) 
+  
+  ## Calculate the number of students within each intervention bundle across all unique study-contrasts
+  num_students_d1gma <- NMA_data_analysis_subset_grpID_d1gma %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
+  print(num_students_d1gma)
+  num_students_d1gma2 <- num_students_d1gma %>% distinct(record_id, contrast_id, .keep_all = TRUE) #Keep only unique entries of each unique study-contrast so that each group of students is not summed more than once (because of multiple measures within some contrasts).
+  print(num_students_d1gma2) 
+  num_students_d1gma_long <- num_students_d1gma2 %>% pivot_longer(c(intervention_prelim, comparison_prelim ), names_to= "group_IC", values_to="intervention_comparison") #Put intervention and comparison groups in same row for summing students receiving the same intervention bundle regardless of whether it was received in the intervention or comparison group assignment.
+  print(num_students_d1gma_long, n=20)
+  num_students_d1gma_long2 <- num_students_d1gma_long %>% mutate(num_students_bundle= ifelse(group_IC == "intervention_prelim", intervention_n, comparison_n)) # Put number of students by assignment group in same column condition on the intervention/comparison group assignment.
+  print(num_students_d1gma_long2)
+  num_students_d1gma_long3 <- num_students_d1gma_long2 %>% group_by(intervention_comparison) %>% summarize(sum_num_students_bundle= sum(num_students_bundle)) # Sum students by intervention bundle.
+  str(num_students_d1gma_long3)
+  print(num_students_d1gma_long3)
+  target_d1gma <- c("BAU","FF","FF+RS","NL+RS","RS","VF+RS")
+  num_students_d1gma_long3 <- num_students_d1gma_long3[match(target_d1gma, num_students_d1gma_long3$intervention_comparison),]
+  print(num_students_d1gma_long3)  
+  num_students_d1gma_long3$intervention_comparison <- as.character(num_students_d1gma_long3$intervention_comparison)
+  str(num_students_d1gma_long3)  
         
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID_d1gma$intervention_prelim)
@@ -647,11 +674,24 @@
       #### Creating the network graph with igraph
       set.seed(3524)
       g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
+      
+      # plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
+      #      layout=layout_in_circle(g),
+      #      #layout=layout_nicely(g),
+      #      #layout=layout_with_lgl(g),
+      #      vertex.size=20, vertex.color=c("lightgray","lightblue","gold","yellow","violet","olivedrab"), vertex.label.color="black", vertex.label.font=2)  
+      
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
            layout=layout_in_circle(g),
            #layout=layout_nicely(g),
            #layout=layout_with_lgl(g),
-           vertex.size=20, vertex.color=c("lightgray","lightblue","gold","yellow","violet","olivedrab"), vertex.label.color="black", vertex.label.font=2)  
+           vertex.size=(num_students_d1gma_long3$sum_num_students_bundle)/35, vertex.color=c("lightgray","lightblue","gold","yellow","violet","olivedrab"), vertex.label.color="black", vertex.label.font=2)  
+      
+      plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
+           layout=layout_in_circle(g),
+           #layout=layout_nicely(g),
+           #layout=layout_with_lgl(g),
+           vertex.size=log((num_students_d1gma_long3$sum_num_students_bundle))*2.5, vertex.color=c("lightgray","lightblue","gold","yellow","violet","olivedrab"), vertex.label.color="black", vertex.label.font=2)        
       
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "Rational Numbers"
       
@@ -688,6 +728,24 @@
   num_contrasts_d2rn_long3$intervention <- gsub("\\+", ".", num_contrasts_d2rn_long3$intervention)
   str(num_contrasts_d2rn_long3)
   print(num_contrasts_d2rn_long3)
+  
+  ## Calculate the number of students within each intervention bundle across all unique study-contrasts
+  num_students_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
+  print(num_students_d2rn)
+  num_students_d2rn2 <- num_students_d2rn %>% distinct(record_id, contrast_id, .keep_all = TRUE) #Keep only unique entries of each unique study-contrast so that each group of students is not summed more than once (because of multiple measures within some contrasts).
+  print(num_students_d2rn2) 
+  num_students_d2rn_long <- num_students_d2rn2 %>% pivot_longer(c(intervention_prelim, comparison_prelim ), names_to= "group_IC", values_to="intervention_comparison") #Put intervention and comparison groups in same row for summing students receiving the same intervention bundle regardless of whether it was received in the intervention or comparison group assignment.
+  print(num_students_d2rn_long, n=20)
+  num_students_d2rn_long2 <- num_students_d2rn_long %>% mutate(num_students_bundle= ifelse(group_IC == "intervention_prelim", intervention_n, comparison_n)) # Put number of students by assignment group in same column condition on the intervention/comparison group assignment.
+  print(num_students_d2rn_long2)
+  num_students_d2rn_long3 <- num_students_d2rn_long2 %>% group_by(intervention_comparison) %>% summarize(sum_num_students_bundle= sum(num_students_bundle)) # Sum students by intervention bundle.
+  str(num_students_d2rn_long3)
+  print(num_students_d2rn_long3)
+  target_d2rn <- c("BAU","NL+FF+RS","NL+RS","NL+TES+FF+RS","NL+TES+RS","NL+TES+VF+RS","RS","TES+VF+RS")
+  num_students_d2rn_long3 <- num_students_d2rn_long3[match(target_d2rn, num_students_d2rn_long3$intervention_comparison),]
+  print(num_students_d2rn_long3)  
+  num_students_d2rn_long3$intervention_comparison <- as.character(num_students_d2rn_long3$intervention_comparison)
+  str(num_students_d2rn_long3)  
       
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
@@ -872,11 +930,24 @@
       #### Creating the network graph with igraph
       set.seed(3524)
       g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
+      
+      # plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
+      #      layout=layout_in_circle(g),
+      #      #layout=layout_nicely(g),
+      #      #layout=layout_with_lgl(g),
+      #      vertex.size=20, vertex.color=c("lightgray","red","yellow","green","orange","pink","violet","aquamarine"), vertex.label.color="black", vertex.label.font=2)   
+      
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
            layout=layout_in_circle(g),
            #layout=layout_nicely(g),
            #layout=layout_with_lgl(g),
-           vertex.size=20, vertex.color=c("lightgray","red","yellow","green","orange","pink","violet","aquamarine"), vertex.label.color="black", vertex.label.font=2)   
+           vertex.size=(num_students_d2rn_long3$sum_num_students_bundle)/25, vertex.color=c("lightgray","red","yellow","green","orange","pink","violet","aquamarine"), vertex.label.color="black", vertex.label.font=2)  
+      
+      plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
+           layout=layout_in_circle(g),
+           #layout=layout_nicely(g),
+           #layout=layout_with_lgl(g),
+           vertex.size=log((num_students_d2rn_long3$sum_num_students_bundle))*2.5, vertex.color=c("lightgray","red","yellow","green","orange","pink","violet","aquamarine"), vertex.label.color="black", vertex.label.font=2)        
       
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "Whole Numbers"
       
@@ -914,6 +985,24 @@
   str(num_contrasts_d3wn_long3)
   print(num_contrasts_d3wn_long3)  
       
+  ## Calculate the number of students within each intervention bundle across all unique study-contrasts
+  num_students_d3wn <- NMA_data_analysis_subset_grpID_d3wn %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
+  print(num_students_d3wn)
+  num_students_d3wn2 <- num_students_d3wn %>% distinct(record_id, contrast_id, .keep_all = TRUE) #Keep only unique entries of each unique study-contrast so that each group of students is not summed more than once (because of multiple measures within some contrasts).
+  print(num_students_d3wn2) 
+  num_students_d3wn_long <- num_students_d3wn2 %>% pivot_longer(c(intervention_prelim, comparison_prelim ), names_to= "group_IC", values_to="intervention_comparison") #Put intervention and comparison groups in same row for summing students receiving the same intervention bundle regardless of whether it was received in the intervention or comparison group assignment.
+  print(num_students_d3wn_long, n=20)
+  num_students_d3wn_long2 <- num_students_d3wn_long %>% mutate(num_students_bundle= ifelse(group_IC == "intervention_prelim", intervention_n, comparison_n)) # Put number of students by assignment group in same column condition on the intervention/comparison group assignment.
+  print(num_students_d3wn_long2)
+  num_students_d3wn_long3 <- num_students_d3wn_long2 %>% group_by(intervention_comparison) %>% summarize(sum_num_students_bundle= sum(num_students_bundle)) # Sum students by intervention bundle.
+  str(num_students_d3wn_long3)
+  print(num_students_d3wn_long3)
+  target_d3wn <- c("BAU","FF","FF+RS","NL+FF+RS","RS","VF+FF+RS","VF+RS")
+  num_students_d3wn_long3 <- num_students_d3wn_long3[match(target_d3wn, num_students_d3wn_long3$intervention_comparison),]
+  print(num_students_d3wn_long3)  
+  num_students_d3wn_long3$intervention_comparison <- as.character(num_students_d3wn_long3$intervention_comparison)
+  str(num_students_d3wn_long3)    
+  
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID_d3wn$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID_d3wn$comparison_prelim)
@@ -1097,8 +1186,21 @@
       #### Creating the network graph with igraph
       set.seed(3524)
       g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
+      
+      # plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
+      #      layout=layout_in_circle(g),
+      #      #layout=layout_nicely(g),
+      #      #layout=layout_with_lgl(g),
+      #      vertex.size=20, vertex.color=c("lightgray","lightblue","gold","red","violet","royalblue1","olivedrab"), vertex.label.color="black", vertex.label.font=2)       
+      
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
            layout=layout_in_circle(g),
            #layout=layout_nicely(g),
            #layout=layout_with_lgl(g),
-           vertex.size=20, vertex.color=c("lightgray","lightblue","gold","red","violet","royalblue1","olivedrab"), vertex.label.color="black", vertex.label.font=2)       
+           vertex.size=(num_students_d3wn_long3$sum_num_students_bundle)/75, vertex.color=c("lightgray","lightblue","gold","red","violet","royalblue1","olivedrab"), vertex.label.color="black", vertex.label.font=2) 
+      
+      plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
+           layout=layout_in_circle(g),
+           #layout=layout_nicely(g),
+           #layout=layout_with_lgl(g),
+           vertex.size=log((num_students_d3wn_long3$sum_num_students_bundle))*2.5, vertex.color=c("lightgray","lightblue","gold","red","violet","royalblue1","olivedrab"), vertex.label.color="black", vertex.label.font=2)       
