@@ -257,7 +257,7 @@
                     mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + NL.TES.FF.RS + NL.TES.RS + NL.TES.VF.RS + RS + TES.VF.RS + VF.FF.RS + VF.RS - 1, 
                     random = ~ 1 | record_id/es_id, 
                     rho=0.60, 
-                    data=NMA_data_analysis_subset_grpID2)
+                    data=NMA_data_analysis_subset_grpID)
   summary(res_mod)
   #weights.rma.mv(res_mod)
   
