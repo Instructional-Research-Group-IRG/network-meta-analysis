@@ -239,11 +239,25 @@
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)  
+  
+  NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID
+  NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(FF= ifelse(FF == -1, 1, FF)) 
+  NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(FF.RS= ifelse(FF.RS == -1, 1, FF.RS)) 
+  NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(NL.FF.RS= ifelse(NL.FF.RS == -1, 1, NL.FF.RS)) 
+  NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(NL.RS= ifelse(NL.RS == -1, 1, NL.RS)) 
+  NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(NL.TES.FF.RS= ifelse(NL.TES.FF.RS == -1, 1, NL.TES.FF.RS)) 
+  NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(NL.TES.RS= ifelse(NL.TES.RS == -1, 1, NL.TES.RS)) 
+  NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(NL.TES.VF.RS= ifelse(NL.TES.VF.RS == -1, 1, NL.TES.VF.RS)) 
+  NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(RS= ifelse(RS == -1, 1, RS)) 
+  NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(TES.VF.RS= ifelse(TES.VF.RS == -1, 1, TES.VF.RS)) 
+  NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(VF.FF.RS= ifelse(VF.FF.RS == -1, 1, VF.FF.RS)) 
+  NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(VF.RS= ifelse(VF.RS == -1, 1, VF.RS)) 
+  
   res_mod <- rma.mv(effect_size, V_list, 
                     mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + NL.TES.FF.RS + NL.TES.RS + NL.TES.VF.RS + RS + TES.VF.RS + VF.FF.RS + VF.RS - 1, 
                     random = ~ 1 | record_id/es_id, 
                     rho=0.60, 
-                    data=NMA_data_analysis_subset_grpID)
+                    data=NMA_data_analysis_subset_grpID2)
   summary(res_mod)
   #weights.rma.mv(res_mod)
   
