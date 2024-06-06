@@ -35,7 +35,7 @@ NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","resea
 convert_to_factor <- function(x) {
   as.factor(x)
 } 
-NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab")] <- lapply(NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab")], convert_to_factor)
+NNMA_Data_Subset[c("group_size_category","ongoing_training","research_lab")] <- lapply(NNMA_Data_Subset[c("group_size_category","ongoing_training","research_lab")], convert_to_factor)
 tab_list_to_factor <- function(x) {
   tabyl(x)
 }
