@@ -339,7 +339,7 @@ summary(NNMA_control_research_lab)
 mvcf <- coef_test(NNMA_control_research_lab,
                   cluster = NNMA_Data_Subset_grpID$record_id, 
                   vcov = "CR2")
-mvcf
+mvcf 
 
 
 

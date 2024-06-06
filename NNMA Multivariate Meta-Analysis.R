@@ -1035,7 +1035,7 @@ V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, r
 #     # for easier comparison with the results from glmulti
 #     #round(mmi[colnames(model.avg(res_mumin)$coefficients),], 4)
 
-# Final Analysis Models
+# Final Analysis Models 
 
 ##Correct variable types loaded in as lists (variables as lists cannot be used as variables in the meta-regressions below)
 convert_to_character <- function(x) {
