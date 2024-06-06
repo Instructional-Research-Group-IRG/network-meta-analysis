@@ -1,3 +1,5 @@
+#TEST FOR CONTROLS
+
 
 #Load libraries
 library(googlesheets4)
@@ -19,16 +21,17 @@ NNMA_Data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_
 
 ##This subset is specific to the meta-regression models. It includes only non-TvsT studies.
 NNMA_Data_Subset <- subset(NNMA_Data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") &
-                             aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") & TvsT==0)
+                             aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR"))
 
 ##Replace all NA values in the binary moderators with 0
-NNMA_Data_Subset <- NNMA_Data_Subset %>% replace_na(list(NL_TX = 0, EX_TX = 0, VF_TX = 0, FF_TX = 0, RS_TX = 0, TES_TX = 0, N_TX = 0, SEO_TX = 0, TV_TX = 0, RV_TX = 0))
+NNMA_Data_Subset <- NNMA_Data_Subset %>% replace_na(list(NL_TX = 0, TES_TX = 0, VF_TX = 0, FF_TX = 0, RS_TX = 0, TES_TX = 0, N_TX = 0, SEO_TX = 0, TV_TX = 0, RV_TX = 0))
 
 ##Correct variable types loaded in as lists (variables as lists cannot be used as variables in the meta-regressions below)
 convert_to_character <- function(x) {
   as.character(x)
 }
 NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab","FWOF_TX")] <- lapply(NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab","FWOF_TX")], convert_to_character)
+
 convert_to_factor <- function(x) {
   as.factor(x)
 } 
@@ -36,12 +39,14 @@ NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","resea
 tab_list_to_factor <- function(x) {
   tabyl(x)
 }
-lapply(NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab")], tab_list_to_factor)
+lapply(NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab","TvsT","measure_developer_numeric","interventionist_numeric","ongoing_training","intervention_content_numeric")], tab_list_to_factor)
+
 NNMA_Data_Subset$FWOF_TX <- gsub("NULL", "0", NNMA_Data_Subset$FWOF_TX)
+
 convert_to_numeric <- function(x) {
   as.numeric(x)
 }
-NNMA_Data_Subset[c("FWOF_TX","grade_level","research_lab","group_size_category","ongoing_training")] <- lapply(NNMA_Data_Subset[c("FWOF_TX","grade_level","research_lab","group_size_category","ongoing_training")], convert_to_numeric)
+NNMA_Data_Subset[c("FWOF_TX","grade_level","research_lab","group_size_category","ongoing_training","group_size_average")] <- lapply(NNMA_Data_Subset[c("FWOF_TX","grade_level","research_lab","group_size_category","ongoing_training","group_size_average")], convert_to_numeric)
 
 #Create unique group ID for each independent group within a study (record ID)
 
@@ -131,18 +136,22 @@ var_class <- function(x) {
   class(x)
 }
 lapply(NNMA_Data_Subset_grpID[c("NL_TX", "TES_TX", "VF_TX", "RS_TX", "FF_TX", "N_TX", "SEO_TX", "TV_TX", "RV_TX", "FWOF_TX")], var_class)
-lapply(NNMA_Data_Subset_grpID[c("publication_year", "domain_numeric", "control_nature_numeric", "dosage_overall_hours_avg", "group_size_category", "grade_level")], var_class)
+lapply(NNMA_Data_Subset_grpID[c("publication_year", "domain_numeric", "control_nature_numeric", "dosage_overall_hours_avg", "group_size_category", "grade_level", "TvsT")], var_class)
 lapply(NNMA_Data_Subset_grpID[c("measure_developer_numeric", "interventionist_numeric", "ongoing_training", "research_lab", "intervention_content_numeric")], var_class)
 
 # cor(NNMA_Data_Subset_grpID[c("NL_TX", "TES_TX", "VF_TX", "RS_TX", "FF_TX", "N_TX", "SEO_TX", "TV_TX", "RV_TX", "FWOF_TX",
-#                              "publication_year", "domain", "control_nature", "dosage_overall_hours_avg", "group_size_category", "grade_level", 
+#                              "publication_year", "domain", "control_nature", "dosage_overall_hours_avg", "group_size_category", "grade_level", "TvsT", 
 #                              "measure_developer", "interventionist", "ongoing_training", "research_lab", "intervention_content")])
 
 cor(NNMA_Data_Subset_grpID[c("NL_TX", "TES_TX", "VF_TX", "RS_TX", "FF_TX", "N_TX", "SEO_TX", "TV_TX", "RV_TX", "FWOF_TX",
                              "publication_year", "domain_numeric", "control_nature_numeric", "dosage_overall_hours_avg", "group_size_category", 
-                             "grade_level", "measure_developer_numeric", "interventionist_numeric", "ongoing_training", "research_lab", "intervention_content_numeric")])
+                             "grade_level", "TvsT", "measure_developer_numeric", "interventionist_numeric", "ongoing_training", "research_lab", "intervention_content_numeric")])
 
 #Run meta-regressions
+
+## Revise some numeric moderators to be factors for the below analyses. Note: cannot do this above with the other class corrections because these moderators first need to be numeric for the correlations just above.
+NNMA_Data_Subset_grpID[c("TvsT","measure_developer_numeric","interventionist_numeric","ongoing_training","intervention_content_numeric")] <- lapply(NNMA_Data_Subset_grpID[c("TvsT","measure_developer_numeric","interventionist_numeric","ongoing_training","intervention_content_numeric")], convert_to_factor)
+
 ####################################################################################################
 
 NNMA_control_year <- rma.mv(yi = effect_size, 
@@ -248,6 +257,23 @@ mvcf
 
 ####################################################################################################
 
+NNMA_control_TvsT <- rma.mv(yi = effect_size, 
+                                   V = V_list, 
+                                   random = ~ 1 | record_id/es_id,
+                                   mods = ~ TvsT - 1,
+                                   test =  "t", 
+                                   data = NNMA_Data_Subset_grpID, 
+                                   method = "REML")
+summary(NNMA_control_TvsT)  
+
+##Use RVE for robustness
+mvcf <- coef_test(NNMA_control_TvsT,
+                  cluster = NNMA_Data_Subset_grpID$record_id, 
+                  vcov = "CR2")
+mvcf
+
+####################################################################################################
+
 NNMA_control_measure_developer <- rma.mv(yi = effect_size, 
                                          V = V_list, 
                                          random = ~ 1 | record_id/es_id,
@@ -316,7 +342,7 @@ mvcf <- coef_test(NNMA_control_research_lab,
 mvcf
 
 
- 
+
 
 ####################################################################################################
 
@@ -333,7 +359,7 @@ summary(NNMA_control_intervention_content)
 mvcf <- coef_test(NNMA_control_intervention_content,
                   cluster = NNMA_Data_Subset_grpID$record_id, 
                   vcov = "CR2")
-mvcf  
+mvcf    
 
 
 ####################################################################################################
@@ -358,6 +384,11 @@ NNMA_control_grade_level_df <- tidy(NNMA_control_grade_level, conf.int = TRUE)
 NNMA_control_grade_level_df
 NNMA_control_grade_level_df$term <- gsub("overall", "grade_level", NNMA_control_grade_level_df$term)
 NNMA_control_grade_level_df    
+
+NNMA_control_TvsT_df <- tidy(NNMA_control_TvsT, conf.int = TRUE)
+NNMA_control_TvsT_df
+NNMA_control_TvsT_df$term <- gsub("overall", "TvsT", NNMA_control_TvsT_df$term)
+NNMA_control_TvsT_df 
 
 NNMA_control_measure_developer_df <- tidy(NNMA_control_measure_developer, conf.int = TRUE)
 NNMA_control_measure_developer_df
@@ -399,7 +430,7 @@ NNMA_control_intervention_content_df
 NNMA_control_intervention_content_df$term <- gsub("overall", "intervention_content", NNMA_control_intervention_content_df$term)
 NNMA_control_intervention_content_df 
 
-mod_analysis <- rbind(NNMA_control_dosage_overall_hours_avg_df, NNMA_control_group_size_category_df, NNMA_control_grade_level_df, NNMA_control_measure_developer_df, NNMA_control_interventionist_df, NNMA_control_year_df, NNMA_control_ongoing_training_df, NNMA_control_research_lab_df, NNMA_control_domain_df, NNMA_control_control_nature_df, NNMA_control_intervention_content_df)
+mod_analysis <- rbind(NNMA_control_dosage_overall_hours_avg_df, NNMA_control_group_size_category_df, NNMA_control_grade_level_df, NNMA_control_TvsT_df, NNMA_control_measure_developer_df, NNMA_control_interventionist_df, NNMA_control_year_df, NNMA_control_ongoing_training_df, NNMA_control_research_lab_df, NNMA_control_domain_df, NNMA_control_control_nature_df, NNMA_control_intervention_content_df)
 print(mod_analysis, n=Inf) 
 
 mod_analysis_BHcorrection <- mod_analysis %>% 

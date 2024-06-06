@@ -1042,19 +1042,24 @@ convert_to_character <- function(x) {
   as.character(x)
 }
 NNMA_Data_Subset_grpID[c("group_size_category","grade_level","ongoing_training","research_lab","FWOF_TX")] <- lapply(NNMA_Data_Subset_grpID[c("group_size_category","grade_level","ongoing_training","research_lab","FWOF_TX")], convert_to_character)
+
 convert_to_factor <- function(x) {
   as.factor(x)
 }    
 NNMA_Data_Subset_grpID[c("group_size_category","ongoing_training","research_lab")] <- lapply(NNMA_Data_Subset_grpID[c("group_size_category","ongoing_training","research_lab")], convert_to_factor)
+NNMA_Data_Subset_grpID[c("TvsT","measure_developer_numeric","interventionist_numeric","ongoing_training","intervention_content_numeric")] <- lapply(NNMA_Data_Subset_grpID[c("TvsT","measure_developer_numeric","interventionist_numeric","ongoing_training","intervention_content_numeric")], convert_to_factor)
+
 tab_list_to_factor <- function(x) {
-  tabyl(x)
+  class(x)
 }
-lapply(NNMA_Data_Subset_grpID[c("group_size_category","grade_level","ongoing_training","research_lab")], tab_list_to_factor)  
+lapply(NNMA_Data_Subset_grpID[c("group_size_category","ongoing_training","research_lab","TvsT","measure_developer_numeric","interventionist_numeric","ongoing_training","intervention_content_numeric")], tab_list_to_factor)  
+
 NNMA_Data_Subset_grpID$FWOF_TX <- gsub("NULL", "0", NNMA_Data_Subset_grpID$FWOF_TX)
+
 convert_to_numeric <- function(x) {
   as.numeric(x)
 }
-NNMA_Data_Subset_grpID[c("FWOF_TX","grade_level","research_lab","group_size_category","ongoing_training")] <- lapply(NNMA_Data_Subset_grpID[c("FWOF_TX","grade_level","research_lab","group_size_category","ongoing_training")], convert_to_numeric)
+NNMA_Data_Subset_grpID[c("FWOF_TX","grade_level","research_lab","group_size_category","group_size_average")] <- lapply(NNMA_Data_Subset_grpID[c("FWOF_TX","grade_level","research_lab","group_size_category","group_size_average")], convert_to_numeric)
 
 
 ##Replace all NA values in the moderators with 0 to avoid observations being dropped from the analysis.
@@ -1092,5 +1097,5 @@ summary(NNMA_MVmodel_ALLICs)
 mvcf <- coef_test(NNMA_MVmodel_ALLICs,
                   cluster = NNMA_Data_Subset_grpID$record_id, 
                   vcov = "CR2")
-mvcf
+mvcf 
 
