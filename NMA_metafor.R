@@ -139,16 +139,18 @@
 # Additional modifications to NMA subset analysis data for running NMA with metafor  
   
   ## Convert variables to their intended types 
-  NMA_data_analysis_subset_grpID$grade_level <- as.numeric(NMA_data_analysis_subset_grpID$grade_level)
   convert_to_character <- function(x) {
     as.character(x)
   }
-  NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq")] <- lapply(NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq")], convert_to_character)
+  NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq","grade_level")] <- lapply(NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq","grade_level")], convert_to_character)
+  
   convert_to_factor <- function(x) {
     as.factor(x)
   }  
   NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq","intervention_prelim","comparison_prelim")] <- lapply(NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq","intervention_prelim","comparison_prelim")], convert_to_factor)
 
+  NMA_data_analysis_subset_grpID$grade_level <- as.numeric(NMA_data_analysis_subset_grpID$grade_level)
+  
   class(NMA_data_analysis_subset_grpID$group_size_category)
   class(NMA_data_analysis_subset_grpID$ongoing_training)
   class(NMA_data_analysis_subset_grpID$research_lab)
@@ -193,8 +195,13 @@
   ## Add contrast matrix to dataset
   NMA_data_analysis_subset_grpID_alldomains <- NMA_data_analysis_subset_grpID # Preserving the original analysis data frame for filtering by domain farther below considering we manipulate NMA_data_analysis_subset_grpID just below for the NMA including all domains.
   NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% drop_na(c(intervention_prelim, comparison_prelim)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
+  str(NMA_data_analysis_subset_grpID, list.len = ncol(NMA_data_analysis_subset_grpID))
   NMA_data_analysis_subset_grpID <- contrmat(NMA_data_analysis_subset_grpID, grp1="intervention_prelim", grp2="comparison_prelim")
-  str(NMA_data_analysis_subset_grpID)
+  str(NMA_data_analysis_subset_grpID, list.len = ncol(NMA_data_analysis_subset_grpID))
+  var_tab <- function(x) {
+    tabyl(x)
+  }
+  lapply(NMA_data_analysis_subset_grpID[c("intervention_prelim","comparison_prelim","FF", "FF.RS", "NL.FF.RS", "NL.RS", "NL.TES.FF.RS", "NL.TES.RS", "NL.TES.VF.RS", "RS", "TES.VF.RS","VF.FF.RS","VF.RS","BAU")], var_tab)
   
   ## Calculate the variance-covariance matrix for multi-treatment studies
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID)
