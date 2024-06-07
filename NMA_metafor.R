@@ -451,7 +451,7 @@
                   #layout=layout_nicely(g),
                   #layout=layout_with_lgl(g),
                   vertex.size=(num_students_dall_long3$sum_num_students_bundle)/75, vertex.color=c("lightgray","lightblue","gold","red","yellow","green","orange","pink","violet","aquamarine","royalblue1","olivedrab"), vertex.label.color="black", vertex.label.font=2)  
-      
+          
       plot.igraph(g, edge.curved=FALSE, edge.width=E(g)$weight, #Version with log transformation
                   layout=layout_in_circle(g),
                   #layout=layout_nicely(g),
