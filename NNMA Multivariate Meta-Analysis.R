@@ -1041,7 +1041,7 @@ V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, r
 convert_to_character <- function(x) {
   as.character(x)
 }
-NNMA_Data_Subset_grpID[c("group_size_category","grade_level","ongoing_training","research_lab","FWOF_TX")] <- lapply(NNMA_Data_Subset_grpID[c("group_size_category","grade_level","ongoing_training","research_lab","FWOF_TX")], convert_to_character)
+NNMA_Data_Subset_grpID[c("group_size_category","grade_level","ongoing_training","research_lab","FWOF_TX","group_size_average")] <- lapply(NNMA_Data_Subset_grpID[c("group_size_category","grade_level","ongoing_training","research_lab","FWOF_TX","group_size_average")], convert_to_character)
 
 convert_to_factor <- function(x) {
   as.factor(x)
