@@ -30,7 +30,7 @@ NNMA_Data_Subset <- NNMA_Data_Subset %>% replace_na(list(NL_TX = 0, TES_TX = 0, 
 convert_to_character <- function(x) {
   as.character(x)
 }
-NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab","FWOF_TX")] <- lapply(NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab","FWOF_TX")], convert_to_character)
+NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab","FWOF_TX","group_size_average")] <- lapply(NNMA_Data_Subset[c("group_size_category","grade_level","ongoing_training","research_lab","FWOF_TX","group_size_average")], convert_to_character)
 
 convert_to_factor <- function(x) {
   as.factor(x)
