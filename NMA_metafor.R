@@ -54,7 +54,7 @@
   tabyl(NMA_data_analysis_subset$intervention_prelim)    
   tabyl(NMA_data_analysis_subset$comparison_prelim) 
   
-# Create unique group ID for each independent group within a study (record ID)
+# Create unique group ID for each independent group within a study
   
   ## Keep only record ID, intervention/comparison bundle, intervention/comparison sample size 
   NMA_data_grpID <- NMA_data_analysis_subset %>% dplyr::select(record_id, intervention = intervention_prelim, comparison = comparison_prelim, intervention_n, comparison_n)
@@ -183,7 +183,7 @@
   tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)  
   
-# Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: all domains (n=3)
+# Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: all 3 domains
   
   ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
   
@@ -202,7 +202,7 @@
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID)
   V_list   
 
-  ## Calculate the number of unique contrasts in which each intervention bundle is included
+  ## Calculate the number of unique contrasts in which each intervention bundle is included for sizing the thickness of the bands in the network graph
   tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)
   num_contrasts_dall <- NMA_data_analysis_subset_grpID %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
@@ -220,7 +220,7 @@
   str(num_contrasts_dall_long3)
   print(num_contrasts_dall_long3)
   
-  ## Calculate the number of students within each intervention bundle across all unique study-contrasts
+  ## Calculate the number of students within each intervention bundle across all unique study-contrasts for sizing the nodes in the netork graph
   num_students_dall <- NMA_data_analysis_subset_grpID %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
   print(num_students_dall)
   num_students_dall2 <- num_students_dall %>% distinct(record_id, contrast_id, .keep_all = TRUE) #Keep only unique entries of each unique study-contrast so that each group of students is not summed more than once (because of multiple measures within some contrasts).
@@ -241,24 +241,11 @@
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)  
-  
-  # NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID
-  # NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(FF= ifelse(FF == -1, 1, FF)) 
-  # NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(FF.RS= ifelse(FF.RS == -1, 1, FF.RS)) 
-  # NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(NL.FF.RS= ifelse(NL.FF.RS == -1, 1, NL.FF.RS)) 
-  # NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(NL.RS= ifelse(NL.RS == -1, 1, NL.RS)) 
-  # NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(NL.TES.FF.RS= ifelse(NL.TES.FF.RS == -1, 1, NL.TES.FF.RS)) 
-  # NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(NL.TES.RS= ifelse(NL.TES.RS == -1, 1, NL.TES.RS)) 
-  # NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(NL.TES.VF.RS= ifelse(NL.TES.VF.RS == -1, 1, NL.TES.VF.RS)) 
-  # NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(RS= ifelse(RS == -1, 1, RS)) 
-  # NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(TES.VF.RS= ifelse(TES.VF.RS == -1, 1, TES.VF.RS)) 
-  # NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(VF.FF.RS= ifelse(VF.FF.RS == -1, 1, VF.FF.RS)) 
-  # NMA_data_analysis_subset_grpID2 <- NMA_data_analysis_subset_grpID2 %>% mutate(VF.RS= ifelse(VF.RS == -1, 1, VF.RS)) 
-  
+
   res_mod <- rma.mv(effect_size, V_list, 
                     mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + NL.TES.FF.RS + NL.TES.RS + NL.TES.VF.RS + RS + TES.VF.RS + VF.FF.RS + VF.RS - 1, 
                     random = ~ 1 | record_id/es_id, 
-                    rho=0.60, 
+                    rho=0.60,
                     data=NMA_data_analysis_subset_grpID)
   summary(res_mod)
   #weights.rma.mv(res_mod)
