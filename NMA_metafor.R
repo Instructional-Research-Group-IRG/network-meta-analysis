@@ -54,7 +54,7 @@
   tabyl(NMA_data_analysis_subset$intervention_prelim)    
   tabyl(NMA_data_analysis_subset$comparison_prelim) 
   
-# Create unique group ID for each independent group within a study
+# Create unique group ID for each independent group of students included in either assignment group of the study-contrasts
   
   ## Keep only record ID, intervention/comparison bundle, intervention/comparison sample size 
   NMA_data_grpID <- NMA_data_analysis_subset %>% dplyr::select(record_id, intervention = intervention_prelim, comparison = comparison_prelim, intervention_n, comparison_n)
