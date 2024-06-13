@@ -44,7 +44,7 @@
   tabyl(NNMA_Data$comparison_prelim) 
   
   ## Subset data for analysis 
-  NMA_data_analysis_subset <- subset(NNMA_Data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") & aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR"))
+  NMA_data_analysis_subset <- subset(NNMA_Data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") & aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") & (TvsT==1 | TvsT==0))
   NMA_data_analysis_subset %>% count()
   
   ## Retabulate variables upon which to subset data to verify correct subset
@@ -148,17 +148,12 @@
     as.factor(x)
   }  
   NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq","intervention_prelim","comparison_prelim")] <- lapply(NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq","intervention_prelim","comparison_prelim")], convert_to_factor)
-
-  NMA_data_analysis_subset_grpID$grade_level <- as.numeric(NMA_data_analysis_subset_grpID$grade_level)
+  NMA_data_analysis_subset_grpID[c("domain_numeric","control_nature_numeric","measure_developer_numeric","interventionist_numeric","intervention_content_numeric","TvsT")] <- lapply(NMA_data_analysis_subset_grpID[c("domain_numeric","control_nature_numeric","measure_developer_numeric","interventionist_numeric","intervention_content_numeric","TvsT")], convert_to_factor)
   
-  class(NMA_data_analysis_subset_grpID$group_size_category)
-  class(NMA_data_analysis_subset_grpID$ongoing_training)
-  class(NMA_data_analysis_subset_grpID$research_lab)
-  class(NMA_data_analysis_subset_grpID$dosage_weekly_freq)
-  class(NMA_data_analysis_subset_grpID$grade_level) 
-  class(NMA_data_analysis_subset_grpID$contrast_id)
-  class(NMA_data_analysis_subset_grpID$intervention_prelim)
-  class(NMA_data_analysis_subset_grpID$comparison_prelim)   
+  NMA_data_analysis_subset_grpID$group_size_average <- as.character(NMA_data_analysis_subset_grpID$group_size_average)
+  NMA_data_analysis_subset_grpID$group_size_average <- as.numeric(NMA_data_analysis_subset_grpID$group_size_average)
+  
+  NMA_data_analysis_subset_grpID$grade_level <- as.numeric(NMA_data_analysis_subset_grpID$grade_level)
   
   ## Correct domain names
   # tabyl(NMA_data_analysis_subset_grpID$domain)
