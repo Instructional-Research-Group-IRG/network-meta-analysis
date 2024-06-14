@@ -220,7 +220,7 @@
   str(num_contrasts_dall_long3)
   print(num_contrasts_dall_long3)
   
-  ## Calculate the number of students within each intervention bundle across all unique study-contrasts for sizing the nodes in the netork graph
+  ## Calculate the number of students within each intervention bundle across all unique study-contrasts for sizing the nodes in the network graph
   num_students_dall <- NMA_data_analysis_subset_grpID %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
   print(num_students_dall)
   num_students_dall2 <- num_students_dall %>% distinct(record_id, contrast_id, .keep_all = TRUE) #Keep only unique entries of each unique study-contrast so that each group of students is not summed more than once (because of multiple measures within some contrasts).
