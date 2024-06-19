@@ -1058,7 +1058,7 @@ V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, r
   convert_to_numeric <- function(x) {
     as.numeric(x)
   }
-  NNMA_Data_Subset_grpID[c("FWOF_TX","grade_level","group_size_average","TvsT")] <- lapply(NNMA_Data_Subset_grpID[c("FWOF_TX","grade_level","group_size_average","TvsT")], convert_to_numeric)
+  NNMA_Data_Subset_grpID[c("FWOF_TX","grade_level","group_size_average")] <- lapply(NNMA_Data_Subset_grpID[c("FWOF_TX","grade_level","group_size_average")], convert_to_numeric)
   
   
   ##Replace all NA values in the moderators with 0 to avoid observations being dropped from the analysis.
@@ -1068,7 +1068,7 @@ V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, r
   NNMA_MVmodel_main <- rma.mv(yi = effect_size, 
                               V = V_list, 
                               random = ~1 | record_id/es_id,
-                              mods = ~ NL_TX + TES_TX + VF_TX + RS_TX + FF_TX + dosage_overall_hours_avg + group_size_category + grade_level + TvsT + measure_developer_numeric + interventionist_numeric + ongoing_training + intervention_content_numeric - 1, 
+                              mods = ~ NL_TX + TES_TX + VF_TX + RS_TX + FF_TX + dosage_overall_hours_avg + group_size_average + grade_level + measure_developer_numeric + interventionist_numeric + ongoing_training + intervention_content_numeric - 1, 
                               test = "t",
                               data = NNMA_Data_Subset_grpID,
                               method = "REML")
