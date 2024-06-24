@@ -144,46 +144,46 @@ lapply(NMA_Data_Subset_grpID[c("measure_developer_numeric", "interventionist_num
 #                              "measure_developer", "interventionist", "ongoing_training", "research_lab", "intervention_content")])
 
 cor(NMA_Data_Subset_grpID[c("NL_TX", "TES_TX", "VF_TX", "RS_TX", "FF_TX", "N_TX", "SEO_TX", "TV_TX", "RV_TX", "FWOF_TX",
-                             "publication_year", "domain_numeric", "control_nature_numeric", "dosage_overall_hours_avg", "group_size_category", 
+                             "publication_year", "domain_numeric", "control_nature_numeric", "dosage_overall_hours_avg", "group_size_average", 
                              "grade_level", "TvsT", "measure_developer_numeric", "interventionist_numeric", "ongoing_training", "research_lab", "intervention_content_numeric")])
 
 #Run meta-regressions
 
-## Revise some numeric moderators to be factors for the below analyses. Note: cannot do this above with the other class corrections because these moderators first need to be numeric for the correlations just above.
+## Revise some numeric moderators to be factors for the below analyses. Note: We cannot do this above with the other class corrections because these moderators first need to be numeric for the correlations just above.
 NMA_Data_Subset_grpID[c("TvsT","measure_developer_numeric","interventionist_numeric","ongoing_training","intervention_content_numeric")] <- lapply(NMA_Data_Subset_grpID[c("TvsT","measure_developer_numeric","interventionist_numeric","ongoing_training","intervention_content_numeric")], convert_to_factor)
 NMA_Data_Subset_grpID[c("group_size_category","domain_numeric","research_lab","control_nature_numeric")] <- lapply(NMA_Data_Subset_grpID[c("group_size_category","domain_numeric","research_lab","control_nature_numeric")], convert_to_factor)
 
 
 ####################################################################################################
 
-NNMA_control_year <- rma.mv(yi = effect_size, 
+NNMA_control_publication_year <- rma.mv(yi = effect_size, 
                             V = V_list, 
                             random = ~ 1 | record_id/es_id,
                             mods = ~ publication_year - 1,
                             test =  "t", 
                             data = NMA_Data_Subset_grpID, 
                             method = "REML")
-summary(NNMA_control_year)  
+summary(NNMA_control_publication_year)  
 
 ##Use RVE for robustness
-mvcf <- coef_test(NNMA_control_year,
+mvcf <- coef_test(NNMA_control_publication_year,
                   cluster = NMA_Data_Subset_grpID$record_id, 
                   vcov = "CR2")
 mvcf
 
 ####################################################################################################
 
-NNMA_control_domain <- rma.mv(yi = effect_size, 
+NNMA_control_domain_numeric <- rma.mv(yi = effect_size, 
                               V = V_list, 
                               random = ~ 1 | record_id/es_id,
                               mods = ~ domain_numeric - 1,
                               test =  "t", 
                               data = NMA_Data_Subset_grpID, 
                               method = "REML")
-summary(NNMA_control_domain)  
+summary(NNMA_control_domain_numeric)  
 
 ##Use RVE for robustness
-mvcf <- coef_test(NNMA_control_domain,
+mvcf <- coef_test(NNMA_control_domain_numeric,
                   cluster = NMA_Data_Subset_grpID$record_id, 
                   vcov = "CR2")
 mvcf  
@@ -191,17 +191,17 @@ mvcf
 
 ####################################################################################################
 
-NNMA_control_control_nature <- rma.mv(yi = effect_size, 
+NNMA_control_control_nature_numeric <- rma.mv(yi = effect_size, 
                                       V = V_list, 
                                       random = ~ 1 | record_id/es_id,
                                       mods = ~ control_nature_numeric - 1,
                                       test =  "t", 
                                       data = NMA_Data_Subset_grpID, 
                                       method = "REML")
-summary(NNMA_control_control_nature)  
+summary(NNMA_control_control_nature_numeric)  
 
 ##Use RVE for robustness
-mvcf <- coef_test(NNMA_control_control_nature,
+mvcf <- coef_test(NNMA_control_control_nature_numeric,
                   cluster = NMA_Data_Subset_grpID$record_id, 
                   vcov = "CR2")
 mvcf 
@@ -225,17 +225,17 @@ mvcf
 
 ####################################################################################################
 
-NNMA_control_group_size_category <- rma.mv(yi = effect_size, 
+NNMA_control_group_size_average <- rma.mv(yi = effect_size, 
                                            V = V_list, 
                                            random = ~ 1 | record_id/es_id,
-                                           mods = ~ group_size_category - 1,
+                                           mods = ~ group_size_average - 1,
                                            test =  "t", 
                                            data = NMA_Data_Subset_grpID, 
                                            method = "REML")
-summary(NNMA_control_group_size_category)  
+summary(NNMA_control_group_size_average)  
 
 ##Use RVE for robustness
-mvcf <- coef_test(NNMA_control_group_size_category,
+mvcf <- coef_test(NNMA_control_group_size_average,
                   cluster = NMA_Data_Subset_grpID$record_id, 
                   vcov = "CR2")
 mvcf
@@ -276,34 +276,34 @@ mvcf
 
 ####################################################################################################
 
-NNMA_control_measure_developer <- rma.mv(yi = effect_size, 
+NNMA_control_measure_developer_numeric <- rma.mv(yi = effect_size, 
                                          V = V_list, 
                                          random = ~ 1 | record_id/es_id,
                                          mods = ~ measure_developer_numeric - 1,
                                          test =  "t", 
                                          data = NMA_Data_Subset_grpID, 
                                          method = "REML")
-summary(NNMA_control_measure_developer)  
+summary(NNMA_control_measure_developer_numeric)  
 
 ##Use RVE for robustness
-mvcf <- coef_test(NNMA_control_measure_developer,
+mvcf <- coef_test(NNMA_control_measure_developer_numeric,
                   cluster = NMA_Data_Subset_grpID$record_id, 
                   vcov = "CR2")
 mvcf
 
 ####################################################################################################
 
-NNMA_control_interventionist <- rma.mv(yi = effect_size, 
+NNMA_control_interventionist_numeric <- rma.mv(yi = effect_size, 
                                        V = V_list, 
                                        random = ~ 1 | record_id/es_id,
                                        mods = ~ interventionist_numeric - 1,
                                        test =  "t", 
                                        data = NMA_Data_Subset_grpID, 
                                        method = "REML")
-summary(NNMA_control_interventionist)  
+summary(NNMA_control_interventionist_numeric)  
 
 ##Use RVE for robustness
-mvcf <- coef_test(NNMA_control_interventionist,
+mvcf <- coef_test(NNMA_control_interventionist_numeric,
                   cluster = NMA_Data_Subset_grpID$record_id, 
                   vcov = "CR2")
 mvcf
@@ -348,17 +348,17 @@ mvcf
 
 ####################################################################################################
 
-NNMA_control_intervention_content <- rma.mv(yi = effect_size, 
+NNMA_control_intervention_content_numeric <- rma.mv(yi = effect_size, 
                                             V = V_list, 
                                             random = ~ 1 | record_id/es_id,
                                             mods = ~ intervention_content_numeric - 1,
                                             test =  "t", 
                                             data = NMA_Data_Subset_grpID, 
                                             method = "REML")
-summary(NNMA_control_intervention_content)  
+summary(NNMA_control_intervention_content_numeric)  
 
 ##Use RVE for robustness
-mvcf <- coef_test(NNMA_control_intervention_content,
+mvcf <- coef_test(NNMA_control_intervention_content_numeric,
                   cluster = NMA_Data_Subset_grpID$record_id, 
                   vcov = "CR2")
 mvcf    
@@ -377,10 +377,10 @@ NNMA_control_dosage_overall_hours_avg_df
 NNMA_control_dosage_overall_hours_avg_df$term <- gsub("overall", "dosage_overall_hours_avg", NNMA_control_dosage_overall_hours_avg_df$term)
 NNMA_control_dosage_overall_hours_avg_df
 
-NNMA_control_group_size_category_df <- tidy(NNMA_control_group_size_category, conf.int = TRUE)
-NNMA_control_group_size_category_df
-NNMA_control_group_size_category_df$term <- gsub("overall", "group_size_category", NNMA_control_group_size_category_df$term)
-NNMA_control_group_size_category_df  
+NNMA_control_group_size_average_df <- tidy(NNMA_control_group_size_average, conf.int = TRUE)
+NNMA_control_group_size_average_df
+NNMA_control_group_size_average_df$term <- gsub("overall", "group_size_average", NNMA_control_group_size_average_df$term)
+NNMA_control_group_size_average_df  
 
 NNMA_control_grade_level_df <- tidy(NNMA_control_grade_level, conf.int = TRUE)
 NNMA_control_grade_level_df
@@ -392,20 +392,20 @@ NNMA_control_TvsT_df
 NNMA_control_TvsT_df$term <- gsub("overall", "TvsT", NNMA_control_TvsT_df$term)
 NNMA_control_TvsT_df 
 
-NNMA_control_measure_developer_df <- tidy(NNMA_control_measure_developer, conf.int = TRUE)
-NNMA_control_measure_developer_df
-NNMA_control_measure_developer_df$term <- gsub("overall", "measure_developer", NNMA_control_measure_developer_df$term)
-NNMA_control_measure_developer_df 
+NNMA_control_measure_developer_numeric_df <- tidy(NNMA_control_measure_developer_numeric, conf.int = TRUE)
+NNMA_control_measure_developer_numeric_df
+NNMA_control_measure_developer_numeric_df$term <- gsub("overall", "measure_developer", NNMA_control_measure_developer_numeric_df$term)
+NNMA_control_measure_developer_numeric_df 
 
-NNMA_control_interventionist_df <- tidy(NNMA_control_interventionist, conf.int = TRUE)
-NNMA_control_interventionist_df
-NNMA_control_interventionist_df$term <- gsub("overall", "interventionist", NNMA_control_interventionist_df$term)
-NNMA_control_interventionist_df 
+NNMA_control_interventionist_numeric_df <- tidy(NNMA_control_interventionist_numeric, conf.int = TRUE)
+NNMA_control_interventionist_numeric_df
+NNMA_control_interventionist_numeric_df$term <- gsub("overall", "interventionist", NNMA_control_interventionist_numeric_df$term)
+NNMA_control_interventionist_numeric_df 
 
-NNMA_control_year_df <- tidy(NNMA_control_year, conf.int = TRUE)
-NNMA_control_year_df
-NNMA_control_year_df$term <- gsub("overall", "control_year", NNMA_control_year_df$term)
-NNMA_control_year_df  
+NNMA_control_publication_year_df <- tidy(NNMA_control_publication_year, conf.int = TRUE)
+NNMA_control_publication_year_df
+NNMA_control_publication_year_df$term <- gsub("overall", "control_year", NNMA_control_publication_year_df$term)
+NNMA_control_publication_year_df  
 
 NNMA_control_ongoing_training_df <- tidy(NNMA_control_ongoing_training, conf.int = TRUE)
 NNMA_control_ongoing_training_df
@@ -417,22 +417,22 @@ NNMA_control_research_lab_df
 NNMA_control_research_lab_df$term <- gsub("overall", "research_lab", NNMA_control_research_lab_df$term)
 NNMA_control_research_lab_df 
 
-NNMA_control_domain_df <- tidy(NNMA_control_domain, conf.int = TRUE)  
-NNMA_control_domain_df 
-NNMA_control_domain_df$term <- gsub("overall", "domain", NNMA_control_domain_df$term)
-NNMA_control_domain_df 
+NNMA_control_domain_numeric_df <- tidy(NNMA_control_domain_numeric, conf.int = TRUE)  
+NNMA_control_domain_numeric_df 
+NNMA_control_domain_numeric_df$term <- gsub("overall", "domain", NNMA_control_domain_numeric_df$term)
+NNMA_control_domain_numeric_df 
 
-NNMA_control_control_nature_df <- tidy(NNMA_control_control_nature, conf.int = TRUE)  
-NNMA_control_control_nature_df
-NNMA_control_control_nature_df$term <- gsub("overall", "control_nature", NNMA_control_control_nature_df$term)
-NNMA_control_control_nature_df 
+NNMA_control_control_nature_numeric_df <- tidy(NNMA_control_control_nature_numeric, conf.int = TRUE)  
+NNMA_control_control_nature_numeric_df
+NNMA_control_control_nature_numeric_df$term <- gsub("overall", "control_nature", NNMA_control_control_nature_numeric_df$term)
+NNMA_control_control_nature_numeric_df 
 
-NNMA_control_intervention_content_df <- tidy(NNMA_control_intervention_content, conf.int = TRUE)  
-NNMA_control_intervention_content_df
-NNMA_control_intervention_content_df$term <- gsub("overall", "intervention_content", NNMA_control_intervention_content_df$term)
-NNMA_control_intervention_content_df 
+NNMA_control_intervention_content_numeric_df <- tidy(NNMA_control_intervention_content_numeric, conf.int = TRUE)  
+NNMA_control_intervention_content_numeric_df
+NNMA_control_intervention_content_numeric_df$term <- gsub("overall", "intervention_content", NNMA_control_intervention_content_numeric_df$term)
+NNMA_control_intervention_content_numeric_df 
 
-mod_analysis <- rbind(NNMA_control_dosage_overall_hours_avg_df, NNMA_control_group_size_category_df, NNMA_control_grade_level_df, NNMA_control_TvsT_df, NNMA_control_measure_developer_df, NNMA_control_interventionist_df, NNMA_control_year_df, NNMA_control_ongoing_training_df, NNMA_control_research_lab_df, NNMA_control_domain_df, NNMA_control_control_nature_df, NNMA_control_intervention_content_df)
+mod_analysis <- rbind(NNMA_control_dosage_overall_hours_avg_df, NNMA_control_group_size_average_df, NNMA_control_grade_level_df, NNMA_control_TvsT_df, NNMA_control_measure_developer_numeric_df, NNMA_control_interventionist_numeric_df, NNMA_control_ongoing_training_df, NNMA_control_intervention_content_numeric_df)
 mod_analysis$p.value <- round(mod_analysis$p.value, digits = 5)
 print(mod_analysis, n=Inf) 
 
