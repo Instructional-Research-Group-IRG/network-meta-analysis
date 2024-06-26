@@ -1303,12 +1303,12 @@
   num_students_d1gma_long3 <- num_students_d1gma_long2 %>% group_by(intervention_comparison) %>% summarize(sum_num_students_bundle= sum(num_students_bundle)) # Sum students by intervention bundle.
   str(num_students_d1gma_long3)
   print(num_students_d1gma_long3)
-  target_d1gma <- c("AE+AR","AF+AR","AN+AE+AF+AR","AN+AE+AR","AN+AE+AV+AR","AN+AF+AR","AN+AR","AN+AV+AE+AR","AR","AR+AN+AV","AV+AF+AR","BAU")
+  target_d1gma <- c("AE+AR","AF+AR","AN+AE+AF+AR","AN+AE+AR","AN+AE+AV+AR","AN+AF+AR","AN+AR","AN+AV+AR","AR","AV+AF+AR","BAU")
   num_students_d1gma_long3 <- num_students_d1gma_long3[match(target_d1gma, num_students_d1gma_long3$intervention_comparison),]
   print(num_students_d1gma_long3)  
   num_students_d1gma_long3$intervention_comparison <- as.character(num_students_d1gma_long3$intervention_comparison)
   str(num_students_d1gma_long3)
-  print(num_contrasts_d1gma_long3)
+  print(num_students_d1gma_long3)
       
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID_d1gmaSA$intervention_combo)
@@ -1393,7 +1393,7 @@
       print(res_mod_d1gmaSA_pscore)
       print(num_contrasts_d1gma_long3)
       res_mod_d1gmaSA_pscore <- res_mod_d1gmaSA_pscore %>% left_join(num_contrasts_d1gma_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-      res_mod_d1gmaSA_pscore$colour <- rep(c("white", "gray95","white", "gray95","white", "gray95","white", "gray95","white", "gray95","white"))
+      res_mod_d1gmaSA_pscore$colour <- rep(c("white", "gray95","white", "gray95","white", "gray95","white", "gray95","white", "gray95"))
       str(res_mod_d1gmaSA_pscore)
       print(res_mod_d1gmaSA_pscore)
       
@@ -1560,11 +1560,12 @@
   num_students_d2rn_long3 <- num_students_d2rn_long2 %>% group_by(intervention_comparison) %>% summarize(sum_num_students_bundle= sum(num_students_bundle)) # Sum students by intervention bundle.
   str(num_students_d2rn_long3)
   print(num_students_d2rn_long3)
-  target_d2rn <- c("AN+AE+AF+AR","AN+AE+AV+AF+AR","AN+AE+AV+AR","AN+AF+AR","AN+AR+AF","AN+AV+AE+AF+AR","AV+AR","BAU")
+  target_d2rn <- c("AN+AE+AF+AR","AN+AE+AV+AF+AR","AN+AE+AV+AR","AN+AF+AR","AV+AR","BAU")
   num_students_d2rn_long3 <- num_students_d2rn_long3[match(target_d2rn, num_students_d2rn_long3$intervention_comparison),]
   print(num_students_d2rn_long3)  
   num_students_d2rn_long3$intervention_comparison <- as.character(num_students_d2rn_long3$intervention_comparison)
-  str(num_students_d2rn_long3)  
+  str(num_students_d2rn_long3) 
+  print(num_students_d2rn_long3) 
       
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID_d2rnSA$intervention_combo)
@@ -1572,7 +1573,7 @@
   check_d2rn <- NMA_data_analysis_subset_grpID_d2rnSA %>% dplyr::select(record_id, contrast_id, intervention_combo, comparison_combo)
   print(check_d2rn)
   res_mod_d2rnSA <- rma.mv(effect_size, V_list, 
-                        mods = ~ AN.AE.AF.AR + AN.AE.AV.AF.AR + AN.AE.AV.AR + AN.AF.AR + AN.AR.AF + AN.AV.AE.AF.AR + AV.AR - 1, 
+                        mods = ~ AN.AE.AF.AR + AN.AE.AV.AF.AR + AN.AE.AV.AR + AN.AF.AR + AV.AR - 1, 
                         random = ~ 1 | record_id/es_id, 
                         rho=0.60, 
                         data=NMA_data_analysis_subset_grpID_d2rnSA)
@@ -1649,7 +1650,7 @@
       print(res_mod_d2rnSA_pscore)
       print(num_contrasts_d2rn_long3)
       res_mod_d2rnSA_pscore <- res_mod_d2rnSA_pscore %>% left_join(num_contrasts_d2rn_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-      res_mod_d2rnSA_pscore$colour <- rep(c("white", "gray95","white", "gray95","white","gray95","white"))
+      res_mod_d2rnSA_pscore$colour <- rep(c("white", "gray95","white", "gray95","white"))
       str(res_mod_d2rnSA_pscore)   
       print(res_mod_d2rnSA_pscore)
       
@@ -1816,11 +1817,12 @@
   num_students_d3wn_long3 <- num_students_d3wn_long2 %>% group_by(intervention_comparison) %>% summarize(sum_num_students_bundle= sum(num_students_bundle)) # Sum students by intervention bundle.
   str(num_students_d3wn_long3)
   print(num_students_d3wn_long3)
-  target_d3wn <- c("AE+AF+AR","AE+AR","AE+AV+AF+AR","AF+AR","AN+AE+AF+AR","AN+AE+AR","AN+AF+AR","AN+AR","AN+AV+AE+AF+AR","AN+AV+AE+AR","AN+AV+AF+AR","AN+AV+AR","AR","AR+AN+AV","AV+AE+AF+AR","AV+AF+AR","BAU")
+  target_d3wn <- c("AE+AF+AR","AE+AR","AE+AV+AF+AR","AF+AR","AN+AE+AF+AR","AN+AE+AR","AN+AE+AV+AF+AR","AN+AE+AV+AR","AN+AF+AR","AN+AR","AN+AV+AF+AR","AN+AV+AR","AR","AV+AF+AR","BAU")
   num_students_d3wn_long3 <- num_students_d3wn_long3[match(target_d3wn, num_students_d3wn_long3$intervention_comparison),]
   print(num_students_d3wn_long3)  
   num_students_d3wn_long3$intervention_comparison <- as.character(num_students_d3wn_long3$intervention_comparison)
-  str(num_students_d3wn_long3)    
+  str(num_students_d3wn_long3) 
+  print(num_students_d3wn_long3) 
       
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID_d3wnSA$intervention_combo)
@@ -1828,7 +1830,7 @@
   check_d3wn <- NMA_data_analysis_subset_grpID_d3wnSA %>% dplyr::select(record_id, contrast_id, intervention_combo, comparison_combo)
   print(check_d3wn)
   res_mod_d3wnSA <- rma.mv(effect_size, V_list, 
-                       mods = ~ AE.AF.AR + AE.AR + AE.AV.AF.AR + AF.AR + AN.AE.AF.AR + AN.AE.AR + AN.AF.AR + AN.AR + AN.AV.AE.AF.AR + AN.AV.AE.AR + AN.AV.AF.AR + AN.AV.AR + AR + AR.AN.AV + AV.AE.AF.AR + AV.AF.AR - 1, 
+                       mods = ~ AE.AF.AR + AE.AR + AE.AV.AF.AR + AF.AR + AN.AE.AF.AR + AN.AE.AR + AN.AE.AV.AF.AR + AN.AE.AV.AR + AN.AF.AR + AN.AR + AN.AV.AF.AR + AN.AV.AR + AR + AV.AF.AR - 1, 
                        random = ~ 1 | record_id/es_id, 
                        rho=0.60, 
                        data=NMA_data_analysis_subset_grpID_d3wnSA)
@@ -1905,7 +1907,7 @@
       print(res_mod_d3wnSA_pscore)
       print(num_contrasts_d3wn_long3)
       res_mod_d3wnSA_pscore <- res_mod_d3wnSA_pscore %>% left_join(num_contrasts_d3wn_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-      res_mod_d3wnSA_pscore$colour <- rep(c("white", "gray95","white", "gray95","white","gray95","white", "gray95","white", "gray95","white","gray95","white", "gray95","white", "gray95"))
+      res_mod_d3wnSA_pscore$colour <- rep(c("white", "gray95","white", "gray95","white","gray95","white", "gray95","white", "gray95","white","gray95","white", "gray95"))
       str(res_mod_d3wnSA_pscore)     
       print(res_mod_d3wnSA_pscore)
       
