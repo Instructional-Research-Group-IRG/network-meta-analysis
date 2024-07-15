@@ -1081,4 +1081,9 @@ V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, r
                     vcov = "CR2")
   mvcf
   
+  mvcf_ci <- conf_int(NNMA_MVmodel_main,
+                    cluster = NNMA_Data_Subset_grpID$record_id, 
+                    vcov = "CR2")
+  mvcf_ci
+  
 
