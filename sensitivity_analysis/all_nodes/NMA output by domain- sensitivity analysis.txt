@@ -1,7 +1,6 @@
 ***Domain General Mathematics Achievement (*_d1gmaSA)
 
-
-		>   summary(res_mod_d1gmaSA)
+	>   summary(res_mod_d1gmaSA)
 
 		Multivariate Meta-Analysis Model (k = 56; method: REML)
 
@@ -41,7 +40,7 @@
 
 ***Domain Rational Numbers (*_d2rnSA)
 
-		>   summary(res_mod_d2rnSA)
+	>   summary(res_mod_d2rnSA)
 
 		Multivariate Meta-Analysis Model (k = 102; method: REML)
 
@@ -71,41 +70,41 @@
 	
 	
 	
-***Domain Whole Numbers (*_d3wn)
+***Domain Whole Numbers (*_d3wnSA)
 
-		>   summary(res_mod_d3wnSA)
+	>   summary(res_mod_d3wnSA)
 
 		Multivariate Meta-Analysis Model (k = 125; method: REML)
 
 		  logLik  Deviance       AIC       BIC      AICc   
-		-55.8817  111.7634  143.7634  187.1159  149.5506   
+		-55.9497  111.8994  143.8994  187.2519  149.6867   
 
 		Variance Components:
 
-					estim    sqrt  nlvls  fixed           factor 
-		sigma^2.1  0.0000  0.0000     29     no        record_id 
-		sigma^2.2  0.1267  0.3559    125     no  record_id/es_id 
+		            estim    sqrt  nlvls  fixed           factor 
+		sigma^2.1  0.0001  0.0104     29     no        record_id 
+		sigma^2.2  0.1269  0.3562    125     no  record_id/es_id 
 
 		Test of Moderators (coefficients 1:14):
-		QM(df = 14) = 126.1446, p-val < .0001
+		QM(df = 14) = 125.5006, p-val < .0001
 
 		Model Results:
 
-						estimate      se     zval    pval    ci.lb   ci.ub      
-		AE.AF.AR          0.7953  0.1793   4.4354  <.0001   0.4439  1.1468  *** 
-		AE.AR            -0.0128  0.2247  -0.0570  0.9545  -0.4532  0.4275      
-		AE.AV.AF.AR       0.8596  0.1978   4.3460  <.0001   0.4719  1.2472  *** 
-		AF.AR             0.5950  0.1276   4.6622  <.0001   0.3449  0.8452  *** 
-		AN.AE.AF.AR       0.5629  0.1285   4.3811  <.0001   0.3111  0.8148  *** 
-		AN.AE.AR          0.3875  0.1550   2.5009  0.0124   0.0838  0.6913    * 
-		AN.AE.AV.AF.AR    0.7460  0.2692   2.7712  0.0056   0.2184  1.2736   ** 
-		AN.AE.AV.AR      -0.1280  0.3978  -0.3218  0.7476  -0.9077  0.6517      
-		AN.AF.AR          0.4197  0.1222   3.4336  0.0006   0.1801  0.6592  *** 
-		AN.AR             0.3644  0.2173   1.6771  0.0935  -0.0614  0.7902    . 
-		AN.AV.AF.AR       0.4234  0.1518   2.7896  0.0053   0.1259  0.7209   ** 
-		AN.AV.AR          0.3735  0.1709   2.1857  0.0288   0.0386  0.7083    * 
-		AR                0.3396  0.1813   1.8727  0.0611  -0.0158  0.6950    . 
-		AV.AF.AR          0.5529  0.1132   4.8828  <.0001   0.3310  0.7749  *** 
+                		estimate      se     zval    pval    ci.lb   ci.ub      
+		AE.AF.AR          0.7978  0.1795   4.4448  <.0001   0.4460  1.1495  *** 
+		AE.AR            -0.0127  0.2249  -0.0567  0.9548  -0.4536  0.4281      
+		AE.AV.AF.AR       0.8596  0.1980   4.3412  <.0001   0.4715  1.2477  *** 
+		AF.AR             0.5943  0.1278   4.6515  <.0001   0.3439  0.8447  *** 
+		AN.AE.AF.AR       0.5628  0.1287   4.3733  <.0001   0.3106  0.8150  *** 
+		AN.AE.AR          0.3876  0.1552   2.4973  0.0125   0.0834  0.6918    * 
+		AN.AE.AV.AF.AR    0.7461  0.2696   2.7672  0.0057   0.2176  1.2745   ** 
+		AN.AE.AV.AR      -0.1280  0.3982  -0.3214  0.7479  -0.9085  0.6525      
+		AN.AF.AR          0.4196  0.1224   3.4277  0.0006   0.1797  0.6596  *** 
+		AN.AR             0.3644  0.2176   1.6744  0.0940  -0.0621  0.7909    . 
+		AN.AV.AF.AR       0.4235  0.1521   2.7852  0.0053   0.1255  0.7215   ** 
+		AN.AV.AR          0.3735  0.1712   2.1823  0.0291   0.0381  0.7090    * 
+		AR                0.3395  0.1815   1.8706  0.0614  -0.0162  0.6952    . 
+		AV.AF.AR          0.5468  0.1124   4.8641  <.0001   0.3264  0.7671  *** 
 
 		---
-		Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1		
+		Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
