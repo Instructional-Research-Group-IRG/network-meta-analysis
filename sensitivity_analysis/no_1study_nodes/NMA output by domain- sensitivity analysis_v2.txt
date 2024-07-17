@@ -1,6 +1,5 @@
 ***Domain General Mathematics Achievement (*_d1gmaSAv2)
 
-
 >     summary(res_mod_d1gmaSAv2)
 
 	Multivariate Meta-Analysis Model (k = 52; method: REML)
@@ -65,75 +64,36 @@
 
 ***Domain Whole Numbers (*_d3wnSAv2)
 
-	(intervention_combo!= "AN+AE+AV+AR" & comparison_combo!= "AF+AR")
+>     summary(res_mod_d3wnSAv2)
 
-*Removes full studies
-?Same output for nodes remaining in analysis data
+	Multivariate Meta-Analysis Model (k = 116; method: REML)
 
-# A tibble: 13 × 2
-   intervention_comparison sum_num_students_bundle
-   <fct>                                     <dbl>
- 1 AE+AF+AR                                    156
- 2 AE+AR                                       101
- 3 AE+AV+AF+AR                                 147
- 4 AN+AE+AF+AR                                 199
- 5 AN+AE+AR                                   1453
- 6 AN+AE+AV+AF+AR                               96
- 7 AN+AF+AR                                    448
- 8 AN+AR                                        64
- 9 AN+AV+AF+AR                                 287
-10 AN+AV+AR                                    237
-11 AR                                          154
-12 AV+AF+AR                                    338
-13 BAU                                        3424
->     num_students_d3wn_long3$intervention_comparison <- as.character(num_students_d3wn_long3$intervention_comparison)
->     str(num_students_d3wn_long3) 
-tibble [13 × 2] (S3: tbl_df/tbl/data.frame)
- $ intervention_comparison: chr [1:13] "AE+AF+AR" "AE+AR" "AE+AV+AF+AR" "AN+AE+AF+AR" ...
- $ sum_num_students_bundle: num [1:13] 156 101 147 199 1453 ...
->     print(num_students_d3wn_long3) 
-# A tibble: 13 × 2
-   intervention_comparison sum_num_students_bundle
-   <chr>                                     <dbl>
- 1 AE+AF+AR                                    156
- 2 AE+AR                                       101
- 3 AE+AV+AF+AR                                 147
- 4 AN+AE+AF+AR                                 199
- 5 AN+AE+AR                                   1453
- 6 AN+AE+AV+AF+AR                               96
- 7 AN+AF+AR                                    448
- 8 AN+AR                                        64
- 9 AN+AV+AF+AR                                 287
-10 AN+AV+AR                                    237
-11 AR                                          154
-12 AV+AF+AR                                    338
-13 BAU                                        3424
+	  logLik  Deviance       AIC       BIC      AICc   
+	-55.4125  110.8250  136.8250  171.3265  140.8250   
 
- NMA_data_analysis_subset_grpID_d3wnSAv2$intervention_combo  n    percent
-                                                   AE+AF+AR  6 0.04878049
-                                                      AE+AR  4 0.03252033
-                                                AE+AV+AF+AR  5 0.04065041
-                                                      AF+AR 12 0.09756098
-                                                AN+AE+AF+AR 20 0.16260163
-                                                   AN+AE+AR  6 0.04878049
-                                             AN+AE+AV+AF+AR  3 0.02439024
-                                                AN+AE+AV+AR  0 0.00000000
-                                                   AN+AF+AR 19 0.15447154
-                                                      AN+AR  5 0.04065041
-                                                AN+AV+AF+AR  7 0.05691057
-                                                   AN+AV+AR  6 0.04878049
-                                                         AR  7 0.05691057
-                                                   AV+AF+AR 23 0.18699187
-                                                      AV+AR  0 0.00000000
->     tabyl(NMA_data_analysis_subset_grpID_d3wnSAv2$comparison_combo)      
- NMA_data_analysis_subset_grpID_d3wnSAv2$comparison_combo   n    percent
-                                                    AF+AR   0 0.00000000
-                                           AN+AE+AV+AF+AR   0 0.00000000
-                                              AN+AE+AV+AR   0 0.00000000
-                                                 AN+AF+AR   4 0.03252033
-                                                      BAU 119 0.96747967
+	Variance Components:
 
-res_mod_d3wnSAv2_pscore$colour <- rep(c("white", "gray95","white", "gray95","white","gray95","white", "gray95","white", "gray95","white","gray95"))
+        	    estim    sqrt  nlvls  fixed           factor 
+	sigma^2.1  0.0000  0.0000     27     no        record_id 
+	sigma^2.2  0.1338  0.3658    116     no  record_id/es_id 
 
+	Test of Moderators (coefficients 1:11):
+	QM(df = 11) = 117.6407, p-val < .0001
 
+	Model Results:
 
+        	     estimate      se     zval    pval    ci.lb   ci.ub      
+	AE.AF.AR       0.7971  0.1826   4.3660  <.0001   0.4393  1.1550  *** 
+	AE.AR         -0.0117  0.2287  -0.0514  0.9590  -0.4600  0.4365      
+	AE.AV.AF.AR    0.8579  0.2015   4.2582  <.0001   0.4630  1.2528  *** 
+	AF.AR          0.5953  0.1299   4.5839  <.0001   0.3408  0.8498  *** 
+	AN.AE.AF.AR    0.5633  0.1299   4.3350  <.0001   0.3086  0.8179  *** 
+	AN.AE.AR       0.3881  0.1587   2.4449  0.0145   0.0770  0.6992    * 
+	AN.AF.AR       0.4195  0.1241   3.3816  0.0007   0.1764  0.6627  *** 
+	AN.AV.AF.AR    0.4232  0.1551   2.7281  0.0064   0.1191  0.7272   ** 
+	AN.AV.AR       0.3756  0.1744   2.1536  0.0313   0.0338  0.7174    * 
+	AR             0.3383  0.1843   1.8356  0.0664  -0.0229  0.6996    . 
+	AV.AF.AR       0.5467  0.1140   4.7961  <.0001   0.3233  0.7700  *** 
+
+	---
+	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

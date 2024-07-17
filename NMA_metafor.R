@@ -1770,7 +1770,7 @@
            vertex.size=log((num_students_d3wn_long3$sum_num_students_bundle))*2.5, vertex.color=c("lightgray","lightblue","gold","red","violet","royalblue1","olivedrab"), vertex.label.color="black", vertex.label.font=2)   
       
 
-#===================================== SENSITIVITY ANALYSIS: EXCLUDE 1 STUDY NODES =====================================#       
+#===================================== SENSITIVITY ANALYSIS: EXCLUDE NODES WITHIN ONLY 1 CONTRAST =====================================#       
       
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "General Mathematics Achievement"
       
@@ -1781,7 +1781,8 @@
       
     ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
 
-    ##Drop nodes with only 1 study
+    ##Drop intervention bundles/nodes within only 1 contrast
+    ##NOTE: We know which intervention bundles/nodes are within only 1 contrast from the counts generated in lines 204-220
     NMA_data_analysis_subset_grpID_d1gmaSAv2 <- NMA_data_analysis_subset_grpID_d1gmaSAv2 %>% drop_na(c(intervention_combo, comparison_combo)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
     tabyl(NMA_data_analysis_subset_grpID_d1gmaSAv2$intervention_combo)
     tabyl(NMA_data_analysis_subset_grpID_d1gmaSAv2$comparison_combo)    
@@ -1803,17 +1804,16 @@
     num_contrasts_d1gma <- NMA_data_analysis_subset_grpID_d1gmaSAv2 %>% dplyr::select(record_id, contrast_id, intervention_combo, comparison_combo)
     print(num_contrasts_d1gma)
     num_contrasts_d1gma_long <- num_contrasts_d1gma %>% pivot_longer(c(intervention_combo, comparison_combo ), names_to= "group_IC", values_to="group_intervention")
-    print(num_contrasts_d1gma_long)
+    print(num_contrasts_d1gma_long, n= Inf)
     num_contrasts_d1gma_long2 <- num_contrasts_d1gma_long %>% distinct(record_id, contrast_id, group_intervention, .keep_all = TRUE)
-    print(num_contrasts_d1gma_long2)
+    print(num_contrasts_d1gma_long2, n= Inf)
     tabyl(num_contrasts_d1gma_long2$contrast_id) #Should be n=2 for each contrast if reshape and distinct steps done correctly: 1 intervention & 1 comparison per unique contrast. 
     num_contrasts_d1gma_long3 <- tabyl(num_contrasts_d1gma_long2$group_intervention)
     num_contrasts_d1gma_long3 <- num_contrasts_d1gma_long3 %>% dplyr::select(intervention= 'num_contrasts_d1gma_long2$group_intervention', num_contrasts= 'n')
-    str(num_contrasts_d1gma_long3)
+    print(num_contrasts_d1gma_long3)
     num_contrasts_d1gma_long3$intervention <- as.character(num_contrasts_d1gma_long3$intervention)
     num_contrasts_d1gma_long3$intervention <- gsub("\\+", ".", num_contrasts_d1gma_long3$intervention)
-    str(num_contrasts_d1gma_long3)
-    print(num_contrasts_d1gma_long3) 
+    print(num_contrasts_d1gma_long3)
       
     ## Calculate the number of students within each intervention bundle across all unique study-contrasts
     num_students_d1gma <- NMA_data_analysis_subset_grpID_d1gmaSAv2 %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_combo, intervention_n, comparison_combo, comparison_n, full_sample_size)
@@ -2045,7 +2045,8 @@
       
     ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
       
-    ##Drop nodes with only 1 study
+    ##Drop intervention bundles/nodes within only 1 contrast
+    ##NOTE: We know which intervention bundles/nodes are within only 1 contrast from the counts generated in lines 460-476
     NMA_data_analysis_subset_grpID_d2rnSAv2 <- NMA_data_analysis_subset_grpID_d2rnSAv2 %>% drop_na(c(intervention_combo, comparison_combo)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
     tabyl(NMA_data_analysis_subset_grpID_d2rnSAv2$intervention_combo)
     tabyl(NMA_data_analysis_subset_grpID_d2rnSAv2$comparison_combo)    
@@ -2309,11 +2310,12 @@
     
     ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
       
-    ##Drop nodes with only 1 study
+    ##Drop intervention bundles/nodes within only 1 contrast
+    ##NOTE: We know which intervention bundles/nodes are within only 1 contrast from the counts generated in lines 716-732
     NMA_data_analysis_subset_grpID_d3wnSAv2 <- NMA_data_analysis_subset_grpID_d3wnSAv2 %>% drop_na(c(intervention_combo, comparison_combo)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
     tabyl(NMA_data_analysis_subset_grpID_d3wnSAv2$intervention_combo)
     tabyl(NMA_data_analysis_subset_grpID_d3wnSAv2$comparison_combo)    
-    #NMA_data_analysis_subset_grpID_d3wnSAv2 <- NMA_data_analysis_subset_grpID_d3wnSAv2 %>% filter(intervention_combo!= "AN+AE+AV+AR")
+    NMA_data_analysis_subset_grpID_d3wnSAv2 <- NMA_data_analysis_subset_grpID_d3wnSAv2 %>% filter(intervention_combo!= "AN+AE+AV+AF+AR" & intervention_combo!= "AN+AE+AV+AR" & intervention_combo!= "AN+AR")
     tabyl(NMA_data_analysis_subset_grpID_d3wnSAv2$intervention_combo)
     tabyl(NMA_data_analysis_subset_grpID_d3wnSAv2$comparison_combo)      
     
@@ -2333,7 +2335,7 @@
     num_contrasts_d3wn_long <- num_contrasts_d3wn %>% pivot_longer(c(intervention_combo, comparison_combo ),names_to= "group_IC", values_to="group_intervention")
     print(num_contrasts_d3wn_long, n=20)
     num_contrasts_d3wn_long2 <- num_contrasts_d3wn_long %>% distinct(record_id, contrast_id, group_intervention, .keep_all = TRUE)
-    print(num_contrasts_d3wn_long2)
+    print(num_contrasts_d3wn_long2, n=Inf)
     tabyl(num_contrasts_d3wn_long2$contrast_id) #Should be n=2 for each contrast if reshape and distinct steps done correctly: 1 intervention & 1 comparison per unique contrast. 
     num_contrasts_d3wn_long3 <- tabyl(num_contrasts_d3wn_long2$group_intervention)
     num_contrasts_d3wn_long3 <- num_contrasts_d3wn_long3 %>% dplyr::select(intervention= 'num_contrasts_d3wn_long2$group_intervention', num_contrasts= 'n')
@@ -2355,7 +2357,7 @@
     num_students_d3wn_long3 <- num_students_d3wn_long2 %>% group_by(intervention_comparison) %>% summarize(sum_num_students_bundle= sum(num_students_bundle)) # Sum students by intervention bundle.
     str(num_students_d3wn_long3)
     print(num_students_d3wn_long3)
-    target_d3wn <- c("AE+AF+AR","AE+AR","AE+AV+AF+AR","AF+AR","AN+AE+AF+AR","AN+AE+AR","AN+AE+AV+AF+AR","AN+AF+AR","AN+AR","AN+AV+AF+AR","AN+AV+AR","AR","AV+AF+AR","BAU")
+    target_d3wn <- c("AE+AF+AR","AE+AR","AE+AV+AF+AR","AF+AR","AN+AE+AF+AR","AN+AE+AR","AN+AF+AR","AN+AV+AF+AR","AN+AV+AR","AR","AV+AF+AR","BAU")
 
     num_students_d3wn_long3 <- num_students_d3wn_long3[match(target_d3wn, num_students_d3wn_long3$intervention_comparison),]
     print(num_students_d3wn_long3)  
@@ -2369,7 +2371,7 @@
     check_d3wn <- NMA_data_analysis_subset_grpID_d3wnSAv2 %>% dplyr::select(record_id, contrast_id, intervention_combo, comparison_combo)
     print(check_d3wn)
     res_mod_d3wnSAv2 <- rma.mv(effect_size, V_list, 
-                             mods = ~ AE.AF.AR + AE.AR + AE.AV.AF.AR + AF.AR + AN.AE.AF.AR + AN.AE.AR + AN.AE.AV.AF.AR + AN.AF.AR + AN.AR + AN.AV.AF.AR + AN.AV.AR + AR + AV.AF.AR - 1,
+                             mods = ~ AE.AF.AR + AE.AR + AE.AV.AF.AR + AF.AR + AN.AE.AF.AR + AN.AE.AR + AN.AF.AR + AN.AV.AF.AR + AN.AV.AR + AR + AV.AF.AR - 1,
                              random = ~ 1 | record_id/es_id, 
                              rho=0.60, 
                              data=NMA_data_analysis_subset_grpID_d3wnSAv2)
@@ -2446,7 +2448,7 @@
         print(res_mod_d3wnSAv2_pscore)
         print(num_contrasts_d3wn_long3)
         res_mod_d3wnSAv2_pscore <- res_mod_d3wnSAv2_pscore %>% left_join(num_contrasts_d3wn_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-        res_mod_d3wnSAv2_pscore$colour <- rep(c("white", "gray95","white", "gray95","white","gray95","white", "gray95","white", "gray95","white", "gray95","white"))
+        res_mod_d3wnSAv2_pscore$colour <- rep(c("white", "gray95","white", "gray95","white","gray95","white", "gray95","white", "gray95","white"))
         str(res_mod_d3wnSAv2_pscore)     
         print(res_mod_d3wnSAv2_pscore)
         
