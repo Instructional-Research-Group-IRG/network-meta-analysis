@@ -1,0 +1,99 @@
+***Domain General Mathematics Achievement (*_d1gmaSAv2)
+
+>     summary(res_mod_d1gmaSAv2)
+
+	Multivariate Meta-Analysis Model (k = 52; method: REML)
+
+  	logLik  Deviance       AIC       BIC      AICc   
+  	1.7243   -3.4486   12.5514   27.1805   16.4433   
+
+	Variance Components:
+
+	            estim    sqrt  nlvls  fixed           factor 
+	sigma^2.1  0.0048  0.0690     18     no        record_id 
+	sigma^2.2  0.0363  0.1906     52     no  record_id/es_id 
+
+	Test for Residual Heterogeneity:
+	QE(df = 46) = 235.3230, p-val < .0001
+
+	Test of Moderators (coefficients 1:6):
+	QM(df = 6) = 46.9960, p-val < .0001
+
+	Model Results:
+
+	             estimate      se    zval    pval    ci.lb   ci.ub      
+	AN.AE.AR       0.3330  0.0607  5.4881  <.0001   0.2141  0.4520  *** 
+	AN.AE.AV.AR    0.1926  0.1347  1.4302  0.1527  -0.0714  0.4566      
+	AN.AF.AR       0.0840  0.1327  0.6335  0.5264  -0.1760  0.3440      
+	AN.AR          0.2241  0.1120  2.0011  0.0454   0.0046  0.4436    * 
+	AR             0.3413  0.1544  2.2115  0.0270   0.0388  0.6439    * 
+	AV.AF.AR       0.5782  0.2458  2.3526  0.0186   0.0965  1.0599    * 
+
+	---
+	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+***Domain Rational Numbers (*_d2rnSAv2)
+
+	>     summary(res_mod_d2rnSAv2)
+
+	Multivariate Meta-Analysis Model (k = 101; method: REML)
+
+	  logLik  Deviance       AIC       BIC      AICc   
+	-99.0158  198.0316  210.0316  225.4799  210.9650   
+
+	Variance Components:
+
+	            estim    sqrt  nlvls  fixed           factor 
+	sigma^2.1  0.2888  0.5374     12     no        record_id 
+	sigma^2.2  0.3431  0.5857    101     no  record_id/es_id 
+
+	Test of Moderators (coefficients 1:4):
+	QM(df = 4) = 60.0928, p-val < .0001
+
+	Model Results:
+
+	                estimate      se    zval    pval    ci.lb   ci.ub      
+	AN.AE.AF.AR       1.0137  0.6030  1.6810  0.0928  -0.1682  2.1956    . 
+	AN.AE.AV.AF.AR    1.0529  0.1880  5.5994  <.0001   0.6843  1.4214  *** 
+	AN.AE.AV.AR       1.0851  0.2419  4.4857  <.0001   0.6110  1.5592  *** 
+	AN.AF.AR          1.5836  0.3845  4.1189  <.0001   0.8300  2.3371  *** 
+
+	---
+	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+***Domain Whole Numbers (*_d3wnSAv2)
+
+>     summary(res_mod_d3wnSAv2)
+
+	Multivariate Meta-Analysis Model (k = 116; method: REML)
+
+	  logLik  Deviance       AIC       BIC      AICc   
+	-55.4125  110.8250  136.8250  171.3265  140.8250   
+
+	Variance Components:
+
+        	    estim    sqrt  nlvls  fixed           factor 
+	sigma^2.1  0.0000  0.0000     27     no        record_id 
+	sigma^2.2  0.1338  0.3658    116     no  record_id/es_id 
+
+	Test of Moderators (coefficients 1:11):
+	QM(df = 11) = 117.6407, p-val < .0001
+
+	Model Results:
+
+        	     estimate      se     zval    pval    ci.lb   ci.ub      
+	AE.AF.AR       0.7971  0.1826   4.3660  <.0001   0.4393  1.1550  *** 
+	AE.AR         -0.0117  0.2287  -0.0514  0.9590  -0.4600  0.4365      
+	AE.AV.AF.AR    0.8579  0.2015   4.2582  <.0001   0.4630  1.2528  *** 
+	AF.AR          0.5953  0.1299   4.5839  <.0001   0.3408  0.8498  *** 
+	AN.AE.AF.AR    0.5633  0.1299   4.3350  <.0001   0.3086  0.8179  *** 
+	AN.AE.AR       0.3881  0.1587   2.4449  0.0145   0.0770  0.6992    * 
+	AN.AF.AR       0.4195  0.1241   3.3816  0.0007   0.1764  0.6627  *** 
+	AN.AV.AF.AR    0.4232  0.1551   2.7281  0.0064   0.1191  0.7272   ** 
+	AN.AV.AR       0.3756  0.1744   2.1536  0.0313   0.0338  0.7174    * 
+	AR             0.3383  0.1843   1.8356  0.0664  -0.0229  0.6996    . 
+	AV.AF.AR       0.5467  0.1140   4.7961  <.0001   0.3233  0.7700  *** 
+
+	---
+	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
