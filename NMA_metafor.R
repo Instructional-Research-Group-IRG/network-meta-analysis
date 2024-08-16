@@ -955,15 +955,17 @@
 #===================================== SENSITIVITY ANALYSIS =====================================#       
   
 # Prepare bundles
-  # If N or NL, then use "AN"
-  # If TEX or SEO, then use "AE"
-  # If VF or TV, then use "AV"
-  # If RS or RV, then use "AR"
-  # If FF or FWOF, then use "AF"
-  
-  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% mutate(intervention_combo_recode = intervention_combo)
-  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% mutate(comparison_combo_recode = comparison_combo)  
+
+  ## Recode intervention/comparison high+low dosage bundles ("combo") based on the following crosswalk:
       
+      # If N or NL, then use "AN"
+      # If TEX or SEO, then use "AE"
+      # If VF or TV, then use "AV"
+      # If RS or RV, then use "AR"
+      # If FF or FWOF, then use "AF"
+      
+  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% mutate(intervention_combo_recode = intervention_combo)
+  tabyl(NMA_data_analysis_subset_grpID$intervention_combo)
   tabyl(NMA_data_analysis_subset_grpID$intervention_combo_recode)
   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("N or NL", "AN", NMA_data_analysis_subset_grpID$intervention_combo_recode)
   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("TEX or SEO", "AE", NMA_data_analysis_subset_grpID$intervention_combo_recode)
@@ -979,9 +981,11 @@
   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("AN\\+AV\\+AE\\+AR","AN+AE+AV+AR", NMA_data_analysis_subset_grpID$intervention_combo_recode)
   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("AV\\+AE\\+AF\\+AR","AE\\+AV\\+AF\\+AR", NMA_data_analysis_subset_grpID$intervention_combo_recode)
   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("AN\\+AV\\+AE\\+AF\\+AR","AN\\+AE\\+AV\\+AF\\+AR", NMA_data_analysis_subset_grpID$intervention_combo_recode)
-  tabyl(NMA_data_analysis_subset_grpID$intervention_combo_recode)
   tabyl(NMA_data_analysis_subset_grpID$intervention_combo)
-  
+  tabyl(NMA_data_analysis_subset_grpID$intervention_combo_recode)
+
+  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% mutate(comparison_combo_recode = comparison_combo)   
+  tabyl(NMA_data_analysis_subset_grpID$comparison_combo)
   tabyl(NMA_data_analysis_subset_grpID$comparison_combo_recode)
   NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("N or NL", "AN", NMA_data_analysis_subset_grpID$comparison_combo_recode)
   NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("TEX or SEO", "AE", NMA_data_analysis_subset_grpID$comparison_combo_recode)
@@ -994,6 +998,7 @@
   tabyl(NMA_data_analysis_subset_grpID$comparison_combo_recode)
   NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("FF\\+FWOF", "AF", NMA_data_analysis_subset_grpID$comparison_combo_recode)
   NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("RS\\+RV", "AR", NMA_data_analysis_subset_grpID$comparison_combo_recode)
+  tabyl(NMA_data_analysis_subset_grpID$comparison_combo)
   tabyl(NMA_data_analysis_subset_grpID$comparison_combo_recode)  
   
   class(NMA_data_analysis_subset_grpID$intervention_combo)
@@ -1010,13 +1015,11 @@
   class(NMA_data_analysis_subset_grpID$intervention_combo_recode)
   class(NMA_data_analysis_subset_grpID$comparison_combo_recode)
 
-  NMA_data_analysis_subset_grpIDu <- NMA_data_analysis_subset_grpID %>% distinct(contrast_id,  .keep_all = TRUE)
+  NMA_data_analysis_subset_grpIDu <- NMA_data_analysis_subset_grpID %>% distinct(contrast_id,  .keep_all = TRUE) # Check tabulated numbers at the contrast level
   tabyl(NMA_data_analysis_subset_grpIDu$intervention_prelim)  
   tabyl(NMA_data_analysis_subset_grpIDu$comparison_prelim)   
-
   tabyl(NMA_data_analysis_subset_grpIDu$intervention_combo)  
   tabyl(NMA_data_analysis_subset_grpIDu$comparison_combo)   
-      
   tabyl(NMA_data_analysis_subset_grpIDu$intervention_combo_recode)  
   tabyl(NMA_data_analysis_subset_grpIDu$comparison_combo_recode) 
   
@@ -1028,18 +1031,44 @@
   tabyl(NMA_data_analysis_subset_grpID_d1gmaSA$domain)
   tabyl(NMA_data_analysis_subset_grpID_d1gmaSA$intervention_combo_recode)
   tabyl(NMA_data_analysis_subset_grpID_d1gmaSA$comparison_combo_recode)
-  #NMA_data_analysis_subset_grpID_d1gmaSA_ANAFAR <- NMA_data_analysis_subset_grpID_d1gmaSA %>% filter() 
-      
+  
+  ## Identify contrasts with recoded bundles that have all three of the following bundles: N & F & R, at any dosage and regardless of whether those bundles include any other components at any dosage level in their combo bundles
+  NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(ANi= grepl(pattern = "AN", x = intervention_combo_recode))
+  NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(AFi= grepl(pattern = "AF", x = intervention_combo_recode))
+  NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(ARi= grepl(pattern = "AR", x = intervention_combo_recode))
+  NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(ANc= grepl(pattern = "AN", x = comparison_combo_recode))
+  NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(AFc= grepl(pattern = "AF", x = comparison_combo_recode))
+  NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(ARc= grepl(pattern = "AR", x = comparison_combo_recode))
+  NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(AN_AF_AR= (ANi==TRUE & AFi== TRUE & ARi== TRUE) | (ANc==TRUE & AFc== TRUE & ARc== TRUE))
+  
+  NMA_data_analysis_subset_grpID_d1gmaSA_check <- NMA_data_analysis_subset_grpID_d1gmaSA %>% dplyr::select(AN_AF_AR, ANi, AFi, ARi, intervention_prelim, intervention_combo, intervention_combo_recode, ANc, AFc, ARc, comparison_prelim, comparison_combo, comparison_combo_recode)
+  print(NMA_data_analysis_subset_grpID_d1gmaSA_check, n=Inf)
+  tabyl(NMA_data_analysis_subset_grpID_d1gmaSA$AN_AF_AR)
+  
+  ## Reduce dataset to just those identified contrasts 
+  NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% filter(AN_AF_AR==TRUE)
+  check_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% dplyr::select(record_id, contrast_id, intervention_combo_recode, comparison_combo_recode)
+  print(check_d1gmaSA)
+  
   ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
-      
+  
   ## Add contrast matrix to dataset
-  # NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% drop_na(c(intervention_combo, comparison_combo)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
-  # NMA_data_analysis_subset_grpID_d1gmaSA <- contrmat(NMA_data_analysis_subset_grpID_d1gmaSA, grp1="intervention_combo", grp2="comparison_combo")
-  # skim(NMA_data_analysis_subset_grpID_d1gmaSA)
-      
+  NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% drop_na(c(intervention_combo_recode, comparison_combo_recode)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
+  NMA_data_analysis_subset_grpID_d1gmaSA <- contrmat(NMA_data_analysis_subset_grpID_d1gmaSA, grp1="intervention_combo_recode", grp2="comparison_combo_recode")
+  skim(NMA_data_analysis_subset_grpID_d1gmaSA)
+  
   ## Calculate the variance-covariance matrix for multi-treatment studies
-  # V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d1gmaSA)
-  # V_list     
+  V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d1gmaSA)
+  V_list
+  
+  ##Run standard NMA
+  res_mod_d1gmaSA <- rma.mv(effect_size, V_list, 
+                           mods = ~ 1,
+                           random = ~ 1 | record_id/es_id, 
+                           rho=0.60, 
+                           data=NMA_data_analysis_subset_grpID_d1gmaSA)
+  summary(res_mod_d1gmaSA)
+  #weights.rma.mv(res_mod_d1gmaSA)   
       
  
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "Rational Numbers"
@@ -1050,53 +1079,44 @@
   tabyl(NMA_data_analysis_subset_grpID_d2rnSA$domain)
   tabyl(NMA_data_analysis_subset_grpID_d2rnSA$intervention_combo_recode)
   tabyl(NMA_data_analysis_subset_grpID_d2rnSA$comparison_combo_recode)
+  
+  ## Identify contrasts with recoded bundles that have all three of the following bundles: N & F & R, at any dosage and regardless of whether those bundles include any other components at any dosage level in their combo bundles
   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(ANi= grepl(pattern = "AN", x = intervention_combo_recode))
   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(AFi= grepl(pattern = "AF", x = intervention_combo_recode))
   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(ARi= grepl(pattern = "AR", x = intervention_combo_recode))
   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(ANc= grepl(pattern = "AN", x = comparison_combo_recode))
   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(AFc= grepl(pattern = "AF", x = comparison_combo_recode))
   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(ARc= grepl(pattern = "AR", x = comparison_combo_recode))
-  
   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(AN_AF_AR= (ANi==TRUE & AFi== TRUE & ARi== TRUE) | (ANc==TRUE & AFc== TRUE & ARc== TRUE))
   
-  NMA_data_analysis_subset_grpID_d2rnSA_check <- NMA_data_analysis_subset_grpID_d2rnSA %>% dplyr::select(AN_AF_AR, ANi, AFi, ARi, ANc, AFc, ARc, intervention_combo_recode, comparison_combo_recode, intervention_prelim, comparison_prelim, intervention_combo, comparison_combo)
+  NMA_data_analysis_subset_grpID_d2rnSA_check <- NMA_data_analysis_subset_grpID_d2rnSA %>% dplyr::select(AN_AF_AR, ANi, AFi, ARi, intervention_prelim, intervention_combo, intervention_combo_recode, ANc, AFc, ARc, comparison_prelim, comparison_combo, comparison_combo_recode)
   print(NMA_data_analysis_subset_grpID_d2rnSA_check, n=Inf)
   tabyl(NMA_data_analysis_subset_grpID_d2rnSA$AN_AF_AR)
-
+  
+  ## Reduce dataset to just those identified contrasts 
   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% filter(AN_AF_AR==TRUE)
-    
+  check_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% dplyr::select(record_id, contrast_id, intervention_combo_recode, comparison_combo_recode)
+  print(check_d2rnSA)
+  
   ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
-      
+  
   ## Add contrast matrix to dataset
-  NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% drop_na(c(intervention_combo, comparison_combo)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
+  NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% drop_na(c(intervention_combo_recode, comparison_combo_recode)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
   NMA_data_analysis_subset_grpID_d2rnSA <- contrmat(NMA_data_analysis_subset_grpID_d2rnSA, grp1="intervention_combo_recode", grp2="comparison_combo_recode")
   skim(NMA_data_analysis_subset_grpID_d2rnSA)
-      
+  
   ## Calculate the variance-covariance matrix for multi-treatment studies
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d2rnSA)
   V_list
   
-  ##Run standard NMA with the unique interventions bundles as moderators  
-  tabyl(NMA_data_analysis_subset_grpID_d2rnSA$intervention_combo_recode)
-  tabyl(NMA_data_analysis_subset_grpID_d2rnSA$comparison_combo_recode)
-  check_d2rn <- NMA_data_analysis_subset_grpID_d2rnSA %>% dplyr::select(record_id, contrast_id, intervention_combo_recode, comparison_combo_recode)
-  print(check_d2rn)
-  res_mod_d2rna <- rma.mv(effect_size, V_list, 
-                         #mods = ~ AN.AE.AF.AR + AN.AE.AV.AF.AR + AN.AF.AR + AN.AE.AV.AR - 1, 
-                         mods = ~ 1,
-                         random = ~ 1 | record_id/es_id, 
-                         rho=0.60, 
-                         data=NMA_data_analysis_subset_grpID_d2rnSA)
-  summary(res_mod_d2rna)
-  
-  res_mod_d2rnb <- rma.mv(effect_size, V_list, 
-                         #mods = ~ AN.AE.AF.AR + AN.AE.AV.AF.AR + AN.AF.AR + AN.AE.AV.AR - 1, 
-                         #mods = ~ 1,
-                         random = ~ 1 | record_id/es_id, 
-                         rho=0.60, 
-                         data=NMA_data_analysis_subset_grpID_d2rnSA)
-  summary(res_mod_d2rnb)
-  #weights.rma.mv(res_mod_d2rn)
+  ##Run standard NMA
+  res_mod_d2rnSA <- rma.mv(effect_size, V_list, 
+                            mods = ~ 1,
+                            random = ~ 1 | record_id/es_id, 
+                            rho=0.60, 
+                            data=NMA_data_analysis_subset_grpID_d2rnSA)
+  summary(res_mod_d2rnSA)
+  #weights.rma.mv(res_mod_d2rnSA)   
       
      
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "Whole Numbers"
@@ -1105,16 +1125,43 @@
   tabyl(NMA_data_analysis_subset_grpID$domain)
   NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID %>% filter(domain == "Whole Numbers")
   tabyl(NMA_data_analysis_subset_grpID_d3wnSA$domain)
-      
+  tabyl(NMA_data_analysis_subset_grpID_d3wnSA$intervention_combo_recode)
+  tabyl(NMA_data_analysis_subset_grpID_d3wnSA$comparison_combo_recode)
+  
+  ## Identify contrasts with recoded bundles that have all three of the following bundles: N & F & R, at any dosage and regardless of whether those bundles include any other components at any dosage level in their combo bundles
+  NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(ANi= grepl(pattern = "AN", x = intervention_combo_recode))
+  NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(AFi= grepl(pattern = "AF", x = intervention_combo_recode))
+  NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(ARi= grepl(pattern = "AR", x = intervention_combo_recode))
+  NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(ANc= grepl(pattern = "AN", x = comparison_combo_recode))
+  NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(AFc= grepl(pattern = "AF", x = comparison_combo_recode))
+  NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(ARc= grepl(pattern = "AR", x = comparison_combo_recode))
+  NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(AN_AF_AR= (ANi==TRUE & AFi== TRUE & ARi== TRUE) | (ANc==TRUE & AFc== TRUE & ARc== TRUE))
+  
+  NMA_data_analysis_subset_grpID_d3wnSA_check <- NMA_data_analysis_subset_grpID_d3wnSA %>% dplyr::select(AN_AF_AR, ANi, AFi, ARi, intervention_prelim, intervention_combo, intervention_combo_recode, ANc, AFc, ARc, comparison_prelim, comparison_combo, comparison_combo_recode)
+  print(NMA_data_analysis_subset_grpID_d3wnSA_check, n=Inf)
+  tabyl(NMA_data_analysis_subset_grpID_d3wnSA$AN_AF_AR)
+  
+  ## Reduce dataset to just those identified contrasts 
+  NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% filter(AN_AF_AR==TRUE)
+  check_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% dplyr::select(record_id, contrast_id, intervention_combo_recode, comparison_combo_recode)
+  print(check_d3wnSA)
+  
   ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
-      
+  
   ## Add contrast matrix to dataset
-  NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% drop_na(c(intervention_combo, comparison_combo)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
-  NMA_data_analysis_subset_grpID_d3wnSA <- contrmat(NMA_data_analysis_subset_grpID_d3wnSA, grp1="intervention_combo", grp2="comparison_combo")
+  NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% drop_na(c(intervention_combo_recode, comparison_combo_recode)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
+  NMA_data_analysis_subset_grpID_d3wnSA <- contrmat(NMA_data_analysis_subset_grpID_d3wnSA, grp1="intervention_combo_recode", grp2="comparison_combo_recode")
   skim(NMA_data_analysis_subset_grpID_d3wnSA)
-      
+  
   ## Calculate the variance-covariance matrix for multi-treatment studies
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d3wnSA)
-  V_list    
-      
- 
+  V_list
+  
+  ##Run standard NMA
+  res_mod_d3wnSA <- rma.mv(effect_size, V_list, 
+                           mods = ~ 1,
+                           random = ~ 1 | record_id/es_id, 
+                           rho=0.60, 
+                           data=NMA_data_analysis_subset_grpID_d3wnSA)
+  summary(res_mod_d3wnSA)
+  #weights.rma.mv(res_mod_d3wnSA)  
