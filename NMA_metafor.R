@@ -1056,6 +1056,8 @@
   NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% drop_na(c(intervention_combo_recode, comparison_combo_recode)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
   NMA_data_analysis_subset_grpID_d1gmaSA <- contrmat(NMA_data_analysis_subset_grpID_d1gmaSA, grp1="intervention_combo_recode", grp2="comparison_combo_recode")
   skim(NMA_data_analysis_subset_grpID_d1gmaSA)
+  tabyl(NMA_data_analysis_subset_grpID_d1gmaSA$intervention_combo_recode)
+  tabyl(NMA_data_analysis_subset_grpID_d1gmaSA$comparison_combo_recode)
   
   ## Calculate the variance-covariance matrix for multi-treatment studies
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d1gmaSA)
@@ -1096,7 +1098,7 @@
   ## Reduce dataset to just those identified contrasts 
   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% filter(AN_AF_AR==TRUE)
   check_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% dplyr::select(record_id, contrast_id, intervention_combo_recode, comparison_combo_recode)
-  print(check_d2rnSA)
+  print(check_d2rnSA, n=Inf)
   
   ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
   
@@ -1104,6 +1106,8 @@
   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% drop_na(c(intervention_combo_recode, comparison_combo_recode)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
   NMA_data_analysis_subset_grpID_d2rnSA <- contrmat(NMA_data_analysis_subset_grpID_d2rnSA, grp1="intervention_combo_recode", grp2="comparison_combo_recode")
   skim(NMA_data_analysis_subset_grpID_d2rnSA)
+  tabyl(NMA_data_analysis_subset_grpID_d2rnSA$intervention_combo_recode)
+  tabyl(NMA_data_analysis_subset_grpID_d2rnSA$comparison_combo_recode)
   
   ## Calculate the variance-covariance matrix for multi-treatment studies
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d2rnSA)
@@ -1144,7 +1148,7 @@
   ## Reduce dataset to just those identified contrasts 
   NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% filter(AN_AF_AR==TRUE)
   check_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% dplyr::select(record_id, contrast_id, intervention_combo_recode, comparison_combo_recode)
-  print(check_d3wnSA)
+  print(check_d3wnSA, n=Inf)
   
   ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
   
@@ -1152,6 +1156,8 @@
   NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% drop_na(c(intervention_combo_recode, comparison_combo_recode)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
   NMA_data_analysis_subset_grpID_d3wnSA <- contrmat(NMA_data_analysis_subset_grpID_d3wnSA, grp1="intervention_combo_recode", grp2="comparison_combo_recode")
   skim(NMA_data_analysis_subset_grpID_d3wnSA)
+  tabyl(NMA_data_analysis_subset_grpID_d3wnSA$intervention_combo_recode)
+  tabyl(NMA_data_analysis_subset_grpID_d3wnSA$comparison_combo_recode)
   
   ## Calculate the variance-covariance matrix for multi-treatment studies
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d3wnSA)
