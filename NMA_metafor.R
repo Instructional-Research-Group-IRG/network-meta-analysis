@@ -444,24 +444,24 @@
       
   ## Subset analysis data frame further to just the Rational Numbers domain (d2rn)
   tabyl(NMA_data_analysis_subset_grpID$domain)
-  NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID %>% filter(domain == "Rational Numbers")
-  tabyl(NMA_data_analysis_subset_grpID_d2rnSA$domain)
+  NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID %>% filter(domain == "Rational Numbers")
+  tabyl(NMA_data_analysis_subset_grpID_d2rn$domain)
       
   ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
       
   ## Add contrast matrix to dataset
-  NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% drop_na(c(intervention_prelim, comparison_prelim)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
-  NMA_data_analysis_subset_grpID_d2rnSA <- contrmat(NMA_data_analysis_subset_grpID_d2rnSA, grp1="intervention_prelim", grp2="comparison_prelim")
-  str(NMA_data_analysis_subset_grpID_d2rnSA)
+  NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% drop_na(c(intervention_prelim, comparison_prelim)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
+  NMA_data_analysis_subset_grpID_d2rn <- contrmat(NMA_data_analysis_subset_grpID_d2rn, grp1="intervention_prelim", grp2="comparison_prelim")
+  str(NMA_data_analysis_subset_grpID_d2rn)
       
   ## Calculate the variance-covariance matrix for multi-treatment studies
-  V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d2rnSA)
+  V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d2rn)
   V_list
   
   ## Calculate the number of unique contrasts in which each intervention bundle is included
-  tabyl(NMA_data_analysis_subset_grpID_d2rnSA$intervention_prelim)
-  tabyl(NMA_data_analysis_subset_grpID_d2rnSA$comparison_prelim)
-  num_contrasts_d2rn <- NMA_data_analysis_subset_grpID_d2rnSA %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
+  tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID_d2rn$comparison_prelim)
+  num_contrasts_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
   print(num_contrasts_d2rn)
   num_contrasts_d2rn_long <- num_contrasts_d2rn %>% pivot_longer(c(intervention_prelim, comparison_prelim ),names_to= "group_IC", values_to="group_intervention")
   print(num_contrasts_d2rn_long)
@@ -477,7 +477,7 @@
   print(num_contrasts_d2rn_long3)
   
   ## Calculate the number of students within each intervention bundle across all unique study-contrasts
-  num_students_d2rn <- NMA_data_analysis_subset_grpID_d2rnSA %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
+  num_students_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
   print(num_students_d2rn)
   num_students_d2rn2 <- num_students_d2rn %>% distinct(record_id, contrast_id, .keep_all = TRUE) #Keep only unique entries of each unique study-contrast so that each group of students is not summed more than once (because of multiple measures within some contrasts).
   print(num_students_d2rn2) 
@@ -495,15 +495,15 @@
   str(num_students_d2rn_long3)  
       
   ##Run standard NMA with the unique interventions bundles as moderators  
-  tabyl(NMA_data_analysis_subset_grpID_d2rnSA$intervention_prelim)
-  tabyl(NMA_data_analysis_subset_grpID_d2rnSA$comparison_prelim)
-  check_d2rn <- NMA_data_analysis_subset_grpID_d2rnSA %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
+  tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID_d2rn$comparison_prelim)
+  check_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
   print(check_d2rn)
   res_mod_d2rn <- rma.mv(effect_size, V_list, 
                           mods = ~ NL.FF.RS + NL.RS + NL.TES.FF.RS + NL.TES.RS + NL.TES.VF.RS + RS + TES.VF.RS - 1, 
                           random = ~ 1 | record_id/es_id, 
                           rho=0.60, 
-                          data=NMA_data_analysis_subset_grpID_d2rnSA)
+                          data=NMA_data_analysis_subset_grpID_d2rn)
   summary(res_mod_d2rn)
   #weights.rma.mv(res_mod_d2rn)
       
@@ -643,14 +643,14 @@
     ###       groups for the creation of the (weighted) edges of the network graph.
       
       #### Review data in contrast-based wide format before reshape for comparison with data after reshape (as a desk check)
-      NMA_data_analysis_subset2 <- NMA_data_analysis_subset_grpID_d2rnSA %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size)
+      NMA_data_analysis_subset2 <- NMA_data_analysis_subset_grpID_d2rn %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size)
       print(NMA_data_analysis_subset2) #Example rows of the contrast-based wide format. Compare to the long format printed below.
       
       #### Each unique contrast within each unique study should only be counted once when weighting the network connections between each unique contrast combination of intervention and comparison in the network graph.
       #### Because there can be multiple measures within multiple domains within each unique contrast within each unique study, we need reduce the data set to one observation per unique contrast within each unique study 
       #### so that a contrast with more domains/measures than another contrast is not overweighted in the visualization of the network connections (re the relative thicknesses of the "edges" between the I/C nodes in the network graph).
-      NMA_data_analysis_subset_grpID_d2rnSA %>% count(record_id, contrast_id)      
-      NMA_data_analysis_subset3 <- NMA_data_analysis_subset_grpID_d2rnSA %>% distinct(record_id, contrast_id, .keep_all = TRUE)
+      NMA_data_analysis_subset_grpID_d2rn %>% count(record_id, contrast_id)      
+      NMA_data_analysis_subset3 <- NMA_data_analysis_subset_grpID_d2rn %>% distinct(record_id, contrast_id, .keep_all = TRUE)
       NMA_data_analysis_subset3 %>% count(record_id, contrast_id)
       NMA_data_analysis_subset3 %>% count()
       NMA_data_analysis_subset4 <- NMA_data_analysis_subset3 %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size)
@@ -1049,6 +1049,9 @@
   NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% filter(AN_AF_AR==TRUE)
   check_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% dplyr::select(record_id, contrast_id, intervention_combo_recode, comparison_combo_recode)
   print(check_d1gmaSA)
+  check_d1gmaSA2 <- NMA_data_analysis_subset_grpID_d1gmaSA %>% distinct(contrast_id, .keep_all=TRUE)
+  check_d1gmaSA2 <- check_d1gmaSA2 %>% dplyr::select(contrast_id, intervention_prelim, intervention_combo, intervention_combo_recode, comparison_prelim, comparison_combo, comparison_combo_recode)
+  print(check_d1gmaSA2)
   
   ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
   
@@ -1099,6 +1102,9 @@
   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% filter(AN_AF_AR==TRUE)
   check_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% dplyr::select(record_id, contrast_id, intervention_combo_recode, comparison_combo_recode)
   print(check_d2rnSA, n=Inf)
+  check_d2rnSA2 <- NMA_data_analysis_subset_grpID_d2rnSA %>% distinct(contrast_id, .keep_all=TRUE)
+  check_d2rnSA2 <- check_d2rnSA2 %>% dplyr::select(contrast_id, intervention_prelim, intervention_combo, intervention_combo_recode, comparison_prelim, comparison_combo, comparison_combo_recode)
+  print(check_d2rnSA2)
   
   ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
   
@@ -1149,6 +1155,9 @@
   NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% filter(AN_AF_AR==TRUE)
   check_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% dplyr::select(record_id, contrast_id, intervention_combo_recode, comparison_combo_recode)
   print(check_d3wnSA, n=Inf)
+  check_d3wnSA2 <- NMA_data_analysis_subset_grpID_d3wnSA %>% distinct(contrast_id, .keep_all=TRUE)
+  check_d3wnSA2 <- check_d3wnSA2 %>% dplyr::select(contrast_id, intervention_prelim, intervention_combo, intervention_combo_recode, comparison_prelim, comparison_combo, comparison_combo_recode)
+  print(check_d3wnSA2)
   
   ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
   
