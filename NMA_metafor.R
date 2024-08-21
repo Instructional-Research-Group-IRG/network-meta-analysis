@@ -200,7 +200,9 @@
   
   ## Calculate the variance-covariance matrix for multi-treatment studies
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d1gma)
-  V_list     
+  V_list    
+  V_list_d1gma <- data.frame(V_list)
+  write_csv(V_list_d1gma, 'V_list_d1gma.csv')
 
   ## Calculate the number of unique contrasts in which each intervention bundle is included
   tabyl(NMA_data_analysis_subset_grpID_d1gma$intervention_prelim)
@@ -244,7 +246,7 @@
   check_d1gma <- NMA_data_analysis_subset_grpID_d1gma %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
   print(check_d1gma)
   res_mod_d1gma <- rma.mv(effect_size, V_list, 
-                        mods = ~ FF + FF.RS + NL.RS + RS + VF.RS - 1, 
+                        mods = ~ FF + FF.RS + NL.RS + RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
                         random = ~ 1 | record_id/es_id, 
                         rho=0.60, 
                         data=NMA_data_analysis_subset_grpID_d1gma)
@@ -311,7 +313,7 @@
     # forest(coef(res_mod_d1gma), diag(vcov(res_mod_d1gma)), slab=sub(".", " ", names(coef(res_mod_d1gma)), fixed=TRUE),
     #        #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention", top=2,
     #        header="Intervention",
-    #        xlab="Difference in Standardized Mean Change")
+    #        xlab="Difference in Standardized Mean Change (compared to BAU)")
         
     ### Create forest plot using ggplot
     
@@ -321,16 +323,16 @@
       print(res_mod_d1gma_pscore)
       print(num_contrasts_d1gma_long3)
       res_mod_d1gma_pscore <- res_mod_d1gma_pscore %>% left_join(num_contrasts_d1gma_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-      res_mod_d1gma_pscore$colour <- rep(c("white", "gray95","white", "gray95","white"))
+      res_mod_d1gma_pscore$colour <- rep(c("violet","yellow","olivedrab","lightblue","gold"))
       str(res_mod_d1gma_pscore)
       print(res_mod_d1gma_pscore)
       
       res_mod_d1gma_pscore_forest <- ggplot(res_mod_d1gma_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
-        geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
+        geom_hline(aes(yintercept = intervention, colour = colour), size=9) +
         geom_pointrange(shape = 22, fill = "black", size = res_mod_d1gma_pscore$num_contrasts/7.5) + 
-        geom_text(label = res_mod_d1gma_pscore$num_contrasts, hjust = -1.25, vjust = 1, colour = "black", fontface="bold", size =3) +        
+        geom_text(label = res_mod_d1gma_pscore$num_contrasts, hjust = 0.5, vjust = 2.5, colour = "black", fontface="bold", size = 4) +        
         geom_vline(xintercept = 0, linetype = 3) +
-        xlab("Difference in Standardized Mean Change with 95% Confidence Interval") +
+        xlab("Difference in Standardized Mean Change (compared to BAU)") +
         labs(caption = "*Size of and values next to points indicate the number of contrasts in which intervention is included", hjust=0) +
         ylab("Intervention Bundle") +
         theme_classic() +
@@ -340,7 +342,7 @@
         #breaks = c(0.25, 0.5, 1, 2, 4), 
         #labels = c("0.25", "0.5", "1", "2", "4"), expand = c(0,0)) +
         theme(axis.text.y = element_blank(), axis.title.y = element_blank())
-        res_mod_d1gma_pscore_forest
+      res_mod_d1gma_pscore_forest
           
       #### Next create data table for merging with above plot with estimates and confidence intervals combined in one column
       res_mod_d1gma_pscore2 <- res_mod_d1gma_pscore
@@ -357,25 +359,25 @@
       res_mod_d1gma_pscore2 <- res_mod_d1gma_pscore2 %>% unite(estimate_cis, estimate, ci.lb, ci.ub, sep= " ", remove = FALSE )
       print(res_mod_d1gma_pscore2)
           
-      LfLabels<-data.frame(x=c(0,4.5,6.7), 
-                           y=c(rep(length(unique(res_mod_d1gma_pscore2$estimate))-0.2,times=3)),
+      LfLabels<-data.frame(x=c(0.11,0.2,0.3), 
+                           y=c(5.25,5.25,5.25),
                            lab=c("Intervention","Estimate (95% CI)","P-score"))
       LfLabels
       
       data_table <- ggplot(data = res_mod_d1gma_pscore2, aes(y = intervention)) +
-        geom_hline(aes(yintercept = intervention, colour = colour), size = 7) +
-        geom_text(aes(x = 0, label = intervention), hjust = 0) +
-        geom_text(aes(x = 5, label = estimate_cis)) +
-        geom_text(aes(x = 7, label = Pscore), hjust = 1) +
-        geom_text(data=LfLabels,aes(x,y,label=lab, fontface="bold"), vjust=-3.5, hjust=0, size=4) +
+        geom_hline(aes(yintercept = intervention, colour = colour), size = 9) +
+        geom_text(aes(x = 0.1, label = intervention)) +
+        geom_text(aes(x = 0.2, label = estimate_cis)) +
+        geom_text(aes(x = 0.3, label = Pscore)) +
+        geom_text(data=LfLabels,aes(x,y,label=lab, fontface="bold"), size=4) +
         scale_colour_identity() +
         theme_void() + 
-        theme(plot.margin = margin(5, 0, 35, 0)) +
+        theme(plot.margin = margin(5, 0, 47, 0)) +
         scale_y_discrete(limits = rev(res_mod_d1gma_pscore$intervention)) 
-      data_table
+      #data_table
           
       #### Finally, merge plot and data table for final forest plot
-      final_fp_nma_d1gma <- grid.arrange(data_table, res_mod_d1gma_pscore_forest, ncol=2)
+      final_fp_nma_d1gma <- grid.arrange(res_mod_d1gma_pscore_forest, data_table, ncol=2)
       final_fp_nma_d1gma
         
     ### Create network graph
@@ -457,6 +459,8 @@
   ## Calculate the variance-covariance matrix for multi-treatment studies
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d2rn)
   V_list
+  V_list_d2rn <- data.frame(V_list)
+  write_csv(V_list_d2rn, 'V_list_d2rn.csv')
   
   ## Calculate the number of unique contrasts in which each intervention bundle is included
   tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
@@ -500,7 +504,7 @@
   check_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
   print(check_d2rn)
   res_mod_d2rn <- rma.mv(effect_size, V_list, 
-                          mods = ~ NL.FF.RS + NL.RS + NL.TES.FF.RS + NL.TES.RS + NL.TES.VF.RS + RS + TES.VF.RS - 1, 
+                          mods = ~ NL.FF.RS + NL.RS + NL.TES.FF.RS + NL.TES.RS + NL.TES.VF.RS + RS + TES.VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
                           random = ~ 1 | record_id/es_id, 
                           rho=0.60, 
                           data=NMA_data_analysis_subset_grpID_d2rn)
@@ -521,22 +525,22 @@
     lt_info_df <- cbind(Comparison = rownames(lt_info_df), lt_info_df)
     lt_info_df2 <- lt_info_df %>% separate_wider_delim(Comparison, delim = ' - ', names = c('comp1', 'comp2'))
     round_digits <- function(x) {
-        round(x, digits = 2)
-      }
-      convert_to_character <- function(x) {
-        as.character(x)
-      }
-      lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], round_digits)
-      lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], as.character)
-      lt_info_df2$ci.lb <- paste("(", lt_info_df2$ci.lb, " ,", sep= "")
-      lt_info_df2$ci.ub <- paste(lt_info_df2$ci.ub, ")", sep= "")
-      lt_info_df2 <- lt_info_df2 %>% unite(pred_cis, pred, ci.lb, ci.ub, sep= " ", remove = FALSE )
-      print(lt_info_df2)
-      lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #To-do: possible to format ci below? + color code by sig
-      lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
-      print(lt_info_df3)
-      write_csv(lt_info_df3, 'nma_league_table_d2rn.csv')
-      #write_xlsx(lt_info_df3, 'nma_league_table_d2rn.xlsx')
+      round(x, digits = 2)
+    }
+    convert_to_character <- function(x) {
+      as.character(x)
+    }
+    lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], round_digits)
+    lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], as.character)
+    lt_info_df2$ci.lb <- paste("(", lt_info_df2$ci.lb, " ,", sep= "")
+    lt_info_df2$ci.ub <- paste(lt_info_df2$ci.ub, ")", sep= "")
+    lt_info_df2 <- lt_info_df2 %>% unite(pred_cis, pred, ci.lb, ci.ub, sep= " ", remove = FALSE )
+    print(lt_info_df2)
+    lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #To-do: possible to format ci below? + color code by sig
+    lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
+    print(lt_info_df3)
+    write_csv(lt_info_df3, 'nma_league_table_d2rn.csv')
+    #write_xlsx(lt_info_df3, 'nma_league_table_d2rn.xlsx')
       
     ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod_d2rn)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
@@ -567,7 +571,7 @@
     # forest(coef(res_mod_d2rn), diag(vcov(res_mod_d2rn)), slab=sub(".", " ", names(coef(res_mod_d2rn)), fixed=TRUE),
     #        #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention", top=2,
     #        header="Intervention",
-    #        xlab="Difference in Standardized Mean Change")
+    #        xlab="Difference in Standardized Mean Change (compared to BAU)")
       
     ### Create forest plot using ggplot
       
@@ -577,16 +581,16 @@
       print(res_mod_d2rn_pscore)
       print(num_contrasts_d2rn_long3)
       res_mod_d2rn_pscore <- res_mod_d2rn_pscore %>% left_join(num_contrasts_d2rn_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-      res_mod_d2rn_pscore$colour <- rep(c("white", "gray95","white", "gray95","white","gray95","white"))
+      res_mod_d2rn_pscore$colour <- rep(c("aquamarine","red","green","orange","yellow","pink","violet")) 
       str(res_mod_d2rn_pscore)   
       print(res_mod_d2rn_pscore)
       
       res_mod_d2rn_pscore_forest <- ggplot(res_mod_d2rn_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
-        geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
+        geom_hline(aes(yintercept = intervention, colour = colour), size=9) +
         geom_pointrange(shape = 22, fill = "black", size = res_mod_d2rn_pscore$num_contrasts/7.5) + 
-        geom_text(label = res_mod_d2rn_pscore$num_contrasts, hjust = -1.25, vjust = 1, colour = "black", fontface="bold", size =3) +        
+        geom_text(label = res_mod_d2rn_pscore$num_contrasts, hjust = 0.5, vjust = 2.5, colour = "black", fontface="bold", size =4) +        
         geom_vline(xintercept = 0, linetype = 3) +
-        xlab("Difference in Standardized Mean Change with 95% Confidence Interval") +
+        xlab("Difference in Standardized Mean Change (compared to BAU)") +
         labs(caption = "*Size of and values next to points indicate the number of contrasts in which intervention is included", hjust=0) +
         ylab("Intervention Bundle") +
         theme_classic() +
@@ -613,25 +617,25 @@
       res_mod_d2rn_pscore2 <- res_mod_d2rn_pscore2 %>% unite(estimate_cis, estimate, ci.lb, ci.ub, sep= " ", remove = FALSE )
       print(res_mod_d2rn_pscore2)
       
-      LfLabels<-data.frame(x=c(0,4.5,6.7), 
-                           y=c(rep(length(unique(res_mod_d2rn_pscore2$estimate))-0.2,times=3)),
+      LfLabels<-data.frame(x=c(0.12,0.2,0.3), 
+                           y=c(7.25,7.25,7.25),
                            lab=c("Intervention","Estimate (95% CI)","P-score"))
       LfLabels
       
       data_table <- ggplot(data = res_mod_d2rn_pscore2, aes(y = intervention)) +
-        geom_hline(aes(yintercept = intervention, colour = colour), size = 7) +
-        geom_text(aes(x = 0, label = intervention), hjust = 0) +
-        geom_text(aes(x = 5, label = estimate_cis)) +
-        geom_text(aes(x = 7, label = Pscore), hjust = 1) +
-        geom_text(data=LfLabels,aes(x,y,label=lab, fontface="bold"), vjust=-3.5, hjust=0, size=4, size=4) +
+        geom_hline(aes(yintercept = intervention, colour = colour), size = 9) +
+        geom_text(aes(x = 0.11, label = intervention)) +
+        geom_text(aes(x = 0.2, label = estimate_cis)) +
+        geom_text(aes(x = 0.3, label = Pscore)) +
+        geom_text(data=LfLabels,aes(x,y,label=lab, fontface="bold"), size=4) +
         scale_colour_identity() +
         theme_void() + 
-        theme(plot.margin = margin(5, 0, 35, 0)) +
+        theme(plot.margin = margin(5, 0, 38, 0)) +
         scale_y_discrete(limits = rev(res_mod_d2rn_pscore$intervention)) 
       data_table
       
       #### Finally, merge plot and datatable for final forest plot
-      final_fp_nma_d2rn <- grid.arrange(data_table, res_mod_d2rn_pscore_forest, ncol=2)
+      final_fp_nma_d2rn <- grid.arrange(res_mod_d2rn_pscore_forest, data_table, ncol=2)
       final_fp_nma_d2rn
       
     ### Create network graph
@@ -712,7 +716,9 @@
       
   ## Calculate the variance-covariance matrix for multi-treatment studies
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d3wn)
-  V_list    
+  V_list
+  V_list_d3wn <- data.frame(V_list)
+  write_csv(V_list_d3wn, 'V_list_d3wn.csv')
   
   ## Calculate the number of unique contrasts in which each intervention bundle is included
   tabyl(NMA_data_analysis_subset_grpID_d3wn$intervention_prelim)
@@ -756,7 +762,7 @@
   check_d3wn <- NMA_data_analysis_subset_grpID_d3wn %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
   print(check_d3wn)
   res_mod_d3wn <- rma.mv(effect_size, V_list, 
-                         mods = ~ FF + FF.RS + NL.FF.RS + RS + VF.FF.RS + VF.RS - 1, 
+                         mods = ~ FF + FF.RS + NL.FF.RS + RS + VF.FF.RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
                          random = ~ 1 | record_id/es_id, 
                          rho=0.60, 
                          data=NMA_data_analysis_subset_grpID_d3wn)
@@ -823,7 +829,7 @@
     # forest(coef(res_mod_d3wn), diag(vcov(res_mod_d3wn)), slab=sub(".", " ", names(coef(res_mod_d3wn)), fixed=TRUE),
     #       #xlim=c(-5,5), alim=c(-3,3), psize=6, header="Intervention", top=2,
     #       header="Intervention",
-    #       xlab="Difference in Standardized Mean Change")
+    #       xlab="Difference in Standardized Mean Change (compared to BAU)")
       
     ### Create forest plot using ggplot
       
@@ -842,7 +848,7 @@
         geom_pointrange(shape = 22, fill = "black", size = res_mod_d3wn_pscore$num_contrasts/7.5) + 
         geom_text(label = res_mod_d3wn_pscore$num_contrasts, hjust = -1.25, vjust = 1, colour = "black", fontface="bold", size =3) +        
         geom_vline(xintercept = 0, linetype = 3) +
-        xlab("Difference in Standardized Mean Change with 95% Confidence Interval") +
+        xlab("Difference in Standardized Mean Change (compared to BAU)") +
         labs(caption = "*Size of and values next to points indicate the number of contrasts in which intervention is included", hjust=0) +
         ylab("Intervention Bundle") +
         theme_classic() +
