@@ -12,7 +12,7 @@
    
   ## Install and load other required packages
   ##install.packages("pacman") 
-  pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr, janitor, naniar, igraph, multcomp, broom, gridExtra, ggplot2, writexl, readr)
+  pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr, janitor, naniar, igraph, multcomp, broom, gridExtra, ggplot2, writexl, readr, grid, gridExtra, cowplot)
 
 # Load (read) data (i.e., copy data to 'dat')
   #dat <- read_sheet("https://docs.google.com/spreadsheets/d/1bWugw06yFyetIVYlhAHHzM_d3KGhegxxLBm-5463j2Q/edit#gid=0") #Test data
@@ -333,7 +333,7 @@
         geom_text(label = res_mod_d1gma_pscore$num_contrasts, hjust = 0.5, vjust = 2.5, colour = "black", fontface="bold", size = 4) +        
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change (compared to BAU)") +
-        labs(caption = "*Size of and values next to points indicate the number of contrasts in which intervention is included", hjust=0) +
+        labs(caption = "*Size of and values next to points indicate the number of contrasts in which each intervention bundle is included", hjust=0) +
         ylab("Intervention Bundle") +
         theme_classic() +
         scale_colour_identity() +
@@ -591,15 +591,16 @@
         geom_text(label = res_mod_d2rn_pscore$num_contrasts, hjust = 0.5, vjust = 2.5, colour = "black", fontface="bold", size =4) +        
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change (compared to BAU)") +
-        labs(caption = "*Size of and values next to points indicate the number of contrasts in which intervention is included", hjust=0) +
+        labs(caption = "*Values under points indicate number of contrasts", hjust=0) +
         ylab("Intervention Bundle") +
         theme_classic() +
         scale_colour_identity() +
         scale_y_discrete(limits = rev(res_mod_d2rn_pscore$intervention)) +
+        theme(axis.title.y = element_text(face = "bold", size=15))
         #scale_x_log10(limits = c(-1.25, 2.25), 
         #breaks = c(0.25, 0.5, 1, 2, 4), 
         #labels = c("0.25", "0.5", "1", "2", "4"), expand = c(0,0)) +
-        theme(axis.text.y = element_blank(), axis.title.y = element_blank())
+        #theme(axis.text.y = element_blank(), axis.title.y = element_blank())
       res_mod_d2rn_pscore_forest
       
       #### Next create data table for merging with above plot with estimates and confidence intervals combined in one column
@@ -616,26 +617,49 @@
       res_mod_d2rn_pscore2$ci.ub <- paste(res_mod_d2rn_pscore2$ci.ub, ")", sep= "")
       res_mod_d2rn_pscore2 <- res_mod_d2rn_pscore2 %>% unite(estimate_cis, estimate, ci.lb, ci.ub, sep= " ", remove = FALSE )
       print(res_mod_d2rn_pscore2)
+
+      LfLabels1<-data.frame(x=c(1), 
+                           y=c(7.5),
+                           lab=c("Estimate (95% CI)"))
+      LfLabels1      
       
-      LfLabels<-data.frame(x=c(0.12,0.2,0.3), 
-                           y=c(7.25,7.25,7.25),
-                           lab=c("Intervention","Estimate (95% CI)","P-score"))
-      LfLabels
-      
-      data_table <- ggplot(data = res_mod_d2rn_pscore2, aes(y = intervention)) +
+      data_table1 <- ggplot(data = res_mod_d2rn_pscore2, aes(x, y = intervention)) +
         geom_hline(aes(yintercept = intervention, colour = colour), size = 9) +
-        geom_text(aes(x = 0.11, label = intervention)) +
-        geom_text(aes(x = 0.2, label = estimate_cis)) +
-        geom_text(aes(x = 0.3, label = Pscore)) +
-        geom_text(data=LfLabels,aes(x,y,label=lab, fontface="bold"), size=4) +
+        #geom_text(aes(x = 0.11, label = intervention)) +
+        geom_text(aes(x = 1, label = estimate_cis)) +
+        #geom_text(aes(x = 1.1, label = Pscore)) +
+        geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=4) +
         scale_colour_identity() +
         theme_void() + 
-        theme(plot.margin = margin(5, 0, 38, 0)) +
+        theme(plot.margin = margin(t=1, r=0, b=1, l=5)) +
         scale_y_discrete(limits = rev(res_mod_d2rn_pscore$intervention)) 
-      data_table
+      data_table1
+      
+      LfLabels2<-data.frame(x=c(1), 
+                            y=c(7.5),
+                            lab=c("P-score"))
+      LfLabels2      
+      
+      data_table2 <- ggplot(data = res_mod_d2rn_pscore2, aes(x, y = intervention)) +
+        geom_hline(aes(yintercept = intervention, colour = colour), size = 9) +
+        #geom_text(aes(x = 0.11, label = intervention)) +
+        #geom_text(aes(x = 1, label = estimate_cis)) +
+        geom_text(aes(x = 1, label = Pscore)) +
+        geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=4) +
+        scale_colour_identity() +
+        theme_void() + 
+        theme(plot.margin = margin(t=1, r=0, b=1, l=5)) +
+        scale_y_discrete(limits = rev(res_mod_d2rn_pscore$intervention)) 
+      data_table2
       
       #### Finally, merge plot and datatable for final forest plot
-      final_fp_nma_d2rn <- grid.arrange(res_mod_d2rn_pscore_forest, data_table, ncol=2)
+      #final_fp_nma_d2rn <- grid.arrange(res_mod_d2rn_pscore_forest, data_table, ncol=2)
+      #table1 <- tableGrob(res_mod_d2rn_pscore_forest)
+      #table2 <- tableGrob(data_table)
+      #final_fp_nma_d2rn <- grid.arrange(table1, table2, ncol=2)
+      aligned_plots <- align_plots(res_mod_d2rn_pscore_forest, data_table1, data_table2, align = "h")
+      #aligned_plots <- align_plots( data_table, res_mod_d2rn_pscore_forest,align = "h")
+      final_fp_nma_d2rn <- grid.arrange(grobs = aligned_plots, nrow= 1, widths= c(3,1,1))
       final_fp_nma_d2rn
       
     ### Create network graph
@@ -849,7 +873,7 @@
         geom_text(label = res_mod_d3wn_pscore$num_contrasts, hjust = -1.25, vjust = 1, colour = "black", fontface="bold", size =3) +        
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change (compared to BAU)") +
-        labs(caption = "*Size of and values next to points indicate the number of contrasts in which intervention is included", hjust=0) +
+        labs(caption = "*Size of and values next to points indicate the number of contrasts in which each intervention bundle is included", hjust=0) +
         ylab("Intervention Bundle") +
         theme_classic() +
         scale_colour_identity() +
