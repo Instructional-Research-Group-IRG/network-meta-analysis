@@ -236,9 +236,9 @@
   print(num_students_d1gma_long3)
   target_d1gma <- c("BAU","FF","FF+RS","NL+RS","RS","VF+RS")
   num_students_d1gma_long3 <- num_students_d1gma_long3[match(target_d1gma, num_students_d1gma_long3$intervention_comparison),]
-  print(num_students_d1gma_long3)  
   num_students_d1gma_long3$intervention_comparison <- as.character(num_students_d1gma_long3$intervention_comparison)
   str(num_students_d1gma_long3)  
+  print(num_students_d1gma_long3)  
         
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID_d1gma$intervention_prelim)
@@ -494,9 +494,9 @@
   print(num_students_d2rn_long3)
   target_d2rn <- c("BAU","NL+FF+RS","NL+RS","NL+TES+FF+RS","NL+TES+RS","NL+TES+VF+RS","RS","TES+VF+RS")
   num_students_d2rn_long3 <- num_students_d2rn_long3[match(target_d2rn, num_students_d2rn_long3$intervention_comparison),]
-  print(num_students_d2rn_long3)  
   num_students_d2rn_long3$intervention_comparison <- as.character(num_students_d2rn_long3$intervention_comparison)
   str(num_students_d2rn_long3)  
+  print(num_students_d2rn_long3)  
       
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
@@ -728,15 +728,15 @@
   num_contrasts_d3wn_long <- num_contrasts_d3wn %>% pivot_longer(c(intervention_prelim, comparison_prelim ),names_to= "group_IC", values_to="group_intervention")
   print(num_contrasts_d3wn_long)
   num_contrasts_d3wn_long2 <- num_contrasts_d3wn_long %>% distinct(record_id, contrast_id, group_intervention, .keep_all = TRUE)
-  print(num_contrasts_d3wn_long2)
-  tabyl(num_contrasts_d3wn_long2$contrast_id) #Should be n=2 for each contrast if reshape and distinct steps done correctly: 1 intervention & 1 comparison per unique contrast. 
+  print(num_contrasts_d3wn_long2, n= Inf)
+  tabyl(num_contrasts_d3wn_long2$contrast_id) #Should be n=2 for each contrast if reshape and distinct steps done correctly: 1 intervention & 1 comparison per unique contrast. Note that contrast id 87196 has n=3 because one measure incorrectly has FF.RS.VF for intervention_prelim instead of FF.RS. 
   num_contrasts_d3wn_long3 <- tabyl(num_contrasts_d3wn_long2$group_intervention)
   num_contrasts_d3wn_long3 <- num_contrasts_d3wn_long3 %>% dplyr::select(intervention= 'num_contrasts_d3wn_long2$group_intervention', num_contrasts= 'n')
   str(num_contrasts_d3wn_long3)
   num_contrasts_d3wn_long3$intervention <- as.character(num_contrasts_d3wn_long3$intervention)
   num_contrasts_d3wn_long3$intervention <- gsub("\\+", ".", num_contrasts_d3wn_long3$intervention)
   str(num_contrasts_d3wn_long3)
-  print(num_contrasts_d3wn_long3)  
+  print(num_contrasts_d3wn_long3) # Note that there should be 0 contrasts with FF.RS.VF. Contrast id 87196 has one measure incorrectly with FF.RS.VF for intervention_prelim instead of FF.RS. 
       
   ## Calculate the number of students within each intervention bundle across all unique study-contrasts
   num_students_d3wn <- NMA_data_analysis_subset_grpID_d3wn %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
@@ -752,9 +752,9 @@
   print(num_students_d3wn_long3)
   target_d3wn <- c("BAU","FF","FF+RS","NL+FF+RS","RS","VF+FF+RS","VF+RS")
   num_students_d3wn_long3 <- num_students_d3wn_long3[match(target_d3wn, num_students_d3wn_long3$intervention_comparison),]
-  print(num_students_d3wn_long3)  
   num_students_d3wn_long3$intervention_comparison <- as.character(num_students_d3wn_long3$intervention_comparison)
-  str(num_students_d3wn_long3)    
+  str(num_students_d3wn_long3)   
+  print(num_students_d3wn_long3)  
   
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID_d3wn$intervention_prelim)
