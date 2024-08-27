@@ -581,26 +581,25 @@
       print(res_mod_d2rn_pscore)
       print(num_contrasts_d2rn_long3)
       res_mod_d2rn_pscore <- res_mod_d2rn_pscore %>% left_join(num_contrasts_d2rn_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-      res_mod_d2rn_pscore$colour <- rep(c("aquamarine","red","green","orange","yellow","pink","violet")) 
+      res_mod_d2rn_pscore$colour <- rep(c("lightsteelblue","cyan","dodgerblue","lightblue","skyblue","lightcyan","deepskyblue")) 
       str(res_mod_d2rn_pscore)   
       print(res_mod_d2rn_pscore)
       
       res_mod_d2rn_pscore_forest <- ggplot(res_mod_d2rn_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
-        geom_hline(aes(yintercept = intervention, colour = colour), size=9) +
-        geom_pointrange(shape = 22, fill = "black", size = res_mod_d2rn_pscore$num_contrasts/7.5) + 
-        geom_text(label = res_mod_d2rn_pscore$num_contrasts, hjust = 0.5, vjust = 2.5, colour = "black", fontface="bold", size =4) +        
+        geom_hline(aes(yintercept = intervention, colour = colour), size=15) +
+        geom_pointrange(shape = 22, fill = "black", size = res_mod_d2rn_pscore$num_contrasts/5) + 
+        geom_text(label = res_mod_d2rn_pscore$num_contrasts, hjust = 0.5, vjust = 2.5, colour = "black", fontface="bold", size =5) +        
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change (compared to BAU)") +
-        labs(caption = "*Values under points indicate number of contrasts", hjust=0) +
+        labs(caption = "*Values under points indicate number of contrasts                                                                       ") +
         ylab("Intervention Bundle") +
         theme_classic() +
         scale_colour_identity() +
         scale_y_discrete(limits = rev(res_mod_d2rn_pscore$intervention)) +
-        theme(axis.title.y = element_text(face = "bold", size=15))
-        #scale_x_log10(limits = c(-1.25, 2.25), 
-        #breaks = c(0.25, 0.5, 1, 2, 4), 
-        #labels = c("0.25", "0.5", "1", "2", "4"), expand = c(0,0)) +
-        #theme(axis.text.y = element_blank(), axis.title.y = element_blank())
+        theme(axis.title.x = element_text(face = "bold", size=20)) +
+        theme(plot.caption = element_text(size = 14)) +
+        theme(axis.title.y = element_text(face = "bold", size=20)) +
+        theme(axis.text.y = element_text(face = "bold", size=15))
       res_mod_d2rn_pscore_forest
       
       #### Next create data table for merging with above plot with estimates and confidence intervals combined in one column
@@ -622,13 +621,10 @@
                            y=c(7.5),
                            lab=c("Estimate (95% CI)"))
       LfLabels1      
-      
       data_table1 <- ggplot(data = res_mod_d2rn_pscore2, aes(x, y = intervention)) +
-        geom_hline(aes(yintercept = intervention, colour = colour), size = 9) +
-        #geom_text(aes(x = 0.11, label = intervention)) +
-        geom_text(aes(x = 1, label = estimate_cis)) +
-        #geom_text(aes(x = 1.1, label = Pscore)) +
-        geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=4) +
+        geom_hline(aes(yintercept = intervention, colour = colour), size = 15) +
+        geom_text(aes(x = 1, label = estimate_cis), size=5.25) +
+        geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=6) +
         scale_colour_identity() +
         theme_void() + 
         theme(plot.margin = margin(t=1, r=0, b=1, l=5)) +
@@ -639,13 +635,10 @@
                             y=c(7.5),
                             lab=c("P-score"))
       LfLabels2      
-      
       data_table2 <- ggplot(data = res_mod_d2rn_pscore2, aes(x, y = intervention)) +
-        geom_hline(aes(yintercept = intervention, colour = colour), size = 9) +
-        #geom_text(aes(x = 0.11, label = intervention)) +
-        #geom_text(aes(x = 1, label = estimate_cis)) +
-        geom_text(aes(x = 1, label = Pscore)) +
-        geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=4) +
+        geom_hline(aes(yintercept = intervention, colour = colour), size = 15) +
+        geom_text(aes(x = 1, label = Pscore), size= 5.25) +
+        geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=6) +
         scale_colour_identity() +
         theme_void() + 
         theme(plot.margin = margin(t=1, r=0, b=1, l=5)) +
@@ -653,12 +646,7 @@
       data_table2
       
       #### Finally, merge plot and datatable for final forest plot
-      #final_fp_nma_d2rn <- grid.arrange(res_mod_d2rn_pscore_forest, data_table, ncol=2)
-      #table1 <- tableGrob(res_mod_d2rn_pscore_forest)
-      #table2 <- tableGrob(data_table)
-      #final_fp_nma_d2rn <- grid.arrange(table1, table2, ncol=2)
       aligned_plots <- align_plots(res_mod_d2rn_pscore_forest, data_table1, data_table2, align = "h")
-      #aligned_plots <- align_plots( data_table, res_mod_d2rn_pscore_forest,align = "h")
       final_fp_nma_d2rn <- grid.arrange(grobs = aligned_plots, nrow= 1, widths= c(3,1,1))
       final_fp_nma_d2rn
       
@@ -716,13 +704,13 @@
            layout=layout_in_circle(g),
            #layout=layout_nicely(g),
            #layout=layout_with_lgl(g),
-           vertex.size=(num_students_d2rn_long3$sum_num_students_bundle)/25, vertex.color=c("lightgray","red","yellow","green","orange","pink","violet","aquamarine"), vertex.label.color="black", vertex.label.font=2)  
+           vertex.size=(num_students_d2rn_long3$sum_num_students_bundle)/25, vertex.color=c("lightgray","lightsteelblue","cyan","dodgerblue","lightblue","skyblue","lightcyan","deepskyblue"), vertex.label.color="black", vertex.label.font=2)  
       
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
            layout=layout_in_circle(g),
            #layout=layout_nicely(g),
            #layout=layout_with_lgl(g),
-           vertex.size=log((num_students_d2rn_long3$sum_num_students_bundle))*2.5, vertex.color=c("lightgray","red","yellow","green","orange","pink","violet","aquamarine"), vertex.label.color="black", vertex.label.font=2)        
+           vertex.size=log((num_students_d2rn_long3$sum_num_students_bundle))*2.5, vertex.color=c("lightgray","lightsteelblue","cyan","dodgerblue","lightblue","skyblue","lightcyan","deepskyblue"), vertex.label.color="black", vertex.label.font=2)        
       
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "Whole Numbers"
       
