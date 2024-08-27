@@ -699,19 +699,22 @@
       #      #layout=layout_nicely(g),
       #      #layout=layout_with_lgl(g),
       #      vertex.size=20, vertex.color=c("lightgray","red","yellow","green","orange","pink","violet","aquamarine"), vertex.label.color="black", vertex.label.font=2)   
+      num_students_d2rn_long3
+      num_students_d2rn_long3 <- num_students_d2rn_long3 %>% mutate(sum_num_students_bundle2= if_else(intervention_comparison!="BAU",sum_num_students_bundle*1,sum_num_students_bundle))
+      num_students_d2rn_long3
       
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
-           layout=layout_in_circle(g),
-           #layout=layout_nicely(g),
-           #layout=layout_with_lgl(g),
-           vertex.size=(num_students_d2rn_long3$sum_num_students_bundle)/25, vertex.color=c("lightgray","lightsteelblue","cyan","dodgerblue","lightblue","skyblue","lightcyan","deepskyblue"), vertex.label.color="black", vertex.label.font=2)  
+           layout=layout_in_circle(g, order=c("BAU", "TES+VF+RS","NL+FF+RS","NL+TES+FF+RS","NL+TES+RS","NL+RS","NL+TES+VF+RS","RS")),
+           vertex.size=(num_students_d2rn_long3$sum_num_students_bundle2)/15, vertex.color=c("lightgray","cyan","skyblue","dodgerblue","lightblue","lightcyan","deepskyblue","lightsteelblue"), vertex.label.color="black", vertex.label.font=2, label.dist=13)  
+
+      num_students_d2rn_long3
+      num_students_d2rn_long3 <- num_students_d2rn_long3 %>% mutate(sum_num_students_bundle3= if_else(intervention_comparison=="BAU",sum_num_students_bundle*5000,sum_num_students_bundle))
+      num_students_d2rn_long3
       
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
-           layout=layout_in_circle(g),
-           #layout=layout_nicely(g),
-           #layout=layout_with_lgl(g),
-           vertex.size=log((num_students_d2rn_long3$sum_num_students_bundle))*2.5, vertex.color=c("lightgray","lightsteelblue","cyan","dodgerblue","lightblue","skyblue","lightcyan","deepskyblue"), vertex.label.color="black", vertex.label.font=2)        
-      
+           layout=layout_in_circle(g, order=c("BAU", "TES+VF+RS","NL+FF+RS","NL+TES+FF+RS","NL+TES+RS","NL+RS","NL+TES+VF+RS","RS")),
+           vertex.size=log((num_students_d2rn_long3$sum_num_students_bundle3))*2.5, vertex.color=c("lightgray","cyan","skyblue","dodgerblue","lightblue","lightcyan","deepskyblue","lightsteelblue"), vertex.label.color="black", vertex.label.font=2)
+
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "Whole Numbers"
       
   ## Subset analysis data frame further to just the Whole Numbers domain (d3wn)
