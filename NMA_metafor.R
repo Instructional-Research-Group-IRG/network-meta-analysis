@@ -323,25 +323,25 @@
       print(res_mod_d1gma_pscore)
       print(num_contrasts_d1gma_long3)
       res_mod_d1gma_pscore <- res_mod_d1gma_pscore %>% left_join(num_contrasts_d1gma_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-      res_mod_d1gma_pscore$colour <- rep(c("violet","yellow","olivedrab","lightblue","gold"))
+      res_mod_d1gma_pscore$colour <- rep(c("deepskyblue","skyblue","royalblue","azure","slategray1"))
       str(res_mod_d1gma_pscore)
       print(res_mod_d1gma_pscore)
       
       res_mod_d1gma_pscore_forest <- ggplot(res_mod_d1gma_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
-        geom_hline(aes(yintercept = intervention, colour = colour), size=9) +
-        geom_pointrange(shape = 22, fill = "black", size = res_mod_d1gma_pscore$num_contrasts/7.5) + 
-        geom_text(label = res_mod_d1gma_pscore$num_contrasts, hjust = 0.5, vjust = 2.5, colour = "black", fontface="bold", size = 4) +        
+        geom_hline(aes(yintercept = intervention, colour = colour), size=15) +
+        geom_pointrange(shape = 22, fill = "black", size = res_mod_d1gma_pscore$num_contrasts/5) + 
+        geom_text(label = res_mod_d1gma_pscore$num_contrasts, hjust = 0.5, vjust = 2.5, colour = "black", fontface="bold", size =5) +        
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change (compared to BAU)") +
-        labs(caption = "*Size of and values next to points indicate the number of contrasts in which each intervention bundle is included", hjust=0) +
+        labs(caption = "*Values under points indicate number of contrasts                                                                       ") +
         ylab("Intervention Bundle") +
         theme_classic() +
         scale_colour_identity() +
         scale_y_discrete(limits = rev(res_mod_d1gma_pscore$intervention)) +
-        #scale_x_log10(limits = c(-1.25, 2.25), 
-        #breaks = c(0.25, 0.5, 1, 2, 4), 
-        #labels = c("0.25", "0.5", "1", "2", "4"), expand = c(0,0)) +
-        theme(axis.text.y = element_blank(), axis.title.y = element_blank())
+        theme(axis.title.x = element_text(face = "bold", size=20)) +
+        theme(plot.caption = element_text(size = 14)) +
+        theme(axis.title.y = element_text(face = "bold", size=20)) +
+        theme(axis.text.y = element_text(face = "bold", size=15))
       res_mod_d1gma_pscore_forest
           
       #### Next create data table for merging with above plot with estimates and confidence intervals combined in one column
@@ -359,25 +359,37 @@
       res_mod_d1gma_pscore2 <- res_mod_d1gma_pscore2 %>% unite(estimate_cis, estimate, ci.lb, ci.ub, sep= " ", remove = FALSE )
       print(res_mod_d1gma_pscore2)
           
-      LfLabels<-data.frame(x=c(0.11,0.2,0.3), 
-                           y=c(5.25,5.25,5.25),
-                           lab=c("Intervention","Estimate (95% CI)","P-score"))
-      LfLabels
-      
-      data_table <- ggplot(data = res_mod_d1gma_pscore2, aes(y = intervention)) +
-        geom_hline(aes(yintercept = intervention, colour = colour), size = 9) +
-        geom_text(aes(x = 0.1, label = intervention)) +
-        geom_text(aes(x = 0.2, label = estimate_cis)) +
-        geom_text(aes(x = 0.3, label = Pscore)) +
-        geom_text(data=LfLabels,aes(x,y,label=lab, fontface="bold"), size=4) +
+      LfLabels1<-data.frame(x=c(1), 
+                            y=c(5.5),
+                            lab=c("Estimate (95% CI)"))
+      LfLabels1      
+      data_table1 <- ggplot(data = res_mod_d1gma_pscore2, aes(x, y = intervention)) +
+        geom_hline(aes(yintercept = intervention, colour = colour), size = 15) +
+        geom_text(aes(x = 1, label = estimate_cis), size=5.25) +
+        geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=6) +
         scale_colour_identity() +
         theme_void() + 
-        theme(plot.margin = margin(5, 0, 47, 0)) +
+        theme(plot.margin = margin(t=1, r=0, b=1, l=5)) +
         scale_y_discrete(limits = rev(res_mod_d1gma_pscore$intervention)) 
-      #data_table
-          
-      #### Finally, merge plot and data table for final forest plot
-      final_fp_nma_d1gma <- grid.arrange(res_mod_d1gma_pscore_forest, data_table, ncol=2)
+      data_table1
+      
+      LfLabels2<-data.frame(x=c(1), 
+                            y=c(5.5),
+                            lab=c("P-score"))
+      LfLabels2      
+      data_table2 <- ggplot(data = res_mod_d1gma_pscore2, aes(x, y = intervention)) +
+        geom_hline(aes(yintercept = intervention, colour = colour), size = 15) +
+        geom_text(aes(x = 1, label = Pscore), size= 5.25) +
+        geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=6) +
+        scale_colour_identity() +
+        theme_void() + 
+        theme(plot.margin = margin(t=1, r=0, b=1, l=5)) +
+        scale_y_discrete(limits = rev(res_mod_d1gma_pscore$intervention)) 
+      data_table2
+      
+      #### Finally, merge plot and datatable for final forest plot
+      aligned_plots <- align_plots(res_mod_d1gma_pscore_forest, data_table1, data_table2, align = "h")
+      final_fp_nma_d1gma <- grid.arrange(grobs = aligned_plots, nrow= 1, widths= c(3,1,1))
       final_fp_nma_d1gma
         
     ### Create network graph
@@ -424,27 +436,29 @@
       set.seed(3524)
       g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
       
-      # plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
-      #      layout=layout_in_circle(g),
-      #      #layout=layout_nicely(g),
-      #      #layout=layout_with_lgl(g),
-      #      vertex.size=20, vertex.color=c("lightgray","lightblue","gold","yellow","violet","olivedrab"), vertex.label.color="black", vertex.label.font=2)  
+      num_students_d1gma_long3
+      num_students_d1gma_long4 <- num_students_d1gma_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="VF+RS" | intervention_comparison=="FF" | intervention_comparison=="FF+RS"),sum_num_students_bundle*3.5,sum_num_students_bundle))
+      num_students_d1gma_long4 <- num_students_d1gma_long4 %>% mutate(dist=c(0,2.25,2.55,2.75,0,2.25))
+      num_students_d1gma_long4 <- num_students_d1gma_long4 %>% mutate(color=c("lightgray","azure","slategray1","skyblue","deepskyblue","royalblue"))
+      num_students_d1gma_long4
       
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
-           layout=layout_in_circle(g),
-           #layout=layout_nicely(g),
-           #layout=layout_with_lgl(g),
-           vertex.size=(num_students_d1gma_long3$sum_num_students_bundle)/35, vertex.color=c("lightgray","lightblue","gold","yellow","violet","olivedrab"), vertex.label.color="black", vertex.label.font=2)  
+           layout=layout_in_circle(g, order=c("BAU", "RS","NL+RS","VF+RS","FF","FF+RS")),
+           vertex.size=(num_students_d1gma_long4$sum_num_students_bundle2)/35, vertex.color=num_students_d1gma_long4$color, 
+           vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d1gma_long4$intervention_comparison, vertex.label.dist=num_students_d1gma_long4$dist)  
+      
+      num_students_d1gma_long4
+      num_students_d1gma_long5 <- num_students_d1gma_long4 %>% mutate(sum_num_students_bundle3= if_else(intervention_comparison=="BAU",sum_num_students_bundle*5000,sum_num_students_bundle))
+      num_students_d1gma_long5
       
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
-           layout=layout_in_circle(g),
-           #layout=layout_nicely(g),
-           #layout=layout_with_lgl(g),
-           vertex.size=log((num_students_d1gma_long3$sum_num_students_bundle))*2.5, vertex.color=c("lightgray","lightblue","gold","yellow","violet","olivedrab"), vertex.label.color="black", vertex.label.font=2)        
+           layout=layout_in_circle(g, order=c("BAU", "RS","NL+RS","VF+RS","FF","FF+RS")),
+           vertex.size=log((num_students_d1gma_long5$sum_num_students_bundle3))*2.5, vertex.color=num_students_d1gma_long4$color,
+           vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d1gma_long5$intervention_comparison, vertex.label.dist=num_students_d1gma_long4$dist)      
       
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "Rational Numbers"
       
-  ## Subset analysis data frame further to just the Rational Numbers domain (d2rn)
+  ## Subset analysis data frame further to just the Rational Numbers domain (      res_mod_d2rn_pscore_forest <- ggplot(res_mod_d2rn_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
   tabyl(NMA_data_analysis_subset_grpID$domain)
   NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID %>% filter(domain == "Rational Numbers")
   tabyl(NMA_data_analysis_subset_grpID_d2rn$domain)
@@ -694,29 +708,25 @@
       set.seed(3524)
       g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
       
-      # plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
-      #      layout=layout_in_circle(g),
-      #      #layout=layout_nicely(g),
-      #      #layout=layout_with_lgl(g),
-      #      vertex.size=20, vertex.color=c("lightgray","red","yellow","green","orange","pink","violet","aquamarine"), vertex.label.color="black", vertex.label.font=2)   
       num_students_d2rn_long3
       num_students_d2rn_long4 <- num_students_d2rn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="TES+VF+RS" | intervention_comparison=="NL+TES+RS" | intervention_comparison=="NL+TES+VF+RS" | intervention_comparison=="RS"),sum_num_students_bundle*2.5,sum_num_students_bundle))
       num_students_d2rn_long4 <- num_students_d2rn_long4 %>% mutate(dist=c(0,3.45,2.85,4.9,4,3.75,1.25,1.25))
+      num_students_d2rn_long4 <- num_students_d2rn_long4 %>% mutate(color=c("lightgray","cyan","skyblue","dodgerblue","lightblue","lightcyan","deepskyblue","lightsteelblue"))
       num_students_d2rn_long4
       
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
            layout=layout_in_circle(g, order=c("BAU", "TES+VF+RS","NL+FF+RS","NL+TES+FF+RS","NL+TES+RS","NL+RS","NL+TES+VF+RS","RS")),
-           vertex.size=(num_students_d2rn_long4$sum_num_students_bundle2)/15, vertex.color=c("lightgray","cyan","skyblue","dodgerblue","lightblue","lightcyan","deepskyblue","lightsteelblue"), 
+           vertex.size=(num_students_d2rn_long4$sum_num_students_bundle2)/15, vertex.color=num_students_d2rn_long4$color, 
            vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d2rn_long4$intervention_comparison, vertex.label.dist=num_students_d2rn_long4$dist)  
 
-      # num_students_d2rn_long4
-      # num_students_d2rn_long5 <- num_students_d2rn_long4 %>% mutate(sum_num_students_bundle3= if_else(intervention_comparison=="BAU",sum_num_students_bundle*5000,sum_num_students_bundle))
-      # num_students_d2rn_long5
-      # 
-      # plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
-      #      layout=layout_in_circle(g, order=c("BAU", "TES+VF+RS","NL+FF+RS","NL+TES+FF+RS","NL+TES+RS","NL+RS","NL+TES+VF+RS","RS")),
-      #      vertex.size=log((num_students_d2rn_long5$sum_num_students_bundle3))*2.5, vertex.color=c("lightgray","cyan","skyblue","dodgerblue","lightblue","lightcyan","deepskyblue","lightsteelblue"), 
-      #      vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d2rn_long5$intervention_comparison, vertex.label.dist=3)
+      num_students_d2rn_long4
+      num_students_d2rn_long5 <- num_students_d2rn_long4 %>% mutate(sum_num_students_bundle3= if_else(intervention_comparison=="BAU",sum_num_students_bundle*5000,sum_num_students_bundle))
+      num_students_d2rn_long5
+
+      plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
+           layout=layout_in_circle(g, order=c("BAU", "TES+VF+RS","NL+FF+RS","NL+TES+FF+RS","NL+TES+RS","NL+RS","NL+TES+VF+RS","RS")),
+           vertex.size=log((num_students_d2rn_long5$sum_num_students_bundle3))*2.5, vertex.color=num_students_d2rn_long4$color,
+           vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d2rn_long5$intervention_comparison, vertex.label.dist=num_students_d2rn_long4$dist)
 
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "Whole Numbers"
       
@@ -857,27 +867,27 @@
       print(res_mod_d3wn_pscore)
       print(num_contrasts_d3wn_long3)
       res_mod_d3wn_pscore <- res_mod_d3wn_pscore %>% left_join(num_contrasts_d3wn_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-      res_mod_d3wn_pscore$colour <- rep(c("white", "gray95","white", "gray95","white","gray95"))
+      res_mod_d3wn_pscore$colour <- rep(c("paleturquoise", "slategray1","azure","cyan", "deepskyblue","royalblue"))
       str(res_mod_d3wn_pscore)     
       print(res_mod_d3wn_pscore)
 
       res_mod_d3wn_pscore_forest <- ggplot(res_mod_d3wn_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
-        geom_hline(aes(yintercept = intervention, colour = colour), size=7) +
-        geom_pointrange(shape = 22, fill = "black", size = res_mod_d3wn_pscore$num_contrasts/7.5) + 
-        geom_text(label = res_mod_d3wn_pscore$num_contrasts, hjust = -1.25, vjust = 1, colour = "black", fontface="bold", size =3) +        
+        geom_hline(aes(yintercept = intervention, colour = colour), size=15) +
+        geom_pointrange(shape = 22, fill = "black", size = res_mod_d3wn_pscore$num_contrasts/7) + 
+        geom_text(label = res_mod_d3wn_pscore$num_contrasts, hjust = 0.5, vjust = 2.5, colour = "black", fontface="bold", size =5) +        
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change (compared to BAU)") +
-        labs(caption = "*Size of and values next to points indicate the number of contrasts in which each intervention bundle is included", hjust=0) +
+        labs(caption = "*Values under points indicate number of contrasts                                                                       ") +
         ylab("Intervention Bundle") +
         theme_classic() +
         scale_colour_identity() +
         scale_y_discrete(limits = rev(res_mod_d3wn_pscore$intervention)) +
-        #scale_x_log10(limits = c(-1.25, 2.25), 
-        #breaks = c(0.25, 0.5, 1, 2, 4), 
-        #labels = c("0.25", "0.5", "1", "2", "4"), expand = c(0,0)) +
-        theme(axis.text.y = element_blank(), axis.title.y = element_blank())
+        theme(axis.title.x = element_text(face = "bold", size=20)) +
+        theme(plot.caption = element_text(size = 14)) +
+        theme(axis.title.y = element_text(face = "bold", size=20)) +
+        theme(axis.text.y = element_text(face = "bold", size=15))
       res_mod_d3wn_pscore_forest
-      
+
       #### Next create data table for merging with above plot with estimates and confidence intervals combined in one column
       res_mod_d3wn_pscore2 <- res_mod_d3wn_pscore
       round_digits <- function(x) {
@@ -893,25 +903,37 @@
       res_mod_d3wn_pscore2 <- res_mod_d3wn_pscore2 %>% unite(estimate_cis, estimate, ci.lb, ci.ub, sep= " ", remove = FALSE )
       print(res_mod_d3wn_pscore2)
       
-      LfLabels<-data.frame(x=c(0,4.5,6.7), 
-                           y=c(rep(length(unique(res_mod_d3wn_pscore2$estimate))-0.2,times=3)),
-                           lab=c("Intervention","Estimate (95% CI)","P-score"))
-      LfLabels
-      
-      data_table <- ggplot(data = res_mod_d3wn_pscore2, aes(y = intervention)) +
-        geom_hline(aes(yintercept = intervention, colour = colour), size = 7) +
-        geom_text(aes(x = 0, label = intervention), hjust = 0) +
-        geom_text(aes(x = 5, label = estimate_cis)) +
-        geom_text(aes(x = 7, label = Pscore), hjust = 1) +
-        geom_text(data=LfLabels,aes(x,y,label=lab, fontface="bold"), vjust=-3.5, hjust=0, size=4, size=4) +
+      LfLabels1<-data.frame(x=c(1), 
+                            y=c(6.5),
+                            lab=c("Estimate (95% CI)"))
+      LfLabels1      
+      data_table1 <- ggplot(data = res_mod_d3wn_pscore2, aes(x, y = intervention)) +
+        geom_hline(aes(yintercept = intervention, colour = colour), size = 15) +
+        geom_text(aes(x = 1, label = estimate_cis), size=5.25) +
+        geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=6) +
         scale_colour_identity() +
         theme_void() + 
-        theme(plot.margin = margin(5, 0, 35, 0)) +
+        theme(plot.margin = margin(t=1, r=0, b=1, l=5)) +
         scale_y_discrete(limits = rev(res_mod_d3wn_pscore$intervention)) 
-      data_table
+      data_table1
+      
+      LfLabels2<-data.frame(x=c(1), 
+                            y=c(6.5),
+                            lab=c("P-score"))
+      LfLabels2      
+      data_table2 <- ggplot(data = res_mod_d3wn_pscore2, aes(x, y = intervention)) +
+        geom_hline(aes(yintercept = intervention, colour = colour), size = 15) +
+        geom_text(aes(x = 1, label = Pscore), size= 5.25) +
+        geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=6) +
+        scale_colour_identity() +
+        theme_void() + 
+        theme(plot.margin = margin(t=1, r=0, b=1, l=5)) +
+        scale_y_discrete(limits = rev(res_mod_d3wn_pscore$intervention)) 
+      data_table2
       
       #### Finally, merge plot and datatable for final forest plot
-      final_fp_nma_d3wn <- grid.arrange(data_table, res_mod_d3wn_pscore_forest, ncol=2)
+      aligned_plots <- align_plots(res_mod_d3wn_pscore_forest, data_table1, data_table2, align = "h")
+      final_fp_nma_d3wn <- grid.arrange(grobs = aligned_plots, nrow= 1, widths= c(3,1,1))
       final_fp_nma_d3wn
       
     ### Create network graph
@@ -962,19 +984,28 @@
       #      layout=layout_in_circle(g),
       #      #layout=layout_nicely(g),
       #      #layout=layout_with_lgl(g),
-      #      vertex.size=20, vertex.color=c("lightgray","lightblue","gold","red","violet","royalblue1","olivedrab"), vertex.label.color="black", vertex.label.font=2)       
+      #      vertex.size=20, vertex.color=c("lightgray","red","yellow","green","orange","pink","violet","aquamarine"), vertex.label.color="black", vertex.label.font=2)   
+      num_students_d3wn_long3
+      #num_students_d3wn_long4 <- num_students_d3wn_long3 %>% mutate(sum_num_students_bundle2= sum_num_students_bundle)
+      num_students_d3wn_long4 <- num_students_d3wn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="VF+FF+RS" | intervention_comparison=="FF" | intervention_comparison=="NL+FF+RS" | intervention_comparison=="VF+RS"),sum_num_students_bundle*3.5,sum_num_students_bundle))
+      num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(dist=c(0,1.5,2.75,2.5,3.5,2.75,1.25))
+      num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(color=c("lightgray","azure","slategray1","cyan","deepskyblue","paleturquoise","royalblue"))
+      num_students_d3wn_long4
       
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
-           layout=layout_in_circle(g),
-           #layout=layout_nicely(g),
-           #layout=layout_with_lgl(g),
-           vertex.size=(num_students_d3wn_long3$sum_num_students_bundle)/75, vertex.color=c("lightgray","lightblue","gold","red","violet","royalblue1","olivedrab"), vertex.label.color="black", vertex.label.font=2) 
+           layout=layout_in_circle(g, order=c("BAU", "VF+FF+RS","FF+RS","FF","NL+FF+RS","RS","VF+RS")),
+           vertex.size=(num_students_d3wn_long4$sum_num_students_bundle2)/75, vertex.color=num_students_d3wn_long4$color, 
+           vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d3wn_long4$intervention_comparison, vertex.label.dist=num_students_d3wn_long4$dist)  
       
+      num_students_d3wn_long4
+      num_students_d3wn_long5 <- num_students_d3wn_long4 %>% mutate(sum_num_students_bundle3= if_else(intervention_comparison=="BAU",sum_num_students_bundle*5000,sum_num_students_bundle))
+      num_students_d3wn_long5
+
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
-           layout=layout_in_circle(g),
-           #layout=layout_nicely(g),
-           #layout=layout_with_lgl(g),
-           vertex.size=log((num_students_d3wn_long3$sum_num_students_bundle))*2.5, vertex.color=c("lightgray","lightblue","gold","red","violet","royalblue1","olivedrab"), vertex.label.color="black", vertex.label.font=2)       
+           layout=layout_in_circle(g, order=c("BAU", "VF+FF+RS","FF+RS","FF","NL+FF+RS","RS","VF+RS")),
+           vertex.size=log((num_students_d3wn_long5$sum_num_students_bundle3))*2.5, vertex.color=num_students_d3wn_long4$color,
+           vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d3wn_long5$intervention_comparison, vertex.label.dist=num_students_d3wn_long4$dist)
+      
 
 #===================================== SENSITIVITY ANALYSIS =====================================#       
   
