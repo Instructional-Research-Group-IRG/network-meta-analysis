@@ -163,16 +163,23 @@
   # NMA_data_analysis_subset_grpID$domain <- gsub("Whole Number", "Whole Numbers", NMA_data_analysis_subset_grpID$domain)
   # tabyl(NMA_data_analysis_subset_grpID$domain)
   # class(NMA_data_analysis_subset_grpID$domain)
+ 
+  ## Correct bundle acronym/code
+  NMA_data_analysis_subset_grpID %>% count()
+  class(NMA_data_analysis_subset_grpID$intervention_prelim)
+  class(NMA_data_analysis_subset_grpID$comparison_prelim)
+  NMA_data_analysis_subset_grpID$intervention_prelim <- as.character(NMA_data_analysis_subset_grpID$intervention_prelim)
+  NMA_data_analysis_subset_grpID$comparison_prelim <- as.character(NMA_data_analysis_subset_grpID$comparison_prelim)
+  tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)
+  NMA_data_analysis_subset_grpID$intervention_prelim <- gsub("TES", "SE", NMA_data_analysis_subset_grpID$intervention_prelim)
+  NMA_data_analysis_subset_grpID$comparison_prelim <- gsub("TES", "SE", NMA_data_analysis_subset_grpID$comparison_prelim)
+  tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)  
   
   ## Drop intervention versus comparison contrasts that have the same bundles
-  NMA_data_analysis_subset_grpID %>% count()
   tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)
-  NMA_data_analysis_subset_grpID$intervention_prelim <- as.character(NMA_data_analysis_subset_grpID$intervention_prelim) #To more easily use the filter function below; otherwise the factor levels of the two columns would have to be lined up.
-  NMA_data_analysis_subset_grpID$comparison_prelim <- as.character(NMA_data_analysis_subset_grpID$comparison_prelim) #To more easily use the filter function below; otherwise the factor levels of the two columns would have to be lined up.
-  tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
-  tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)
-  tabyl(NMA_data_analysis_subset_grpID$domain)
   NMA_data_analysis_subset_grpID %>% count()
   NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% filter(intervention_prelim!=comparison_prelim) #This also removes any rows with <NA> values in columns intervention_prelim & comparison_prelim.
   tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
@@ -181,8 +188,8 @@
   NMA_data_analysis_subset_grpID %>% count()
   NMA_data_analysis_subset_grpID$intervention_prelim <- as.factor(NMA_data_analysis_subset_grpID$intervention_prelim)
   NMA_data_analysis_subset_grpID$comparison_prelim <- as.factor(NMA_data_analysis_subset_grpID$comparison_prelim)
-  tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
-  tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)  
+  class(NMA_data_analysis_subset_grpID$intervention_prelim)
+  class(NMA_data_analysis_subset_grpID$comparison_prelim)  
  
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "General Mathematics Achievement"
       
@@ -323,7 +330,7 @@
       print(res_mod_d1gma_pscore)
       print(num_contrasts_d1gma_long3)
       res_mod_d1gma_pscore <- res_mod_d1gma_pscore %>% left_join(num_contrasts_d1gma_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-      res_mod_d1gma_pscore$colour <- rep(c("deepskyblue","skyblue","royalblue","azure","slategray1"))
+      res_mod_d1gma_pscore$colour <- rep(c("azure1","green","khaki1","royalblue1","burlywood1"))
       str(res_mod_d1gma_pscore)
       print(res_mod_d1gma_pscore)
       
@@ -439,7 +446,7 @@
       num_students_d1gma_long3
       num_students_d1gma_long4 <- num_students_d1gma_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="VF+RS" | intervention_comparison=="FF" | intervention_comparison=="FF+RS"),sum_num_students_bundle*3.5,sum_num_students_bundle))
       num_students_d1gma_long4 <- num_students_d1gma_long4 %>% mutate(dist=c(0,2.25,2.55,2.75,0,2.25))
-      num_students_d1gma_long4 <- num_students_d1gma_long4 %>% mutate(color=c("lightgray","azure","slategray1","skyblue","deepskyblue","royalblue"))
+      num_students_d1gma_long4 <- num_students_d1gma_long4 %>% mutate(color=c("lightgray","royalblue1","burlywood1","green","azure1","khaki1"))
       num_students_d1gma_long4
       
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
@@ -462,19 +469,6 @@
   tabyl(NMA_data_analysis_subset_grpID$domain)
   NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID %>% filter(domain == "Rational Numbers")
   tabyl(NMA_data_analysis_subset_grpID_d2rn$domain)
-      
-  ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
-      
-  ## Add contrast matrix to dataset
-  NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% drop_na(c(intervention_prelim, comparison_prelim)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
-  NMA_data_analysis_subset_grpID_d2rn <- contrmat(NMA_data_analysis_subset_grpID_d2rn, grp1="intervention_prelim", grp2="comparison_prelim")
-  str(NMA_data_analysis_subset_grpID_d2rn)
-      
-  ## Calculate the variance-covariance matrix for multi-treatment studies
-  V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d2rn)
-  V_list
-  V_list_d2rn <- data.frame(V_list)
-  write_csv(V_list_d2rn, 'V_list_d2rn.csv')
   
   ## Calculate the number of unique contrasts in which each intervention bundle is included
   tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
@@ -494,6 +488,14 @@
   str(num_contrasts_d2rn_long3)
   print(num_contrasts_d2rn_long3)
   
+  ## Remove one-contrast bundles
+  tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID_d2rn$comparison_prelim)
+  NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% filter(intervention_prelim!="RS" & intervention_prelim!="NL+SE+VF+RS" & intervention_prelim!="SE+VF+RS")
+  NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% filter(comparison_prelim!="RS" & comparison_prelim!="NL+SE+VF+RS" & comparison_prelim!="SE+VF+RS")
+  tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID_d2rn$comparison_prelim)  
+  
   ## Calculate the number of students within each intervention bundle across all unique study-contrasts
   num_students_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
   print(num_students_d2rn)
@@ -506,19 +508,31 @@
   num_students_d2rn_long3 <- num_students_d2rn_long2 %>% group_by(intervention_comparison) %>% summarize(sum_num_students_bundle= sum(num_students_bundle)) # Sum students by intervention bundle.
   str(num_students_d2rn_long3)
   print(num_students_d2rn_long3)
-  target_d2rn <- c("BAU","NL+FF+RS","NL+RS","NL+TES+FF+RS","NL+TES+RS","NL+TES+VF+RS","RS","TES+VF+RS")
+  #target_d2rn <- c("BAU","NL+FF+RS","NL+RS","NL+SE+FF+RS","NL+SE+RS","NL+SE+VF+RS","RS","SE+VF+RS")
+  target_d2rn <- c("BAU","NL+FF+RS","NL+RS","NL+SE+FF+RS","NL+SE+RS")
   num_students_d2rn_long3 <- num_students_d2rn_long3[match(target_d2rn, num_students_d2rn_long3$intervention_comparison),]
   num_students_d2rn_long3$intervention_comparison <- as.character(num_students_d2rn_long3$intervention_comparison)
   str(num_students_d2rn_long3)  
   print(num_students_d2rn_long3)  
+  
+  ## Add contrast matrix to dataset
+  NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% drop_na(c(intervention_prelim, comparison_prelim)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
+  NMA_data_analysis_subset_grpID_d2rn <- contrmat(NMA_data_analysis_subset_grpID_d2rn, grp1="intervention_prelim", grp2="comparison_prelim")
+  str(NMA_data_analysis_subset_grpID_d2rn)
+  
+  ## Calculate the variance-covariance matrix for multi-treatment studies
+  V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d2rn)
+  V_list
+  V_list_d2rn <- data.frame(V_list)
+  write_csv(V_list_d2rn, 'V_list_d2rn.csv')
       
-  ##Run standard NMA with the unique interventions bundles as moderators  
+  ##Run standard NMA with the unique interventions bundles as moderators: exclude one-contrast bundles  
   tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID_d2rn$comparison_prelim)
   check_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
   print(check_d2rn)
   res_mod_d2rn <- rma.mv(effect_size, V_list, 
-                          mods = ~ NL.FF.RS + NL.RS + NL.TES.FF.RS + NL.TES.RS + NL.TES.VF.RS + RS + TES.VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                          mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
                           random = ~ 1 | record_id/es_id, 
                           rho=0.60, 
                           data=NMA_data_analysis_subset_grpID_d2rn)
@@ -595,7 +609,8 @@
       print(res_mod_d2rn_pscore)
       print(num_contrasts_d2rn_long3)
       res_mod_d2rn_pscore <- res_mod_d2rn_pscore %>% left_join(num_contrasts_d2rn_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-      res_mod_d2rn_pscore$colour <- rep(c("lightsteelblue","cyan","dodgerblue","lightblue","skyblue","lightcyan","deepskyblue")) 
+      res_mod_d2rn_pscore$colour <- rep(c("red","mediumpurple1","tan1","green")) 
+      #res_mod_d2rn_pscore$colour <- rep(c("turquoise1","red","mediumpurple1","tan1","green","yellow","azure1")) 
       str(res_mod_d2rn_pscore)   
       print(res_mod_d2rn_pscore)
       
@@ -632,7 +647,7 @@
       print(res_mod_d2rn_pscore2)
 
       LfLabels1<-data.frame(x=c(1), 
-                           y=c(7.5),
+                           y=c(4.5),
                            lab=c("Estimate (95% CI)"))
       LfLabels1      
       data_table1 <- ggplot(data = res_mod_d2rn_pscore2, aes(x, y = intervention)) +
@@ -646,7 +661,7 @@
       data_table1
       
       LfLabels2<-data.frame(x=c(1), 
-                            y=c(7.5),
+                            y=c(4.5),
                             lab=c("P-score"))
       LfLabels2      
       data_table2 <- ggplot(data = res_mod_d2rn_pscore2, aes(x, y = intervention)) +
@@ -709,13 +724,13 @@
       g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
       
       num_students_d2rn_long3
-      num_students_d2rn_long4 <- num_students_d2rn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="TES+VF+RS" | intervention_comparison=="NL+TES+RS" | intervention_comparison=="NL+TES+VF+RS" | intervention_comparison=="RS"),sum_num_students_bundle*2.5,sum_num_students_bundle))
-      num_students_d2rn_long4 <- num_students_d2rn_long4 %>% mutate(dist=c(0,3.45,2.85,4.9,4,3.75,1.25,1.25))
-      num_students_d2rn_long4 <- num_students_d2rn_long4 %>% mutate(color=c("lightgray","cyan","skyblue","dodgerblue","lightblue","lightcyan","deepskyblue","lightsteelblue"))
+      num_students_d2rn_long4 <- num_students_d2rn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="SE+VF+RS" | intervention_comparison=="NL+SE+RS" | intervention_comparison=="NL+SE+VF+RS" | intervention_comparison=="RS"),sum_num_students_bundle*2.5,sum_num_students_bundle))
+      num_students_d2rn_long4 <- num_students_d2rn_long4 %>% mutate(dist=c(0,3.65,3.25,4.9,4.25))
+      num_students_d2rn_long4 <- num_students_d2rn_long4 %>% mutate(color=c("lightgray","red","green","mediumpurple1","tan1"))
       num_students_d2rn_long4
       
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
-           layout=layout_in_circle(g, order=c("BAU", "TES+VF+RS","NL+FF+RS","NL+TES+FF+RS","NL+TES+RS","NL+RS","NL+TES+VF+RS","RS")),
+           layout=layout_in_circle(g, order=c("BAU","NL+FF+RS","NL+SE+FF+RS","NL+SE+RS","NL+RS")),
            vertex.size=(num_students_d2rn_long4$sum_num_students_bundle2)/15, vertex.color=num_students_d2rn_long4$color, 
            vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d2rn_long4$intervention_comparison, vertex.label.dist=num_students_d2rn_long4$dist)  
 
@@ -724,7 +739,7 @@
       num_students_d2rn_long5
 
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
-           layout=layout_in_circle(g, order=c("BAU", "TES+VF+RS","NL+FF+RS","NL+TES+FF+RS","NL+TES+RS","NL+RS","NL+TES+VF+RS","RS")),
+           layout=layout_in_circle(g, order=c("BAU","NL+FF+RS","NL+SE+FF+RS","NL+SE+RS","NL+RS")),
            vertex.size=log((num_students_d2rn_long5$sum_num_students_bundle3))*2.5, vertex.color=num_students_d2rn_long4$color,
            vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d2rn_long5$intervention_comparison, vertex.label.dist=num_students_d2rn_long4$dist)
 
@@ -867,7 +882,7 @@
       print(res_mod_d3wn_pscore)
       print(num_contrasts_d3wn_long3)
       res_mod_d3wn_pscore <- res_mod_d3wn_pscore %>% left_join(num_contrasts_d3wn_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-      res_mod_d3wn_pscore$colour <- rep(c("paleturquoise", "slategray1","azure","cyan", "deepskyblue","royalblue"))
+      res_mod_d3wn_pscore$colour <- rep(c("hotpink", "burlywood1","royalblue1","red", "azure1","khaki1"))
       str(res_mod_d3wn_pscore)     
       print(res_mod_d3wn_pscore)
 
@@ -989,7 +1004,7 @@
       #num_students_d3wn_long4 <- num_students_d3wn_long3 %>% mutate(sum_num_students_bundle2= sum_num_students_bundle)
       num_students_d3wn_long4 <- num_students_d3wn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="VF+FF+RS" | intervention_comparison=="FF" | intervention_comparison=="NL+FF+RS" | intervention_comparison=="VF+RS"),sum_num_students_bundle*5.5,sum_num_students_bundle))
       num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(dist=c(0,2.5,2.85,2.6,0,3.15,1.55))
-      num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(color=c("lightgray","azure","slategray1","cyan","deepskyblue","paleturquoise","royalblue"))
+      num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(color=c("lightgray","royalblue1","burlywood1","red","azure1","hotpink","khaki1"))
       num_students_d3wn_long4
       
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
@@ -1024,7 +1039,7 @@
   tabyl(NMA_data_analysis_subset_grpID$intervention_combo_recode)
   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("N or NL", "AN", NMA_data_analysis_subset_grpID$intervention_combo_recode)
   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("TEX or SEO", "AE", NMA_data_analysis_subset_grpID$intervention_combo_recode)
-  NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("TES or SEO", "AE", NMA_data_analysis_subset_grpID$intervention_combo_recode)
+  NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("SE or SEO", "AE", NMA_data_analysis_subset_grpID$intervention_combo_recode)
   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("VF or TV", "AV", NMA_data_analysis_subset_grpID$intervention_combo_recode)
   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("RS or RV", "AR", NMA_data_analysis_subset_grpID$intervention_combo_recode)
   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("FF or FWOF", "AF", NMA_data_analysis_subset_grpID$intervention_combo_recode)  
@@ -1044,7 +1059,7 @@
   tabyl(NMA_data_analysis_subset_grpID$comparison_combo_recode)
   NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("N or NL", "AN", NMA_data_analysis_subset_grpID$comparison_combo_recode)
   NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("TEX or SEO", "AE", NMA_data_analysis_subset_grpID$comparison_combo_recode)
-  NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("TES or SEO", "AE", NMA_data_analysis_subset_grpID$comparison_combo_recode)
+  NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("SE or SEO", "AE", NMA_data_analysis_subset_grpID$comparison_combo_recode)
   NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("VF or TV", "AV", NMA_data_analysis_subset_grpID$comparison_combo_recode)
   NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("RS or RV", "AR", NMA_data_analysis_subset_grpID$comparison_combo_recode)
   NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("FF or FWOF", "AF", NMA_data_analysis_subset_grpID$comparison_combo_recode)  
