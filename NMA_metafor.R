@@ -206,7 +206,7 @@
     NMA_data_analysis_subset_grpID_c %>% count()
     tabyl(NMA_data_analysis_subset_grpID_c$contrast_id)
     
-    ### Number of contrasts
+    ### Number of studies
     NMA_data_analysis_subset_grpID_s <- NMA_data_analysis_subset_grpID %>% distinct(record_id, .keep_all = TRUE)
     NMA_data_analysis_subset_grpID_s %>% count()
     tabyl(NMA_data_analysis_subset_grpID_s$record_id)
