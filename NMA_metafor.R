@@ -190,7 +190,27 @@
   NMA_data_analysis_subset_grpID$comparison_prelim <- as.factor(NMA_data_analysis_subset_grpID$comparison_prelim)
   class(NMA_data_analysis_subset_grpID$intervention_prelim)
   class(NMA_data_analysis_subset_grpID$comparison_prelim)  
- 
+  
+  ## Drop rows with missing values in the intervention and comparison columns (i.e., <NA>).
+  NMA_data_analysis_subset_grpID %>% count()
+  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% drop_na(c(intervention_prelim, comparison_prelim)) 
+  NMA_data_analysis_subset_grpID %>% count()
+  
+  ## Check counts of final NMA analysis file
+    
+    ### Number of effect sizes
+    NMA_data_analysis_subset_grpID %>% count()
+    
+    ### Number of contrasts
+    NMA_data_analysis_subset_grpID_c <- NMA_data_analysis_subset_grpID %>% distinct(contrast_id, .keep_all = TRUE)
+    NMA_data_analysis_subset_grpID_c %>% count()
+    tabyl(NMA_data_analysis_subset_grpID_c$contrast_id)
+    
+    ### Number of contrasts
+    NMA_data_analysis_subset_grpID_s <- NMA_data_analysis_subset_grpID %>% distinct(record_id, .keep_all = TRUE)
+    NMA_data_analysis_subset_grpID_s %>% count()
+    tabyl(NMA_data_analysis_subset_grpID_s$record_id)
+    
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "General Mathematics Achievement"
       
   ## Subset analysis data frame further to just the General Mathematics Achievement domain (d1gma)
@@ -253,13 +273,22 @@
   tabyl(NMA_data_analysis_subset_grpID_d1gma$comparison_prelim)
   check_d1gma <- NMA_data_analysis_subset_grpID_d1gma %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
   print(check_d1gma)
-  res_mod_d1gma <- rma.mv(effect_size, V_list, 
-                        mods = ~ FF + FF.RS + NL.RS + RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
-                        random = ~ 1 | record_id/es_id, 
-                        rho=0.60, 
-                        data=NMA_data_analysis_subset_grpID_d1gma)
-  summary(res_mod_d1gma)
-  #weights.rma.mv(res_mod_d1gma)
+
+    ### Fit model assuming consistency (tau^2_omega=0)
+    res_mod_d1gma <- rma.mv(effect_size, V_list, 
+                            mods = ~ FF + FF.RS + NL.RS + RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                            random = ~ 1 | record_id/es_id, 
+                            rho=0.60, 
+                            data=NMA_data_analysis_subset_grpID_d1gma)
+    summary(res_mod_d1gma)
+
+    ### Fit Jackson's model to test for inconsistency 
+    res_mod_d1gma_J <- rma.mv(effect_size, V_list,
+                              mods = ~ FF + FF.RS + NL.RS + RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                              random = list(~ 1 | record_id/es_id, ~ domain | record_id, ~ contrast_id | record_id),
+                              rho=0.60, phi=1/2,
+                              data=NMA_data_analysis_subset_grpID_d1gma)
+    summary(res_mod_d1gma_J)
       
     ### Estimate all pairwise differences between treatments
     contr <- data.frame(t(combn(names(coef(res_mod_d1gma)), 2)))
@@ -532,13 +561,22 @@
   tabyl(NMA_data_analysis_subset_grpID_d2rn$comparison_prelim)
   check_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
   print(check_d2rn)
-  res_mod_d2rn <- rma.mv(effect_size, V_list, 
-                          mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
-                          random = ~ 1 | record_id/es_id, 
-                          rho=0.60, 
-                          data=NMA_data_analysis_subset_grpID_d2rn)
-  summary(res_mod_d2rn)
-  #weights.rma.mv(res_mod_d2rn)
+  
+    ### Fit model assuming consistency (tau^2_omega=0)
+    res_mod_d2rn <- rma.mv(effect_size, V_list, 
+                           mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                           random = ~ 1 | record_id/es_id, 
+                           rho=0.60, 
+                           data=NMA_data_analysis_subset_grpID_d2rn)
+    summary(res_mod_d2rn)
+    
+    ### Fit Jackson's model to test for inconsistency 
+    res_mod_d2rn_J <- rma.mv(effect_size, V_list, 
+                           mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                           random = list(~ 1 | record_id/es_id, ~ domain | record_id, ~ contrast_id | record_id),
+                           rho=0.60, phi=1/2,
+                           data=NMA_data_analysis_subset_grpID_d2rn)
+    summary(res_mod_d2rn_J)
       
     ### Estimate all pairwise differences between treatments
     contr <- data.frame(t(combn(names(coef(res_mod_d2rn)), 2)))
@@ -812,13 +850,22 @@
   tabyl(NMA_data_analysis_subset_grpID_d3wn$comparison_prelim)
   check_d3wn <- NMA_data_analysis_subset_grpID_d3wn %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
   print(check_d3wn)
-  res_mod_d3wn <- rma.mv(effect_size, V_list, 
-                         mods = ~ FF + FF.RS + NL.FF.RS + RS + VF.FF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
-                         random = ~ 1 | record_id/es_id, 
-                         rho=0.60, 
-                         data=NMA_data_analysis_subset_grpID_d3wn)
-  summary(res_mod_d3wn)
-  #weights.rma.mv(res_mod_d3wn)
+  
+    ### Fit model assuming consistency (tau^2_omega=0)
+    res_mod_d3wn <- rma.mv(effect_size, V_list, 
+                           mods = ~ FF + FF.RS + NL.FF.RS + RS + VF.FF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                           random = ~ 1 | record_id/es_id, 
+                           rho=0.60, 
+                           data=NMA_data_analysis_subset_grpID_d3wn)
+    summary(res_mod_d3wn)
+    
+    ### Fit Jackson's model to test for inconsistency 
+    res_mod_d3wn_J <- rma.mv(effect_size, V_list, 
+                           mods = ~ FF + FF.RS + NL.FF.RS + RS + VF.FF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                           random = list(~ 1 | record_id/es_id, ~ contrast_id | record_id, ~ contrast_id | record_id), 
+                           rho=0.60, 
+                           data=NMA_data_analysis_subset_grpID_d3wn)
+    summary(res_mod_d3wn_J)
   
     ### Estimate all pairwise differences between treatments
     contr <- data.frame(t(combn(names(coef(res_mod_d3wn)), 2)))
@@ -1258,3 +1305,59 @@
                            data=NMA_data_analysis_subset_grpID_d3wnSA)
   summary(res_mod_d3wnSA)
   #weights.rma.mv(res_mod_d3wnSA)  
+  
+  #===================================== TEST CONSISTENCY ASSUPMTIONS =====================================#  
+    
+    ## Domain: General Mathematics Achievement
+    
+      ### fit model assuming consistency (tau^2_omega=0)
+      res_mod_d1gma <- rma.mv(effect_size, V_list, 
+                              mods = ~ FF + FF.RS + NL.RS + RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                              random = ~ 1 | record_id/es_id, 
+                              rho=0.60, 
+                              data=NMA_data_analysis_subset_grpID_d1gma)
+      summary(res_mod_d1gma)
+      
+      ### fit Jackson's model
+      res_mod_d1gma_J <- rma.mv(effect_size, V_list, 
+                              mods = ~ FF + FF.RS + NL.RS + RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                              random = list(~ 1 | record_id/es_id, ~ 1 | record_id/es_id),
+                              rho=0.60, phi=1/2,
+                              data=NMA_data_analysis_subset_grpID_d1gma)
+      summary(res_mod_d1gma_J)
+      
+    ## Domain: Rational Numbers
+      
+      ### fit model assuming consistency (tau^2_omega=0)  
+      res_mod_d2rn <- rma.mv(effect_size, V_list, 
+                             mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                             random = ~ 1 | record_id/es_id, 
+                             rho=0.60, 
+                             data=NMA_data_analysis_subset_grpID_d2rn)
+      summary(res_mod_d2rn)
+      
+      ### fit Jackson's model
+      res_mod_d2rn_J <- rma.mv(effect_size, V_list, 
+                             mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                             random = ~ 1 | record_id/es_id, 
+                             rho=0.60, 
+                             data=NMA_data_analysis_subset_grpID_d2rn)
+      summary(res_mod_d2rn_J)
+    
+    ## Domain: Whole Numbers
+      
+      ### fit model assuming consistency (tau^2_omega=0) 
+      res_mod_d3wn <- rma.mv(effect_size, V_list, 
+                             mods = ~ FF + FF.RS + NL.FF.RS + RS + VF.FF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                             random = ~ 1 | record_id/es_id, 
+                             rho=0.60, 
+                             data=NMA_data_analysis_subset_grpID_d3wn)
+      summary(res_mod_d3wn)
+      
+      ### fit Jackson's model
+      res_mod_d3wn_J <- rma.mv(effect_size, V_list, 
+                             mods = ~ FF + FF.RS + NL.FF.RS + RS + VF.FF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                             random = ~ 1 | record_id/es_id, 
+                             rho=0.60, 
+                             data=NMA_data_analysis_subset_grpID_d3wn)
+      summary(res_mod_d3wn_j)
