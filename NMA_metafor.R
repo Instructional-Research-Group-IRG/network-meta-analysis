@@ -200,6 +200,7 @@
     
     ### Number of effect sizes
     NMA_data_analysis_subset_grpID %>% count()
+    tabyl(NMA_data_analysis_subset_grpID$es_id)
     
     ### Number of contrasts
     NMA_data_analysis_subset_grpID_c <- NMA_data_analysis_subset_grpID %>% distinct(contrast_id, .keep_all = TRUE)
