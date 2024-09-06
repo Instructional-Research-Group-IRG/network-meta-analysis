@@ -259,7 +259,6 @@
   print(num_students_d1gma_long3)    
         
   ## Add contrast matrix to dataset
-  NMA_data_analysis_subset_grpID_d1gma <- NMA_data_analysis_subset_grpID_d1gma %>% drop_na(c(intervention_prelim, comparison_prelim)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
   NMA_data_analysis_subset_grpID_d1gma <- contrmat(NMA_data_analysis_subset_grpID_d1gma, grp1="intervention_prelim", grp2="comparison_prelim")
   str(NMA_data_analysis_subset_grpID_d1gma)
   
@@ -526,7 +525,7 @@
   NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% filter(comparison_prelim!="RS" & comparison_prelim!="NL+SE+VF+RS" & comparison_prelim!="SE+VF+RS")
   tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID_d2rn$comparison_prelim)  
-  
+
   ## Calculate the number of students within each intervention bundle across all unique study-contrasts
   num_students_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
   print(num_students_d2rn)
@@ -547,7 +546,6 @@
   print(num_students_d2rn_long3)  
   
   ## Add contrast matrix to dataset
-  NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% drop_na(c(intervention_prelim, comparison_prelim)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
   NMA_data_analysis_subset_grpID_d2rn <- contrmat(NMA_data_analysis_subset_grpID_d2rn, grp1="intervention_prelim", grp2="comparison_prelim")
   str(NMA_data_analysis_subset_grpID_d2rn)
   
@@ -836,7 +834,6 @@
   print(num_students_d3wn_long3)  
       
   ## Add contrast matrix to dataset
-  NMA_data_analysis_subset_grpID_d3wn <- NMA_data_analysis_subset_grpID_d3wn %>% drop_na(c(intervention_prelim, comparison_prelim)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
   NMA_data_analysis_subset_grpID_d3wn <- contrmat(NMA_data_analysis_subset_grpID_d3wn, grp1="intervention_prelim", grp2="comparison_prelim")
   str(NMA_data_analysis_subset_grpID_d3wn)
       
@@ -1076,7 +1073,29 @@
            layout=layout_in_circle(g, order=c("BAU", "VF+FF+RS","FF+RS","FF","NL+FF+RS","RS")),
            vertex.size=log((num_students_d3wn_long5$sum_num_students_bundle3))*2.5, vertex.color=num_students_d3wn_long4$color,
            vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d3wn_long5$intervention_comparison, vertex.label.dist=num_students_d3wn_long4$dist)
+
+#===================================== ANALYSIS SAMPLE SIZES =====================================#        
+
+# Combine final analysis files by domain
+      NMA_data_analysis_subset_grpID_final <- bind_rows(NMA_data_analysis_subset_grpID_d1gma, NMA_data_analysis_subset_grpID_d2rn, NMA_data_analysis_subset_grpID_d3wn)
+      tabyl(NMA_data_analysis_subset_grpID_final$domain)
       
+# Check counts of final NMA analysis file
+      
+      ### Number of effect sizes
+      NMA_data_analysis_subset_grpID_final %>% count()
+      tabyl(NMA_data_analysis_subset_grpID_final$es_id)
+      
+      ### Number of contrasts
+      NMA_data_analysis_subset_grpID_final_c <- NMA_data_analysis_subset_grpID_final %>% distinct(contrast_id, .keep_all = TRUE)
+      NMA_data_analysis_subset_grpID_final_c %>% count()
+      tabyl(NMA_data_analysis_subset_grpID_final_c$contrast_id)
+      
+      ### Number of studies
+      NMA_data_analysis_subset_grpID_final_s <- NMA_data_analysis_subset_grpID_final %>% distinct(record_id, .keep_all = TRUE)
+      NMA_data_analysis_subset_grpID_final_s %>% count()
+      tabyl(NMA_data_analysis_subset_grpID_final_s$record_id)      
+            
 
 #===================================== SENSITIVITY ANALYSIS =====================================#       
   
