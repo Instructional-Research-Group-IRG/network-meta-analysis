@@ -184,8 +184,8 @@
   NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% filter(intervention_prelim!=comparison_prelim) #This also removes any rows with <NA> values in columns intervention_prelim & comparison_prelim.
   tabyl(NMA_data_analysis_subset_grpID$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID$comparison_prelim)  
-  tabyl(NMA_data_analysis_subset_grpID$domain)
   NMA_data_analysis_subset_grpID %>% count()
+  tabyl(NMA_data_analysis_subset_grpID$domain)
   NMA_data_analysis_subset_grpID$intervention_prelim <- as.factor(NMA_data_analysis_subset_grpID$intervention_prelim)
   NMA_data_analysis_subset_grpID$comparison_prelim <- as.factor(NMA_data_analysis_subset_grpID$comparison_prelim)
   class(NMA_data_analysis_subset_grpID$intervention_prelim)
@@ -1094,9 +1094,15 @@
       ### Number of studies
       NMA_data_analysis_subset_grpID_final_s <- NMA_data_analysis_subset_grpID_final %>% distinct(record_id, .keep_all = TRUE)
       NMA_data_analysis_subset_grpID_final_s %>% count()
-      tabyl(NMA_data_analysis_subset_grpID_final_s$record_id)      
-            
+      tabyl(NMA_data_analysis_subset_grpID_final_s$record_id)     
+      
+      ## Calculate the number of students within each intervention bundle across all unique study-contrasts
+      num_students_final <- NMA_data_analysis_subset_grpID_final %>% distinct(record_id, contrast_id, .keep_all = TRUE) #Keep only unique entries of each unique study-contrast so that each group of students is not summed more than once (because of multiple measures within some contrasts).
+      num_students_final2 <- num_students_final %>% summarize(sum_num_students_bundle= sum(full_sample_size)) # Sum students
+      str(num_students_final2)
+      print(num_students_final2)
 
+      
 #===================================== SENSITIVITY ANALYSIS =====================================#       
   
 # Prepare bundles
