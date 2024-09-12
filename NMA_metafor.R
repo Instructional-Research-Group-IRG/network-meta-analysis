@@ -1074,6 +1074,7 @@
            vertex.size=log((num_students_d3wn_long5$sum_num_students_bundle3))*2.5, vertex.color=num_students_d3wn_long4$color,
            vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d3wn_long5$intervention_comparison, vertex.label.dist=num_students_d3wn_long4$dist)
 
+      
 #===================================== ANALYSIS SAMPLE SIZES =====================================#        
 
 # Combine final analysis files by domain
@@ -1101,8 +1102,13 @@
       num_students_final2 <- num_students_final %>% summarize(sum_num_students_bundle= sum(full_sample_size)) # Sum students
       str(num_students_final2)
       print(num_students_final2)
-
       
+      ## Export data for verifying counts
+      NMA_data_analysis_subset_grpID_final2 <- NMA_data_analysis_subset_grpID_final %>% dplyr::select(domain, record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, measure_name, measure_type)
+      NMA_data_analysis_subset_grpID_final2 <- NMA_data_analysis_subset_grpID_final2 %>% arrange(domain, record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, measure_name, measure_type)
+      write_csv(NMA_data_analysis_subset_grpID_final2, 'NMA_counts_by_domain.csv')
+     
+
 #===================================== SENSITIVITY ANALYSIS =====================================#       
   
 # Prepare bundles
@@ -1331,59 +1337,3 @@
                            data=NMA_data_analysis_subset_grpID_d3wnSA)
   summary(res_mod_d3wnSA)
   #weights.rma.mv(res_mod_d3wnSA)  
-  
-  #===================================== TEST CONSISTENCY ASSUPMTIONS =====================================#  
-    
-    ## Domain: General Mathematics Achievement
-    
-      ### fit model assuming consistency (tau^2_omega=0)
-      res_mod_d1gma <- rma.mv(effect_size, V_list, 
-                              mods = ~ FF + FF.RS + NL.RS + RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
-                              random = ~ 1 | record_id/es_id, 
-                              rho=0.60, 
-                              data=NMA_data_analysis_subset_grpID_d1gma)
-      summary(res_mod_d1gma)
-      
-      ### fit Jackson's model
-      res_mod_d1gma_J <- rma.mv(effect_size, V_list, 
-                              mods = ~ FF + FF.RS + NL.RS + RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
-                              random = list(~ 1 | record_id/es_id, ~ 1 | record_id/es_id),
-                              rho=0.60, phi=1/2,
-                              data=NMA_data_analysis_subset_grpID_d1gma)
-      summary(res_mod_d1gma_J)
-      
-    ## Domain: Rational Numbers
-      
-      ### fit model assuming consistency (tau^2_omega=0)  
-      res_mod_d2rn <- rma.mv(effect_size, V_list, 
-                             mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
-                             random = ~ 1 | record_id/es_id, 
-                             rho=0.60, 
-                             data=NMA_data_analysis_subset_grpID_d2rn)
-      summary(res_mod_d2rn)
-      
-      ### fit Jackson's model
-      res_mod_d2rn_J <- rma.mv(effect_size, V_list, 
-                             mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
-                             random = ~ 1 | record_id/es_id, 
-                             rho=0.60, 
-                             data=NMA_data_analysis_subset_grpID_d2rn)
-      summary(res_mod_d2rn_J)
-    
-    ## Domain: Whole Numbers
-      
-      ### fit model assuming consistency (tau^2_omega=0) 
-      res_mod_d3wn <- rma.mv(effect_size, V_list, 
-                             mods = ~ FF + FF.RS + NL.FF.RS + RS + VF.FF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
-                             random = ~ 1 | record_id/es_id, 
-                             rho=0.60, 
-                             data=NMA_data_analysis_subset_grpID_d3wn)
-      summary(res_mod_d3wn)
-      
-      ### fit Jackson's model
-      res_mod_d3wn_J <- rma.mv(effect_size, V_list, 
-                             mods = ~ FF + FF.RS + NL.FF.RS + RS + VF.FF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
-                             random = ~ 1 | record_id/es_id, 
-                             rho=0.60, 
-                             data=NMA_data_analysis_subset_grpID_d3wn)
-      summary(res_mod_d3wn_j)
