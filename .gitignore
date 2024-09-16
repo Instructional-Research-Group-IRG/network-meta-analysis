@@ -9,5 +9,5 @@ dat.lopez2019.txt
 metafor_CBT_example.R
 V_list*
 intervention_bundle_guide.xlsx
-*.csv
+V_list*.csv
 NMA_counts_by_domain.xlsx
