@@ -198,6 +198,9 @@
   
   ## Check counts of final NMA analysis file
     
+    ### NUmber of domains
+    tabyl(NMA_data_analysis_subset_grpID$domain)
+  
     ### Number of effect sizes
     NMA_data_analysis_subset_grpID %>% count()
     tabyl(NMA_data_analysis_subset_grpID$es_id)
