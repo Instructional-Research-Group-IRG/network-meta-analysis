@@ -206,6 +206,9 @@
     NMA_data_analysis_subset_grpID_c <- NMA_data_analysis_subset_grpID %>% distinct(contrast_id, .keep_all = TRUE)
     NMA_data_analysis_subset_grpID_c %>% count()
     tabyl(NMA_data_analysis_subset_grpID_c$contrast_id)
+    NMA_study_contrast_list <- NMA_data_analysis_subset_grpID_c %>% dplyr::select(record_id, "Abbreviated Citation", contrast_id, contrast_name) #Create list of study-contrasts included in NMA.
+    print(NMA_study_contrast_list, n= Inf)
+    write_csv(NMA_study_contrast_list, 'NMA_study_contrast_list.csv')
     
     ### Number of studies
     NMA_data_analysis_subset_grpID_s <- NMA_data_analysis_subset_grpID %>% distinct(record_id, .keep_all = TRUE)
