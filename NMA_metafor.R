@@ -1092,6 +1092,10 @@
       ### Number of effect sizes
       NMA_data_analysis_subset_grpID_final %>% count()
       tabyl(NMA_data_analysis_subset_grpID_final$es_id)
+      NMA_study_contrast_list_es_final <- NMA_data_analysis_subset_grpID_final %>% dplyr::select(record_id, "Abbreviated Citation", contrast_id, contrast_name, domain, measure_name, es_id) #Create list of study-contrasts included in NMA.
+      NMA_study_contrast_list_es_final <- NMA_study_contrast_list_es_final %>% arrange(record_id, contrast_id, es_id)
+      print(NMA_study_contrast_list_es_final)
+      write_csv(NMA_study_contrast_list_es_final, 'NMA_study_contrast_list_es_final.csv')
       
       ### Number of contrasts
       NMA_data_analysis_subset_grpID_final_c <- NMA_data_analysis_subset_grpID_final %>% distinct(contrast_id, .keep_all = TRUE)
