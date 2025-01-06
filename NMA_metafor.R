@@ -1112,7 +1112,9 @@
       tabyl(NMA_data_analysis_subset_grpID_final_s$record_id)     
       
       ## Calculate the number of students
-      num_students_final <- NMA_data_analysis_subset_grpID_final %>% distinct(record_id, contrast_id, .keep_all = TRUE) #Keep only unique entries of each unique study-contrast so that each group of students is not summed more than once (because of multiple measures within some contrasts).
+      NMA_data_analysis_subset_grpID_final_ord <- NMA_data_analysis_subset_grpID_final %>% arrange(record_id, contrast_id, es_id, desc(full_sample_size))
+      NMA_data_analysis_subset_grpID_final_ord <- NMA_data_analysis_subset_grpID_final_ord %>% dplyr::select(record_id, contrast_id, es_id, full_sample_size)
+      num_students_final <- NMA_data_analysis_subset_grpID_final_ord %>% distinct(record_id, contrast_id, .keep_all = TRUE) #Keep only unique entries of each unique study-contrast so that each group of students is not summed more than once (because of multiple measures within some contrasts).
       num_students_final2 <- num_students_final %>% summarize(sum_num_students_bundle= sum(full_sample_size)) # Sum students
       str(num_students_final2)
       print(num_students_final2)
