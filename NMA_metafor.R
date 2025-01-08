@@ -1113,7 +1113,7 @@
       tabyl(NMA_data_analysis_subset_grpID_final_s$record_id)     
       
       ## Calculate the number of students
-      NMA_data_analysis_subset_grpID_final_ord <- NMA_data_analysis_subset_grpID_final %>% arrange(record_id, contrast_id, desc(full_sample_size))
+      NMA_data_analysis_subset_grpID_final_ord <- NMA_data_analysis_subset_grpID_final %>% arrange(record_id, contrast_id, desc(full_sample_size)) #Sort data based on study id -> contrast id within study id -> largest outcome measure sample size within contrast id. That way when we reduce the dataset to the contrast level below, we take the outcome measure within each contrast with the largest sample size for summing sample sizes across contrasts (We want the max sum).
       NMA_data_analysis_subset_grpID_final_ord2 <- NMA_data_analysis_subset_grpID_final_ord %>% dplyr::select(record_id, contrast_id, es_id, full_sample_size, TvsT)
       num_students_final <- NMA_data_analysis_subset_grpID_final_ord2 %>% distinct(record_id, contrast_id, .keep_all = TRUE) #Keep only unique entries of each unique study-contrast so that each group of students is not summed more than once (because of multiple measures within some contrasts).
       
