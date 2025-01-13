@@ -370,7 +370,7 @@
       str(res_mod_d1gma_pscore)
       print(res_mod_d1gma_pscore)
 
-      res_mod_d1gma_pscore_forest <- ggplot(res_mod_d1gma_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
+      res_mod_d1gma_pscore_forest <- ggplot(res_mod_d1gma_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) +  
         geom_hline(aes(yintercept = intervention, colour = colour), size=15) +
         geom_pointrange(shape = 22, fill = "black", size = res_mod_d1gma_pscore$num_contrasts/5) + 
         geom_text(label = res_mod_d1gma_pscore$num_contrasts, hjust = 0.5, vjust = 2.25, colour = "black", fontface="bold", size =10) +        
