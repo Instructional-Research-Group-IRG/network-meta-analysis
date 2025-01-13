@@ -12,7 +12,7 @@
    
   ## Install and load other required packages
   ##install.packages("pacman") 
-  pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr, janitor, naniar, igraph, multcomp, broom, gridExtra, ggplot2, writexl, readr, grid, gridExtra, cowplot)
+  pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr, janitor, naniar, igraph, multcomp, broom, gridExtra, ggplot2, writexl, readr, grid, gridExtra, cowplot, extrafont)
 
 # Load (read) data (i.e., copy data to 'dat')
   #dat <- read_sheet("https://docs.google.com/spreadsheets/d/1bWugw06yFyetIVYlhAHHzM_d3KGhegxxLBm-5463j2Q/edit#gid=0") #Test data
@@ -373,7 +373,7 @@
       res_mod_d1gma_pscore_forest <- ggplot(res_mod_d1gma_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) +  
         geom_hline(aes(yintercept = intervention, colour = colour), size=15) +
         geom_pointrange(shape = 22, fill = "black", size = res_mod_d1gma_pscore$num_contrasts/5) + 
-        geom_text(label = res_mod_d1gma_pscore$num_contrasts, hjust = 0.5, vjust = 2.25, colour = "black", fontface="bold", size =10) +        
+        geom_text(label = res_mod_d1gma_pscore$num_contrasts, hjust = 0.5, vjust = 2.25, colour = "black", size =9, family= "Times New Roman") +        
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change (compared to BAU)") +
         labs(caption = "*Values under points indicate number of contrasts                                                        ") +
@@ -381,10 +381,11 @@
         theme_classic() +
         scale_colour_identity() +
         scale_y_discrete(limits = rev(res_mod_d1gma_pscore$intervention)) +
-        theme(axis.title.x = element_text(face = "bold", size=25), #x-axis title
+        theme(text= element_text(family = "Times New Roman"),
+              axis.title.x = element_text(face = "bold", size=25), #x-axis title
               plot.caption = element_text(size = 18), #plot caption (x-axis)
-              axis.title.y = element_text(face = "bold", size=25), #y-axis title
-              axis.text.y = element_text(face = "bold", size=25), #the intervention bundles
+              axis.title.y = element_text(face = "bold", size=25, hjust= 0.44), #y-axis title
+              axis.text.y = element_text(size=23, hjust=0.5), #the intervention bundles
               axis.text.x = element_text(size = 20)) #x-axis tick values
       res_mod_d1gma_pscore_forest
           
@@ -408,12 +409,12 @@
                             lab=c("Estimate (95% CI)"))
       LfLabels1      
       data_table1 <- ggplot(data = res_mod_d1gma_pscore2, aes(x, y = intervention)) +
-        geom_hline(aes(yintercept = intervention, colour = colour), size = 15) + #geom_hline(aes(yintercept = intervention, colour = colour), size = 15) + #This is for the horizontal color bands
-        geom_text(aes(x = 1, label = estimate_cis), size= 9.25) + #geom_text(aes(x = 1, label = estimate_cis), size=5.25) + # This is for the estimate and (ci) within the horizontal color bands.
-        geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=10) + #geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=6) +
+        geom_hline(aes(yintercept = intervention, colour = colour), size = 15) + 
+        geom_text(aes(x = 1, label = estimate_cis), size= 9.25, family= "Times New Roman") + 
+        geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=10, family= "Times New Roman") + 
         scale_colour_identity() +
         theme_void() + 
-        theme(plot.margin = margin(t=1, r=0, b=1, l=5)) +
+        theme(text= element_text(family = "Times New Roman"), plot.margin = margin(t=1, r=0, b=1, l=5)) +
         scale_y_discrete(limits = rev(res_mod_d1gma_pscore$intervention)) 
       data_table1
       
@@ -422,18 +423,18 @@
                             lab=c("P-score"))
       LfLabels2      
       data_table2 <- ggplot(data = res_mod_d1gma_pscore2, aes(x, y = intervention)) +
-        geom_hline(aes(yintercept = intervention, colour = colour), size = 15) + #geom_hline(aes(yintercept = intervention, colour = colour), size = 15) + #This is for the horizontal color bands
-        geom_text(aes(x = 1, label = Pscore), size= 9.25) +
-        geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=10) +
+        geom_hline(aes(yintercept = intervention, colour = colour), size = 15) + 
+        geom_text(aes(x = 1, label = Pscore), size= 9.25, family= "Times New Roman") +
+        geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=10, family= "Times New Roman") +
         scale_colour_identity() +
         theme_void() + 
-        theme(plot.margin = margin(t=1, r=0, b=1, l=5)) +
+        theme(text= element_text(family = "Times New Roman"), plot.margin = margin(t=1, r=0, b=1, l=5)) +
         scale_y_discrete(limits = rev(res_mod_d1gma_pscore$intervention)) 
       data_table2
       
       #### Finally, merge plot and datatable for final forest plot
       aligned_plots <- align_plots(res_mod_d1gma_pscore_forest, data_table1, data_table2, align = "h")
-      final_fp_nma_d1gma <- grid.arrange(grobs = aligned_plots, nrow= 1, widths= c(3,1,1))
+      final_fp_nma_d1gma <- grid.arrange(grobs = aligned_plots, nrow= 1, widths= c(2.5,0.75,0.5))
       final_fp_nma_d1gma
         
     ### Create network graph
@@ -662,7 +663,7 @@
       res_mod_d2rn_pscore_forest <- ggplot(res_mod_d2rn_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
         geom_hline(aes(yintercept = intervention, colour = colour), size=15) +
         geom_pointrange(shape = 22, fill = "black", size = res_mod_d2rn_pscore$num_contrasts/5) + 
-        geom_text(label = res_mod_d2rn_pscore$num_contrasts, hjust = 0.5, vjust = 2.25, colour = "black", fontface="bold", size =10) +        
+        geom_text(label = res_mod_d2rn_pscore$num_contrasts, hjust = 0.5, vjust = 2.25, colour = "black", size =9, family= "Times New Roman") +        
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change (compared to BAU)") +
         labs(caption = "*Values under points indicate number of contrasts                                               ") +
@@ -670,15 +671,11 @@
         theme_classic() +
         scale_colour_identity() +
         scale_y_discrete(limits = rev(res_mod_d2rn_pscore$intervention)) +
-        # theme(axis.title.x = element_text(face = "bold", size=25)) +
-        # theme(plot.caption = element_text(size = 18)) +
-        # theme(axis.title.y = element_text(face = "bold", size=25)) +
-        # theme(axis.text.y = element_text(face = "bold", size=25))
-        # theme(axis.text.x = element_text(size = 20)) #This is a new line to adjust the x-axis tick values
-        theme(axis.title.x = element_text(face = "bold", size=25), #x-axis title
+        theme(text= element_text(family = "Times New Roman"),
+              axis.title.x = element_text(face = "bold", size=25), #x-axis title
               plot.caption = element_text(size = 18), #plot caption (x-axis)
-              axis.title.y = element_text(face = "bold", size=25), #y-axis title
-              axis.text.y = element_text(face = "bold", size=25), #the intervention bundles
+              axis.title.y = element_text(face = "bold", size=25, hjust=0.5), #y-axis title
+              axis.text.y = element_text(size=23, hjust=0.5), #the intervention bundles
               axis.text.x = element_text(size = 20)) #x-axis tick values
       res_mod_d2rn_pscore_forest
       
@@ -703,11 +700,11 @@
       LfLabels1      
       data_table1 <- ggplot(data = res_mod_d2rn_pscore2, aes(x, y = intervention)) +
         geom_hline(aes(yintercept = intervention, colour = colour), size = 15) +
-        geom_text(aes(x = 1, label = estimate_cis), size=9.25) +
-        geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=10) +
+        geom_text(aes(x = 1, label = estimate_cis), size=9.25, family= "Times New Roman") +
+        geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=10, family= "Times New Roman") +
         scale_colour_identity() +
         theme_void() + 
-        theme(plot.margin = margin(t=1, r=0, b=1, l=5)) +
+        theme(text= element_text(family = "Times New Roman"), plot.margin = margin(t=1, r=0, b=1, l=5)) +
         scale_y_discrete(limits = rev(res_mod_d2rn_pscore$intervention)) 
       data_table1
       
@@ -717,17 +714,17 @@
       LfLabels2      
       data_table2 <- ggplot(data = res_mod_d2rn_pscore2, aes(x, y = intervention)) +
         geom_hline(aes(yintercept = intervention, colour = colour), size = 15) +
-        geom_text(aes(x = 1, label = Pscore), size= 9.25) +
-        geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=10) +
+        geom_text(aes(x = 1, label = Pscore), size= 9.25, family= "Times New Roman") +
+        geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=10, family= "Times New Roman") +
         scale_colour_identity() +
         theme_void() + 
-        theme(plot.margin = margin(t=1, r=0, b=1, l=5)) +
+        theme(text= element_text(family = "Times New Roman"), plot.margin = margin(t=1, r=0, b=1, l=5)) +
         scale_y_discrete(limits = rev(res_mod_d2rn_pscore$intervention)) 
       data_table2
       
       #### Finally, merge plot and datatable for final forest plot
       aligned_plots <- align_plots(res_mod_d2rn_pscore_forest, data_table1, data_table2, align = "h")
-      final_fp_nma_d2rn <- grid.arrange(grobs = aligned_plots, nrow= 1, widths= c(3,1,1))
+      final_fp_nma_d2rn <- grid.arrange(grobs = aligned_plots, nrow= 1, widths= c(2.5,1,0.5))
       final_fp_nma_d2rn
       
     ### Create network graph
@@ -955,7 +952,7 @@
       res_mod_d3wn_pscore_forest <- ggplot(res_mod_d3wn_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
         geom_hline(aes(yintercept = intervention, colour = colour), size=15) +
         geom_pointrange(shape = 22, fill = "black", size = res_mod_d3wn_pscore$num_contrasts/7) + 
-        geom_text(label = res_mod_d3wn_pscore$num_contrasts, hjust = 0.5, vjust = 2.25, colour = "black", fontface="bold", size =10) +        
+        geom_text(label = res_mod_d3wn_pscore$num_contrasts, hjust = 0.5, vjust = 2.25, colour = "black", size =9, family= "Times New Roman") +        
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change (compared to BAU)") +
         labs(caption = "*Values under points indicate number of contrasts                                                   ") +
@@ -963,10 +960,11 @@
         theme_classic() +
         scale_colour_identity() +
         scale_y_discrete(limits = rev(res_mod_d3wn_pscore$intervention)) +
-        theme(axis.title.x = element_text(face = "bold", size=25), #x-axis title
+        theme(text= element_text(family = "Times New Roman"),
+              axis.title.x = element_text(face = "bold", size=25), #x-axis title
               plot.caption = element_text(size = 18), #plot caption (x-axis)
-              axis.title.y = element_text(face = "bold", size=25), #y-axis title
-              axis.text.y = element_text(face = "bold", size=25), #the intervention bundles
+              axis.title.y = element_text(face = "bold", size=25, hjust=0.6), #y-axis title
+              axis.text.y = element_text(size=23, hjust=0.5), #the intervention bundles
               axis.text.x = element_text(size = 20)) #x-axis tick values
       res_mod_d3wn_pscore_forest
 
@@ -991,11 +989,11 @@
       LfLabels1      
       data_table1 <- ggplot(data = res_mod_d3wn_pscore2, aes(x, y = intervention)) +
         geom_hline(aes(yintercept = intervention, colour = colour), size = 15) +
-        geom_text(aes(x = 1, label = estimate_cis), size=9.25) +
-        geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=10) +
+        geom_text(aes(x = 1, label = estimate_cis), size=9.25, family= "Times New Roman") +
+        geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=10, family= "Times New Roman") +
         scale_colour_identity() +
         theme_void() + 
-        theme(plot.margin = margin(t=1, r=0, b=1, l=5)) +
+        theme(text= element_text(family = "Times New Roman"), plot.margin = margin(t=1, r=0, b=1, l=5)) +
         scale_y_discrete(limits = rev(res_mod_d3wn_pscore$intervention)) 
       data_table1
       
@@ -1005,17 +1003,17 @@
       LfLabels2      
       data_table2 <- ggplot(data = res_mod_d3wn_pscore2, aes(x, y = intervention)) +
         geom_hline(aes(yintercept = intervention, colour = colour), size = 15) +
-        geom_text(aes(x = 1, label = Pscore), size= 9.25) +
-        geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=10) +
+        geom_text(aes(x = 1, label = Pscore), size= 9.25, family= "Times New Roman") +
+        geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=10, family= "Times New Roman") +
         scale_colour_identity() +
         theme_void() + 
-        theme(plot.margin = margin(t=1, r=0, b=1, l=5)) +
+        theme(text= element_text(family = "Times New Roman"), plot.margin = margin(t=1, r=0, b=1, l=5)) +
         scale_y_discrete(limits = rev(res_mod_d3wn_pscore$intervention)) 
       data_table2
       
       #### Finally, merge plot and datatable for final forest plot
       aligned_plots <- align_plots(res_mod_d3wn_pscore_forest, data_table1, data_table2, align = "h")
-      final_fp_nma_d3wn <- grid.arrange(grobs = aligned_plots, nrow= 1, widths= c(3,1,1))
+      final_fp_nma_d3wn <- grid.arrange(grobs = aligned_plots, nrow= 1, widths= c(2.5,1,0.5))
       final_fp_nma_d3wn
       
     ### Create network graph
