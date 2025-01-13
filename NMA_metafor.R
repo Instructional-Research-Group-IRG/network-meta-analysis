@@ -369,7 +369,7 @@
       res_mod_d1gma_pscore$colour <- rep(c("azure1","green","khaki1","royalblue1","burlywood1"))
       str(res_mod_d1gma_pscore)
       print(res_mod_d1gma_pscore)
-      
+
       res_mod_d1gma_pscore_forest <- ggplot(res_mod_d1gma_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
         geom_hline(aes(yintercept = intervention, colour = colour), size=15) +
         geom_pointrange(shape = 22, fill = "black", size = res_mod_d1gma_pscore$num_contrasts/5) + 
@@ -381,11 +381,11 @@
         theme_classic() +
         scale_colour_identity() +
         scale_y_discrete(limits = rev(res_mod_d1gma_pscore$intervention)) +
-        theme(axis.title.x = element_text(face = "bold", size=25)) +
-        theme(plot.caption = element_text(size = 18)) +
-        theme(axis.title.y = element_text(face = "bold", size=25)) +
-        theme(axis.text.y = element_text(face = "bold", size=25)) + #These are the bundles
-        theme(axis.text.x = element_text(size = 20)) #This is a new line to adjust the x-axis tick values
+        theme(axis.title.x = element_text(face = "bold", size=25), #x-axis title
+              plot.caption = element_text(size = 18), #plot caption (x-axis)
+              axis.title.y = element_text(face = "bold", size=25), #y-axis title
+              axis.text.y = element_text(face = "bold", size=25), #the intervention bundles
+              axis.text.x = element_text(size = 20)) #x-axis tick values
       res_mod_d1gma_pscore_forest
           
       #### Next create data table for merging with above plot with estimates and confidence intervals combined in one column
@@ -670,11 +670,16 @@
         theme_classic() +
         scale_colour_identity() +
         scale_y_discrete(limits = rev(res_mod_d2rn_pscore$intervention)) +
-        theme(axis.title.x = element_text(face = "bold", size=25)) +
-        theme(plot.caption = element_text(size = 18)) +
-        theme(axis.title.y = element_text(face = "bold", size=25)) +
-        theme(axis.text.y = element_text(face = "bold", size=25))
-        theme(axis.text.x = element_text(size = 20)) #This is a new line to adjust the x-axis tick values
+        # theme(axis.title.x = element_text(face = "bold", size=25)) +
+        # theme(plot.caption = element_text(size = 18)) +
+        # theme(axis.title.y = element_text(face = "bold", size=25)) +
+        # theme(axis.text.y = element_text(face = "bold", size=25))
+        # theme(axis.text.x = element_text(size = 20)) #This is a new line to adjust the x-axis tick values
+        theme(axis.title.x = element_text(face = "bold", size=25), #x-axis title
+              plot.caption = element_text(size = 18), #plot caption (x-axis)
+              axis.title.y = element_text(face = "bold", size=25), #y-axis title
+              axis.text.y = element_text(face = "bold", size=25), #the intervention bundles
+              axis.text.x = element_text(size = 20)) #x-axis tick values
       res_mod_d2rn_pscore_forest
       
       #### Next create data table for merging with above plot with estimates and confidence intervals combined in one column
@@ -958,11 +963,11 @@
         theme_classic() +
         scale_colour_identity() +
         scale_y_discrete(limits = rev(res_mod_d3wn_pscore$intervention)) +
-        theme(axis.title.x = element_text(face = "bold", size=25)) +
-        theme(plot.caption = element_text(size = 18)) +
-        theme(axis.title.y = element_text(face = "bold", size=25)) +
-        theme(axis.text.y = element_text(face = "bold", size=25))
-        theme(axis.text.x = element_text(size = 20)) #This is a new line to adjust the x-axis tick values
+        theme(axis.title.x = element_text(face = "bold", size=25), #x-axis title
+              plot.caption = element_text(size = 18), #plot caption (x-axis)
+              axis.title.y = element_text(face = "bold", size=25), #y-axis title
+              axis.text.y = element_text(face = "bold", size=25), #the intervention bundles
+              axis.text.x = element_text(size = 20)) #x-axis tick values
       res_mod_d3wn_pscore_forest
 
       #### Next create data table for merging with above plot with estimates and confidence intervals combined in one column
@@ -1357,7 +1362,7 @@
   tabyl(NMA_data_analysis_subset_grpID_d3wnSA$intervention_combo_recode)
   tabyl(NMA_data_analysis_subset_grpID_d3wnSA$comparison_combo_recode)
   
-  ## Calculate the variance-covariance matrix for multi-treatment studies
+  ## Calculate the variance-covariance matrix for multi-treatment studies 
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d3wnSA)
   V_list
   
