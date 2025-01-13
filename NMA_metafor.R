@@ -662,18 +662,19 @@
       res_mod_d2rn_pscore_forest <- ggplot(res_mod_d2rn_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
         geom_hline(aes(yintercept = intervention, colour = colour), size=15) +
         geom_pointrange(shape = 22, fill = "black", size = res_mod_d2rn_pscore$num_contrasts/5) + 
-        geom_text(label = res_mod_d2rn_pscore$num_contrasts, hjust = 0.5, vjust = 2.5, colour = "black", fontface="bold", size =5) +        
+        geom_text(label = res_mod_d2rn_pscore$num_contrasts, hjust = 0.5, vjust = 2.25, colour = "black", fontface="bold", size =10) +        
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change (compared to BAU)") +
-        labs(caption = "*Values under points indicate number of contrasts                                                                       ") +
+        labs(caption = "*Values under points indicate number of contrasts                                               ") +
         ylab("Intervention Bundle") +
         theme_classic() +
         scale_colour_identity() +
         scale_y_discrete(limits = rev(res_mod_d2rn_pscore$intervention)) +
-        theme(axis.title.x = element_text(face = "bold", size=20)) +
-        theme(plot.caption = element_text(size = 14)) +
-        theme(axis.title.y = element_text(face = "bold", size=20)) +
-        theme(axis.text.y = element_text(face = "bold", size=15))
+        theme(axis.title.x = element_text(face = "bold", size=25)) +
+        theme(plot.caption = element_text(size = 18)) +
+        theme(axis.title.y = element_text(face = "bold", size=25)) +
+        theme(axis.text.y = element_text(face = "bold", size=25))
+        theme(axis.text.x = element_text(size = 20)) #This is a new line to adjust the x-axis tick values
       res_mod_d2rn_pscore_forest
       
       #### Next create data table for merging with above plot with estimates and confidence intervals combined in one column
@@ -697,8 +698,8 @@
       LfLabels1      
       data_table1 <- ggplot(data = res_mod_d2rn_pscore2, aes(x, y = intervention)) +
         geom_hline(aes(yintercept = intervention, colour = colour), size = 15) +
-        geom_text(aes(x = 1, label = estimate_cis), size=5.25) +
-        geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=6) +
+        geom_text(aes(x = 1, label = estimate_cis), size=9.25) +
+        geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=10) +
         scale_colour_identity() +
         theme_void() + 
         theme(plot.margin = margin(t=1, r=0, b=1, l=5)) +
@@ -711,8 +712,8 @@
       LfLabels2      
       data_table2 <- ggplot(data = res_mod_d2rn_pscore2, aes(x, y = intervention)) +
         geom_hline(aes(yintercept = intervention, colour = colour), size = 15) +
-        geom_text(aes(x = 1, label = Pscore), size= 5.25) +
-        geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=6) +
+        geom_text(aes(x = 1, label = Pscore), size= 9.25) +
+        geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=10) +
         scale_colour_identity() +
         theme_void() + 
         theme(plot.margin = margin(t=1, r=0, b=1, l=5)) +
@@ -949,18 +950,19 @@
       res_mod_d3wn_pscore_forest <- ggplot(res_mod_d3wn_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
         geom_hline(aes(yintercept = intervention, colour = colour), size=15) +
         geom_pointrange(shape = 22, fill = "black", size = res_mod_d3wn_pscore$num_contrasts/7) + 
-        geom_text(label = res_mod_d3wn_pscore$num_contrasts, hjust = 0.5, vjust = 2.5, colour = "black", fontface="bold", size =5) +        
+        geom_text(label = res_mod_d3wn_pscore$num_contrasts, hjust = 0.5, vjust = 2.25, colour = "black", fontface="bold", size =10) +        
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change (compared to BAU)") +
-        labs(caption = "*Values under points indicate number of contrasts                                                                       ") +
+        labs(caption = "*Values under points indicate number of contrasts                                                   ") +
         ylab("Intervention Bundle") +
         theme_classic() +
         scale_colour_identity() +
         scale_y_discrete(limits = rev(res_mod_d3wn_pscore$intervention)) +
-        theme(axis.title.x = element_text(face = "bold", size=20)) +
-        theme(plot.caption = element_text(size = 14)) +
-        theme(axis.title.y = element_text(face = "bold", size=20)) +
-        theme(axis.text.y = element_text(face = "bold", size=15))
+        theme(axis.title.x = element_text(face = "bold", size=25)) +
+        theme(plot.caption = element_text(size = 18)) +
+        theme(axis.title.y = element_text(face = "bold", size=25)) +
+        theme(axis.text.y = element_text(face = "bold", size=25))
+        theme(axis.text.x = element_text(size = 20)) #This is a new line to adjust the x-axis tick values
       res_mod_d3wn_pscore_forest
 
       #### Next create data table for merging with above plot with estimates and confidence intervals combined in one column
@@ -984,8 +986,8 @@
       LfLabels1      
       data_table1 <- ggplot(data = res_mod_d3wn_pscore2, aes(x, y = intervention)) +
         geom_hline(aes(yintercept = intervention, colour = colour), size = 15) +
-        geom_text(aes(x = 1, label = estimate_cis), size=5.25) +
-        geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=6) +
+        geom_text(aes(x = 1, label = estimate_cis), size=9.25) +
+        geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=10) +
         scale_colour_identity() +
         theme_void() + 
         theme(plot.margin = margin(t=1, r=0, b=1, l=5)) +
@@ -998,8 +1000,8 @@
       LfLabels2      
       data_table2 <- ggplot(data = res_mod_d3wn_pscore2, aes(x, y = intervention)) +
         geom_hline(aes(yintercept = intervention, colour = colour), size = 15) +
-        geom_text(aes(x = 1, label = Pscore), size= 5.25) +
-        geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=6) +
+        geom_text(aes(x = 1, label = Pscore), size= 9.25) +
+        geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=10) +
         scale_colour_identity() +
         theme_void() + 
         theme(plot.margin = margin(t=1, r=0, b=1, l=5)) +
