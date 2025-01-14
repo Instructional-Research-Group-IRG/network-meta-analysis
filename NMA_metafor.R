@@ -724,7 +724,7 @@
       
       #### Finally, merge plot and datatable for final forest plot
       aligned_plots <- align_plots(res_mod_d2rn_pscore_forest, data_table1, data_table2, align = "h")
-      final_fp_nma_d2rn <- grid.arrange(grobs = aligned_plots, nrow= 1, widths= c(2.5,1,0.5))
+      final_fp_nma_d2rn <- grid.arrange(grobs = aligned_plots, nrow= 1, widths= c(2.5,0.75,0.5))
       final_fp_nma_d2rn
       
     ### Create network graph
@@ -1013,7 +1013,7 @@
       
       #### Finally, merge plot and datatable for final forest plot
       aligned_plots <- align_plots(res_mod_d3wn_pscore_forest, data_table1, data_table2, align = "h")
-      final_fp_nma_d3wn <- grid.arrange(grobs = aligned_plots, nrow= 1, widths= c(2.5,1,0.5))
+      final_fp_nma_d3wn <- grid.arrange(grobs = aligned_plots, nrow= 1, widths= c(2.5,0.75,0.5))
       final_fp_nma_d3wn
       
     ### Create network graph
