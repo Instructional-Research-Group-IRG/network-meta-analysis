@@ -19,7 +19,7 @@
   NNMA_Data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_mN43K7HH3C7WhsPMnPsB1HDuRLE4/edit#gid=0") #Full data set
 
   ## Explore data  
-  NNMA_Data %>% count()
+  NNMA_Data %>% count() 
   head(NNMA_Data)
   skim(NNMA_Data)
   NNMA_Data$contrast_id <- as.character(NNMA_Data$contrast_id)
