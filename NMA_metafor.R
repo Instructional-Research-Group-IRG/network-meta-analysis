@@ -244,7 +244,13 @@
   print(num_contrasts_d1gma_long3) 
  
   ## Remove one-contrast bundles
-  #Note: None to remove
+  print(num_contrasts_d1gma_long3) ##NL+RS bundle is in only one contrast
+  tabyl(NMA_data_analysis_subset_grpID_d1gma$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID_d1gma$comparison_prelim)
+  NMA_data_analysis_subset_grpID_d1gma <- NMA_data_analysis_subset_grpID_d1gma %>% filter(intervention_prelim!="NL+RS")
+  #NMA_data_analysis_subset_grpID_d1gma <- NMA_data_analysis_subset_grpID_d1gma %>% filter(comparison_prelim!="NL+RS")
+  tabyl(NMA_data_analysis_subset_grpID_d1gma$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID_d1gma$comparison_prelim)  
    
   ## Calculate the number of students within each intervention bundle across all unique study-contrasts
   num_students_d1gma <- NMA_data_analysis_subset_grpID_d1gma %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
@@ -258,7 +264,7 @@
   num_students_d1gma_long3 <- num_students_d1gma_long2 %>% group_by(intervention_comparison) %>% summarize(sum_num_students_bundle= sum(num_students_bundle)) # Sum students by intervention bundle.
   str(num_students_d1gma_long3)
   print(num_students_d1gma_long3)
-  target_d1gma <- c("BAU","FF","FF+RS","NL+RS","RS","VF+RS")
+  target_d1gma <- c("BAU","FF","FF+RS","RS")
   num_students_d1gma_long3 <- num_students_d1gma_long3[match(target_d1gma, num_students_d1gma_long3$intervention_comparison),]
   num_students_d1gma_long3$intervention_comparison <- as.character(num_students_d1gma_long3$intervention_comparison)
   str(num_students_d1gma_long3)  
@@ -282,18 +288,20 @@
 
     ### Fit model assuming consistency (tau^2_omega=0)
     res_mod_d1gma <- rma.mv(effect_size, V_list, 
-                            mods = ~ FF + FF.RS + NL.RS + RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                            mods = ~ FF + FF.RS + RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
                             random = ~ 1 | record_id/es_id, 
                             rho=0.60, 
-                            data=NMA_data_analysis_subset_grpID_d1gma)
-    summary(res_mod_d1gma)
+                            data=NMA_data_analysis_subset_grpID_d1gma,
+                            control = list(optimizer = "optim", method = "Nelder-Mead"))
+    summary(res_mod_d1gma) 
 
     ### Fit Jackson's model to test for inconsistency 
     res_mod_d1gma_J <- rma.mv(effect_size, V_list,
-                              mods = ~ FF + FF.RS + NL.RS + RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                              mods = ~ FF + FF.RS + RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons 
                               random = list(~ 1 | record_id/es_id, ~ domain | record_id, ~ contrast_id | record_id),
                               rho=0.60, phi=1/2,
-                              data=NMA_data_analysis_subset_grpID_d1gma)
+                              data=NMA_data_analysis_subset_grpID_d1gma,
+                              control = list(optimizer = "optim", method = "Nelder-Mead"))
     summary(res_mod_d1gma_J)
       
     ### Estimate all pairwise differences between treatments
@@ -366,7 +374,7 @@
       print(res_mod_d1gma_pscore)
       print(num_contrasts_d1gma_long3)
       res_mod_d1gma_pscore <- res_mod_d1gma_pscore %>% left_join(num_contrasts_d1gma_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-      res_mod_d1gma_pscore$colour <- rep(c("azure1","green","khaki1","royalblue1","burlywood1"))
+      res_mod_d1gma_pscore$colour <- rep(c("azure1","royalblue1","burlywood1"))
       str(res_mod_d1gma_pscore)
       print(res_mod_d1gma_pscore)
 
@@ -381,12 +389,11 @@
         theme_classic() +
         scale_colour_identity() +
         scale_y_discrete(limits = rev(res_mod_d1gma_pscore$intervention)) +
-        theme(text= element_text(family = "Times New Roman"),
-              axis.title.x = element_text(face = "bold", size=25), #x-axis title
-              plot.caption = element_text(size = 18), #plot caption (x-axis)
-              axis.title.y = element_text(face = "bold", size=25, hjust= 0.44), #y-axis title
-              axis.text.y = element_text(size=23, hjust=0.5), #the intervention bundles
-              axis.text.x = element_text(size = 20)) #x-axis tick values
+        theme(axis.title.x = element_text(face = "bold", size=25, family= "Times New Roman"), #x-axis title
+              plot.caption = element_text(size = 18, family= "Times New Roman"), #plot caption (x-axis)
+              axis.title.y = element_text(face = "bold", size=25, hjust= 0.44, family= "Times New Roman"), #y-axis title
+              axis.text.y = element_text(size=25, hjust=0.5), #the intervention bundles
+              axis.text.x = element_text(size = 20, family= "Times New Roman")) #x-axis tick values
       res_mod_d1gma_pscore_forest
           
       #### Next create data table for merging with above plot with estimates and confidence intervals combined in one column
@@ -405,7 +412,7 @@
       print(res_mod_d1gma_pscore2)
           
       LfLabels1<-data.frame(x=c(1), 
-                            y=c(5.5),
+                            y=c(3.5),
                             lab=c("Estimate (95% CI)"))
       LfLabels1      
       data_table1 <- ggplot(data = res_mod_d1gma_pscore2, aes(x, y = intervention)) +
@@ -414,12 +421,12 @@
         geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=10, family= "Times New Roman") + 
         scale_colour_identity() +
         theme_void() + 
-        theme(text= element_text(family = "Times New Roman"), plot.margin = margin(t=1, r=0, b=1, l=5)) +
+        theme(text= element_text(family = "Times New Roman")) +
         scale_y_discrete(limits = rev(res_mod_d1gma_pscore$intervention)) 
       data_table1
       
       LfLabels2<-data.frame(x=c(1), 
-                            y=c(5.5),
+                            y=c(3.5),
                             lab=c("P-score"))
       LfLabels2      
       data_table2 <- ggplot(data = res_mod_d1gma_pscore2, aes(x, y = intervention)) +
@@ -428,7 +435,7 @@
         geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=10, family= "Times New Roman") +
         scale_colour_identity() +
         theme_void() + 
-        theme(text= element_text(family = "Times New Roman"), plot.margin = margin(t=1, r=0, b=1, l=5)) +
+        theme(text= element_text(family = "Times New Roman")) +
         scale_y_discrete(limits = rev(res_mod_d1gma_pscore$intervention)) 
       data_table2
       
@@ -482,24 +489,24 @@
       g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
       
       num_students_d1gma_long3
-      num_students_d1gma_long4 <- num_students_d1gma_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="VF+RS" | intervention_comparison=="FF" | intervention_comparison=="FF+RS"),sum_num_students_bundle*3.5,sum_num_students_bundle))
-      num_students_d1gma_long4 <- num_students_d1gma_long4 %>% mutate(dist=c(0,2.25,2.55,2.75,0,2.25))
-      num_students_d1gma_long4 <- num_students_d1gma_long4 %>% mutate(color=c("lightgray","royalblue1","burlywood1","green","azure1","khaki1"))
+      num_students_d1gma_long4 <- num_students_d1gma_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="FF" | intervention_comparison=="FF+RS"),sum_num_students_bundle*1,sum_num_students_bundle))
+      num_students_d1gma_long4 <- num_students_d1gma_long4 %>% mutate(dist=c(0,2.25,2.55,0))
+      num_students_d1gma_long4 <- num_students_d1gma_long4 %>% mutate(color=c("lightgray","royalblue1","burlywood1","azure1"))
       num_students_d1gma_long4
       
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
-           layout=layout_in_circle(g, order=c("BAU", "RS","NL+RS","VF+RS","FF","FF+RS")),
-           vertex.size=(num_students_d1gma_long4$sum_num_students_bundle2)/35, vertex.color=num_students_d1gma_long4$color, 
+           layout=layout_in_circle(g, order=c("BAU", "RS","FF","FF+RS")),
+           vertex.size=(num_students_d1gma_long4$sum_num_students_bundle2)/5, vertex.color=num_students_d1gma_long4$color, 
            vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d1gma_long4$intervention_comparison, vertex.label.dist=num_students_d1gma_long4$dist)  
       
-      num_students_d1gma_long4
-      num_students_d1gma_long5 <- num_students_d1gma_long4 %>% mutate(sum_num_students_bundle3= if_else(intervention_comparison=="BAU",sum_num_students_bundle*5000,sum_num_students_bundle))
-      num_students_d1gma_long5
-      
-      plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
-           layout=layout_in_circle(g, order=c("BAU", "RS","NL+RS","VF+RS","FF","FF+RS")),
-           vertex.size=log((num_students_d1gma_long5$sum_num_students_bundle3))*2.5, vertex.color=num_students_d1gma_long4$color,
-           vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d1gma_long5$intervention_comparison, vertex.label.dist=num_students_d1gma_long4$dist)      
+      # num_students_d1gma_long4
+      # num_students_d1gma_long5 <- num_students_d1gma_long4 %>% mutate(sum_num_students_bundle3= if_else(intervention_comparison=="BAU",sum_num_students_bundle*5000,sum_num_students_bundle))
+      # num_students_d1gma_long5
+      # 
+      # plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
+      #      layout=layout_in_circle(g, order=c("BAU", "RS","NL+RS","FF","FF+RS")),
+      #      vertex.size=log((num_students_d1gma_long5$sum_num_students_bundle3))*2.5, vertex.color=num_students_d1gma_long4$color,
+      #      vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d1gma_long5$intervention_comparison, vertex.label.dist=num_students_d1gma_long4$dist)      
       
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "Rational Numbers"
       
@@ -527,10 +534,11 @@
   print(num_contrasts_d2rn_long3)
   
   ## Remove one-contrast bundles
+  print(num_contrasts_d2rn_long3)
   tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID_d2rn$comparison_prelim)
-  NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% filter(intervention_prelim!="RS" & intervention_prelim!="NL+SE+VF+RS" & intervention_prelim!="SE+VF+RS")
-  NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% filter(comparison_prelim!="RS" & comparison_prelim!="NL+SE+VF+RS" & comparison_prelim!="SE+VF+RS")
+  NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% filter(intervention_prelim!="NL+SE+VF+RS" & intervention_prelim!="SE+VF+RS")
+  #NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% filter(comparison_prelim!="NL+SE+VF+RS" & comparison_prelim!="SE+VF+RS")
   tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID_d2rn$comparison_prelim)  
 
@@ -671,12 +679,11 @@
         theme_classic() +
         scale_colour_identity() +
         scale_y_discrete(limits = rev(res_mod_d2rn_pscore$intervention)) +
-        theme(text= element_text(family = "Times New Roman"),
-              axis.title.x = element_text(face = "bold", size=25), #x-axis title
-              plot.caption = element_text(size = 18), #plot caption (x-axis)
-              axis.title.y = element_text(face = "bold", size=25, hjust=0.5), #y-axis title
-              axis.text.y = element_text(size=23, hjust=0.5), #the intervention bundles
-              axis.text.x = element_text(size = 20)) #x-axis tick values
+        theme(axis.title.x = element_text(face = "bold", size=25, family= "Times New Roman"), #x-axis title
+              plot.caption = element_text(size = 18, family= "Times New Roman"), #plot caption (x-axis)
+              axis.title.y = element_text(face = "bold", size=25, hjust= 0.44, family= "Times New Roman"), #y-axis title
+              axis.text.y = element_text(size=25, hjust=0.5), #the intervention bundles
+              axis.text.x = element_text(size = 20, family= "Times New Roman")) #x-axis tick values      
       res_mod_d2rn_pscore_forest
       
       #### Next create data table for merging with above plot with estimates and confidence intervals combined in one column
@@ -704,7 +711,7 @@
         geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=10, family= "Times New Roman") +
         scale_colour_identity() +
         theme_void() + 
-        theme(text= element_text(family = "Times New Roman"), plot.margin = margin(t=1, r=0, b=1, l=5)) +
+        theme(text= element_text(family = "Times New Roman")) +
         scale_y_discrete(limits = rev(res_mod_d2rn_pscore$intervention)) 
       data_table1
       
@@ -718,7 +725,7 @@
         geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=10, family= "Times New Roman") +
         scale_colour_identity() +
         theme_void() + 
-        theme(text= element_text(family = "Times New Roman"), plot.margin = margin(t=1, r=0, b=1, l=5)) +
+        theme(text= element_text(family = "Times New Roman")) +
         scale_y_discrete(limits = rev(res_mod_d2rn_pscore$intervention)) 
       data_table2
       
@@ -772,7 +779,7 @@
       g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
       
       num_students_d2rn_long3
-      num_students_d2rn_long4 <- num_students_d2rn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="SE+VF+RS" | intervention_comparison=="NL+SE+RS" | intervention_comparison=="NL+SE+VF+RS" | intervention_comparison=="RS"),sum_num_students_bundle*2.5,sum_num_students_bundle))
+      num_students_d2rn_long4 <- num_students_d2rn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="SE+VF+RS" | intervention_comparison=="NL+SE+RS" | intervention_comparison=="NL+SE+VF+RS" | intervention_comparison=="RS"),sum_num_students_bundle*1.5,sum_num_students_bundle))
       num_students_d2rn_long4 <- num_students_d2rn_long4 %>% mutate(dist=c(0,3.65,3.25,4.9,4.25))
       num_students_d2rn_long4 <- num_students_d2rn_long4 %>% mutate(color=c("lightgray","red","green","mediumpurple1","darkorange"))
       num_students_d2rn_long4
@@ -782,14 +789,14 @@
            vertex.size=(num_students_d2rn_long4$sum_num_students_bundle2)/15, vertex.color=num_students_d2rn_long4$color, 
            vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d2rn_long4$intervention_comparison, vertex.label.dist=num_students_d2rn_long4$dist)  
 
-      num_students_d2rn_long4
-      num_students_d2rn_long5 <- num_students_d2rn_long4 %>% mutate(sum_num_students_bundle3= if_else(intervention_comparison=="BAU",sum_num_students_bundle*5000,sum_num_students_bundle))
-      num_students_d2rn_long5
-
-      plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
-           layout=layout_in_circle(g, order=c("BAU","NL+FF+RS","NL+SE+FF+RS","NL+SE+RS","NL+RS")),
-           vertex.size=log((num_students_d2rn_long5$sum_num_students_bundle3))*2.5, vertex.color=num_students_d2rn_long4$color,
-           vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d2rn_long5$intervention_comparison, vertex.label.dist=num_students_d2rn_long4$dist)
+      # num_students_d2rn_long4
+      # num_students_d2rn_long5 <- num_students_d2rn_long4 %>% mutate(sum_num_students_bundle3= if_else(intervention_comparison=="BAU",sum_num_students_bundle*5000,sum_num_students_bundle))
+      # num_students_d2rn_long5
+      # 
+      # plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
+      #      layout=layout_in_circle(g, order=c("BAU","NL+FF+RS","NL+SE+FF+RS","NL+SE+RS","NL+RS")),
+      #      vertex.size=log((num_students_d2rn_long5$sum_num_students_bundle3))*2.5, vertex.color=num_students_d2rn_long4$color,
+      #      vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d2rn_long5$intervention_comparison, vertex.label.dist=num_students_d2rn_long4$dist)
 
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "Whole Numbers"
       
@@ -817,10 +824,11 @@
   print(num_contrasts_d3wn_long3) # Note that there should be 0 contrasts with FF.RS.VF. Contrast id 87196 has one measure incorrectly with FF.RS.VF for intervention_prelim instead of FF.RS. 
   
   ## Remove one-contrast bundles
+  print(num_contrasts_d3wn_long3)
   tabyl(NMA_data_analysis_subset_grpID_d3wn$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID_d3wn$comparison_prelim)
-  NMA_data_analysis_subset_grpID_d3wn <- NMA_data_analysis_subset_grpID_d3wn %>% filter(intervention_prelim!="VF+RS")
-  NMA_data_analysis_subset_grpID_d3wn <- NMA_data_analysis_subset_grpID_d3wn %>% filter(comparison_prelim!="VF+RS")
+  NMA_data_analysis_subset_grpID_d3wn <- NMA_data_analysis_subset_grpID_d3wn %>% filter(intervention_prelim!="NL+RS")
+  #NMA_data_analysis_subset_grpID_d3wn <- NMA_data_analysis_subset_grpID_d3wn %>% filter(comparison_prelim!="NL+RS")
   tabyl(NMA_data_analysis_subset_grpID_d3wn$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID_d3wn$comparison_prelim)   
   
@@ -837,7 +845,7 @@
   str(num_students_d3wn_long3)
   print(num_students_d3wn_long3)
   #target_d3wn <- c("BAU","FF","FF+RS","NL+FF+RS","RS","VF+FF+RS","VF+RS")
-  target_d3wn <- c("BAU","FF","FF+RS","NL+FF+RS","RS","VF+FF+RS")
+  target_d3wn <- c("BAU","FF","FF+RS","NL+FF+RS","RS","VF+FF+RS","VF+RS")
   num_students_d3wn_long3 <- num_students_d3wn_long3[match(target_d3wn, num_students_d3wn_long3$intervention_comparison),]
   num_students_d3wn_long3$intervention_comparison <- as.character(num_students_d3wn_long3$intervention_comparison)
   str(num_students_d3wn_long3)   
@@ -861,7 +869,7 @@
   
     ### Fit model assuming consistency (tau^2_omega=0)
     res_mod_d3wn <- rma.mv(effect_size, V_list, 
-                           mods = ~ FF + FF.RS + NL.FF.RS + RS + VF.FF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                           mods = ~ FF + FF.RS + NL.FF.RS + RS + VF.FF.RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
                            random = ~ 1 | record_id/es_id, 
                            rho=0.60, 
                            data=NMA_data_analysis_subset_grpID_d3wn)
@@ -869,7 +877,7 @@
     
     ### Fit Jackson's model to test for inconsistency 
     res_mod_d3wn_J <- rma.mv(effect_size, V_list, 
-                           mods = ~ FF + FF.RS + NL.FF.RS + RS + VF.FF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                           mods = ~ FF + FF.RS + NL.FF.RS + RS + VF.FF.RS + VF.RS  - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
                            random = list(~ 1 | record_id/es_id, ~ contrast_id | record_id, ~ contrast_id | record_id), 
                            rho=0.60, 
                            data=NMA_data_analysis_subset_grpID_d3wn)
@@ -945,7 +953,7 @@
       print(res_mod_d3wn_pscore)
       print(num_contrasts_d3wn_long3)
       res_mod_d3wn_pscore <- res_mod_d3wn_pscore %>% left_join(num_contrasts_d3wn_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-      res_mod_d3wn_pscore$colour <- rep(c("yellow", "burlywood1","royalblue1","red", "azure1"))
+      res_mod_d3wn_pscore$colour <- rep(c("yellow", "burlywood1","royalblue1","red", "azure1","pink"))
       str(res_mod_d3wn_pscore)     
       print(res_mod_d3wn_pscore)
 
@@ -960,12 +968,11 @@
         theme_classic() +
         scale_colour_identity() +
         scale_y_discrete(limits = rev(res_mod_d3wn_pscore$intervention)) +
-        theme(text= element_text(family = "Times New Roman"),
-              axis.title.x = element_text(face = "bold", size=25), #x-axis title
-              plot.caption = element_text(size = 18), #plot caption (x-axis)
-              axis.title.y = element_text(face = "bold", size=25, hjust=0.6), #y-axis title
-              axis.text.y = element_text(size=23, hjust=0.5), #the intervention bundles
-              axis.text.x = element_text(size = 20)) #x-axis tick values
+        theme(axis.title.x = element_text(face = "bold", size=25, family= "Times New Roman"), #x-axis title
+              plot.caption = element_text(size = 18, family= "Times New Roman"), #plot caption (x-axis)
+              axis.title.y = element_text(face = "bold", size=25, hjust= 0.44, family= "Times New Roman"), #y-axis title
+              axis.text.y = element_text(size=25, hjust=0.5), #the intervention bundles
+              axis.text.x = element_text(size = 20, family= "Times New Roman")) #x-axis tick values
       res_mod_d3wn_pscore_forest
 
       #### Next create data table for merging with above plot with estimates and confidence intervals combined in one column
@@ -984,7 +991,7 @@
       print(res_mod_d3wn_pscore2)
       
       LfLabels1<-data.frame(x=c(1), 
-                            y=c(5.5),
+                            y=c(6.5),
                             lab=c("Estimate (95% CI)"))
       LfLabels1      
       data_table1 <- ggplot(data = res_mod_d3wn_pscore2, aes(x, y = intervention)) +
@@ -993,12 +1000,12 @@
         geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=10, family= "Times New Roman") +
         scale_colour_identity() +
         theme_void() + 
-        theme(text= element_text(family = "Times New Roman"), plot.margin = margin(t=1, r=0, b=1, l=5)) +
+        theme(text= element_text(family = "Times New Roman")) +
         scale_y_discrete(limits = rev(res_mod_d3wn_pscore$intervention)) 
       data_table1
       
       LfLabels2<-data.frame(x=c(1), 
-                            y=c(5.5),
+                            y=c(6.5),
                             lab=c("P-score"))
       LfLabels2      
       data_table2 <- ggplot(data = res_mod_d3wn_pscore2, aes(x, y = intervention)) +
@@ -1007,7 +1014,7 @@
         geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=10, family= "Times New Roman") +
         scale_colour_identity() +
         theme_void() + 
-        theme(text= element_text(family = "Times New Roman"), plot.margin = margin(t=1, r=0, b=1, l=5)) +
+        theme(text= element_text(family = "Times New Roman")) +
         scale_y_discrete(limits = rev(res_mod_d3wn_pscore$intervention)) 
       data_table2
       
@@ -1066,10 +1073,9 @@
       #      #layout=layout_with_lgl(g),
       #      vertex.size=20, vertex.color=c("lightgray","red","yellow","green","orange","pink","violet","aquamarine"), vertex.label.color="black", vertex.label.font=2)   
       num_students_d3wn_long3
-      #num_students_d3wn_long4 <- num_students_d3wn_long3 %>% mutate(sum_num_students_bundle2= sum_num_students_bundle)
-      num_students_d3wn_long4 <- num_students_d3wn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="VF+FF+RS" | intervention_comparison=="FF" | intervention_comparison=="NL+FF+RS" | intervention_comparison=="VF+RS"),sum_num_students_bundle*5.5,sum_num_students_bundle))
-      num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(dist=c(0,2.5,2.85,2.6,0,3.45))
-      num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(color=c("lightgray","royalblue1","burlywood1","red","azure1","yellow"))
+      num_students_d3wn_long4 <- num_students_d3wn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="VF+FF+RS" | intervention_comparison=="FF" | intervention_comparison=="NL+FF+RS" | intervention_comparison=="VF+RS"),sum_num_students_bundle*4.5,sum_num_students_bundle))
+      num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(dist=c(0,2.5,2.75,2.6,0,3.45,2))
+      num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(color=c("lightgray","royalblue1","burlywood1","red","azure1","yellow","pink"))
       num_students_d3wn_long4
       
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
@@ -1077,14 +1083,14 @@
            vertex.size=(num_students_d3wn_long4$sum_num_students_bundle2)/75, vertex.color=num_students_d3wn_long4$color, 
            vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d3wn_long4$intervention_comparison, vertex.label.dist=num_students_d3wn_long4$dist)  
       
-      num_students_d3wn_long4
-      num_students_d3wn_long5 <- num_students_d3wn_long4 %>% mutate(sum_num_students_bundle3= if_else(intervention_comparison=="BAU",sum_num_students_bundle*5000,sum_num_students_bundle))
-      num_students_d3wn_long5
-
-      plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
-           layout=layout_in_circle(g, order=c("BAU", "VF+FF+RS","FF+RS","FF","NL+FF+RS","RS")),
-           vertex.size=log((num_students_d3wn_long5$sum_num_students_bundle3))*2.5, vertex.color=num_students_d3wn_long4$color,
-           vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d3wn_long5$intervention_comparison, vertex.label.dist=num_students_d3wn_long4$dist)
+      # num_students_d3wn_long4
+      # num_students_d3wn_long5 <- num_students_d3wn_long4 %>% mutate(sum_num_students_bundle3= if_else(intervention_comparison=="BAU",sum_num_students_bundle*5000,sum_num_students_bundle))
+      # num_students_d3wn_long5
+      # 
+      # plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
+      #      layout=layout_in_circle(g, order=c("BAU", "VF+FF+RS","FF+RS","FF","NL+FF+RS","RS")),
+      #      vertex.size=log((num_students_d3wn_long5$sum_num_students_bundle3))*2.5, vertex.color=num_students_d3wn_long4$color,
+      #      vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d3wn_long5$intervention_comparison, vertex.label.dist=num_students_d3wn_long4$dist)
 
       
 #===================================== ANALYSIS SAMPLE SIZES =====================================#        
@@ -1156,219 +1162,219 @@
       # If RS or RV, then use "AR"
       # If FF or FWOF, then use "AF"
       
-  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% mutate(intervention_combo_recode = intervention_combo)
-  tabyl(NMA_data_analysis_subset_grpID$intervention_combo)
-  tabyl(NMA_data_analysis_subset_grpID$intervention_combo_recode)
-  NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("N or NL", "AN", NMA_data_analysis_subset_grpID$intervention_combo_recode)
-  NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("TEX or SEO", "AE", NMA_data_analysis_subset_grpID$intervention_combo_recode)
-  NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("SE or SEO", "AE", NMA_data_analysis_subset_grpID$intervention_combo_recode)
-  NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("VF or TV", "AV", NMA_data_analysis_subset_grpID$intervention_combo_recode)
-  NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("RS or RV", "AR", NMA_data_analysis_subset_grpID$intervention_combo_recode)
-  NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("FF or FWOF", "AF", NMA_data_analysis_subset_grpID$intervention_combo_recode)  
-  NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub(" ", "", NMA_data_analysis_subset_grpID$intervention_combo_recode)
-  NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("or", "\\+", NMA_data_analysis_subset_grpID$intervention_combo_recode)
-  tabyl(NMA_data_analysis_subset_grpID$intervention_combo_recode)
-  NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("AN\\+AR\\+AF","AN\\+AF\\+AR", NMA_data_analysis_subset_grpID$intervention_combo_recode)
-  NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("AR\\+AN\\+AV", "AN\\+AV\\+AR", NMA_data_analysis_subset_grpID$intervention_combo_recode)
-  NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("AN\\+AV\\+AE\\+AR","AN+AE+AV+AR", NMA_data_analysis_subset_grpID$intervention_combo_recode)
-  NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("AV\\+AE\\+AF\\+AR","AE\\+AV\\+AF\\+AR", NMA_data_analysis_subset_grpID$intervention_combo_recode)
-  NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("AN\\+AV\\+AE\\+AF\\+AR","AN\\+AE\\+AV\\+AF\\+AR", NMA_data_analysis_subset_grpID$intervention_combo_recode)
-  tabyl(NMA_data_analysis_subset_grpID$intervention_combo)
-  tabyl(NMA_data_analysis_subset_grpID$intervention_combo_recode)
-
-  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% mutate(comparison_combo_recode = comparison_combo)   
-  tabyl(NMA_data_analysis_subset_grpID$comparison_combo)
-  tabyl(NMA_data_analysis_subset_grpID$comparison_combo_recode)
-  NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("N or NL", "AN", NMA_data_analysis_subset_grpID$comparison_combo_recode)
-  NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("TEX or SEO", "AE", NMA_data_analysis_subset_grpID$comparison_combo_recode)
-  NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("SE or SEO", "AE", NMA_data_analysis_subset_grpID$comparison_combo_recode)
-  NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("VF or TV", "AV", NMA_data_analysis_subset_grpID$comparison_combo_recode)
-  NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("RS or RV", "AR", NMA_data_analysis_subset_grpID$comparison_combo_recode)
-  NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("FF or FWOF", "AF", NMA_data_analysis_subset_grpID$comparison_combo_recode)  
-  NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub(" ", "", NMA_data_analysis_subset_grpID$comparison_combo_recode)
-  NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("or", "\\+", NMA_data_analysis_subset_grpID$comparison_combo_recode)
-  tabyl(NMA_data_analysis_subset_grpID$comparison_combo_recode)
-  NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("FF\\+FWOF", "AF", NMA_data_analysis_subset_grpID$comparison_combo_recode)
-  NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("RS\\+RV", "AR", NMA_data_analysis_subset_grpID$comparison_combo_recode)
-  tabyl(NMA_data_analysis_subset_grpID$comparison_combo)
-  tabyl(NMA_data_analysis_subset_grpID$comparison_combo_recode)  
-  
-  class(NMA_data_analysis_subset_grpID$intervention_combo)
-  class(NMA_data_analysis_subset_grpID$comparison_combo)
-  NMA_data_analysis_subset_grpID$intervention_combo <- as.factor(NMA_data_analysis_subset_grpID$intervention_combo)
-  NMA_data_analysis_subset_grpID$comparison_combo <- as.factor(NMA_data_analysis_subset_grpID$comparison_combo)
-  class(NMA_data_analysis_subset_grpID$intervention_combo)
-  class(NMA_data_analysis_subset_grpID$comparison_combo)
-  
-  class(NMA_data_analysis_subset_grpID$intervention_combo_recode)
-  class(NMA_data_analysis_subset_grpID$comparison_combo_recode)
-  NMA_data_analysis_subset_grpID$intervention_combo_recode <- as.factor(NMA_data_analysis_subset_grpID$intervention_combo_recode)
-  NMA_data_analysis_subset_grpID$comparison_combo_recode <- as.factor(NMA_data_analysis_subset_grpID$comparison_combo_recode)
-  class(NMA_data_analysis_subset_grpID$intervention_combo_recode)
-  class(NMA_data_analysis_subset_grpID$comparison_combo_recode)
-
-  NMA_data_analysis_subset_grpIDu <- NMA_data_analysis_subset_grpID %>% distinct(contrast_id,  .keep_all = TRUE) # Check tabulated numbers at the contrast level
-  tabyl(NMA_data_analysis_subset_grpIDu$intervention_prelim)  
-  tabyl(NMA_data_analysis_subset_grpIDu$comparison_prelim)   
-  tabyl(NMA_data_analysis_subset_grpIDu$intervention_combo)  
-  tabyl(NMA_data_analysis_subset_grpIDu$comparison_combo)   
-  tabyl(NMA_data_analysis_subset_grpIDu$intervention_combo_recode)  
-  tabyl(NMA_data_analysis_subset_grpIDu$comparison_combo_recode) 
-  
-# Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "General Mathematics Achievement"
-      
-  ## Subset analysis data frame further to just the General Mathematics Achievement domain (d1gma)
-  tabyl(NMA_data_analysis_subset_grpID$domain)
-  NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID %>% filter(domain == "General Mathematics Achievement") 
-  tabyl(NMA_data_analysis_subset_grpID_d1gmaSA$domain)
-  tabyl(NMA_data_analysis_subset_grpID_d1gmaSA$intervention_combo_recode)
-  tabyl(NMA_data_analysis_subset_grpID_d1gmaSA$comparison_combo_recode)
-  
-  ## Identify contrasts with recoded bundles that have all three of the following bundles: N & F & R, at any dosage and regardless of whether those bundles include any other components at any dosage level in their combo bundles
-  NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(ANi= grepl(pattern = "AN", x = intervention_combo_recode))
-  NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(AFi= grepl(pattern = "AF", x = intervention_combo_recode))
-  NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(ARi= grepl(pattern = "AR", x = intervention_combo_recode))
-  NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(ANc= grepl(pattern = "AN", x = comparison_combo_recode))
-  NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(AFc= grepl(pattern = "AF", x = comparison_combo_recode))
-  NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(ARc= grepl(pattern = "AR", x = comparison_combo_recode))
-  NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(AN_AF_AR= (ANi==TRUE & AFi== TRUE & ARi== TRUE) | (ANc==TRUE & AFc== TRUE & ARc== TRUE))
-  
-  NMA_data_analysis_subset_grpID_d1gmaSA_check <- NMA_data_analysis_subset_grpID_d1gmaSA %>% dplyr::select(AN_AF_AR, ANi, AFi, ARi, intervention_prelim, intervention_combo, intervention_combo_recode, ANc, AFc, ARc, comparison_prelim, comparison_combo, comparison_combo_recode)
-  print(NMA_data_analysis_subset_grpID_d1gmaSA_check, n=Inf)
-  tabyl(NMA_data_analysis_subset_grpID_d1gmaSA$AN_AF_AR)
-  
-  ## Reduce dataset to just those identified contrasts 
-  NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% filter(AN_AF_AR==TRUE)
-  check_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% dplyr::select(record_id, contrast_id, intervention_combo_recode, comparison_combo_recode)
-  print(check_d1gmaSA)
-  check_d1gmaSA2 <- NMA_data_analysis_subset_grpID_d1gmaSA %>% distinct(contrast_id, .keep_all=TRUE)
-  check_d1gmaSA2 <- check_d1gmaSA2 %>% dplyr::select(contrast_id, intervention_prelim, intervention_combo, intervention_combo_recode, comparison_prelim, comparison_combo, comparison_combo_recode)
-  print(check_d1gmaSA2)
-  
-  ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
-  
-  ## Add contrast matrix to dataset
-  NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% drop_na(c(intervention_combo_recode, comparison_combo_recode)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
-  NMA_data_analysis_subset_grpID_d1gmaSA <- contrmat(NMA_data_analysis_subset_grpID_d1gmaSA, grp1="intervention_combo_recode", grp2="comparison_combo_recode")
-  skim(NMA_data_analysis_subset_grpID_d1gmaSA)
-  tabyl(NMA_data_analysis_subset_grpID_d1gmaSA$intervention_combo_recode)
-  tabyl(NMA_data_analysis_subset_grpID_d1gmaSA$comparison_combo_recode)
-  
-  ## Calculate the variance-covariance matrix for multi-treatment studies
-  V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d1gmaSA)
-  V_list
-  
-  ##Run standard NMA
-  res_mod_d1gmaSA <- rma.mv(effect_size, V_list, 
-                           mods = ~ 1,
-                           random = ~ 1 | record_id/es_id, 
-                           rho=0.60, 
-                           data=NMA_data_analysis_subset_grpID_d1gmaSA)
-  summary(res_mod_d1gmaSA)
-  #weights.rma.mv(res_mod_d1gmaSA)   
-      
- 
-# Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "Rational Numbers"
-      
-  ## Subset analysis data frame further to just the Rational Numbers domain (d2rn)
-  tabyl(NMA_data_analysis_subset_grpID$domain)
-  NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID %>% filter(domain == "Rational Numbers")
-  tabyl(NMA_data_analysis_subset_grpID_d2rnSA$domain)
-  tabyl(NMA_data_analysis_subset_grpID_d2rnSA$intervention_combo_recode)
-  tabyl(NMA_data_analysis_subset_grpID_d2rnSA$comparison_combo_recode)
-  
-  ## Identify contrasts with recoded bundles that have all three of the following bundles: N & F & R, at any dosage and regardless of whether those bundles include any other components at any dosage level in their combo bundles
-  NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(ANi= grepl(pattern = "AN", x = intervention_combo_recode))
-  NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(AFi= grepl(pattern = "AF", x = intervention_combo_recode))
-  NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(ARi= grepl(pattern = "AR", x = intervention_combo_recode))
-  NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(ANc= grepl(pattern = "AN", x = comparison_combo_recode))
-  NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(AFc= grepl(pattern = "AF", x = comparison_combo_recode))
-  NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(ARc= grepl(pattern = "AR", x = comparison_combo_recode))
-  NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(AN_AF_AR= (ANi==TRUE & AFi== TRUE & ARi== TRUE) | (ANc==TRUE & AFc== TRUE & ARc== TRUE))
-  
-  NMA_data_analysis_subset_grpID_d2rnSA_check <- NMA_data_analysis_subset_grpID_d2rnSA %>% dplyr::select(AN_AF_AR, ANi, AFi, ARi, intervention_prelim, intervention_combo, intervention_combo_recode, ANc, AFc, ARc, comparison_prelim, comparison_combo, comparison_combo_recode)
-  print(NMA_data_analysis_subset_grpID_d2rnSA_check, n=Inf)
-  tabyl(NMA_data_analysis_subset_grpID_d2rnSA$AN_AF_AR)
-  
-  ## Reduce dataset to just those identified contrasts 
-  NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% filter(AN_AF_AR==TRUE)
-  check_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% dplyr::select(record_id, contrast_id, intervention_combo_recode, comparison_combo_recode)
-  print(check_d2rnSA, n=Inf)
-  check_d2rnSA2 <- NMA_data_analysis_subset_grpID_d2rnSA %>% distinct(contrast_id, .keep_all=TRUE)
-  check_d2rnSA2 <- check_d2rnSA2 %>% dplyr::select(contrast_id, intervention_prelim, intervention_combo, intervention_combo_recode, comparison_prelim, comparison_combo, comparison_combo_recode)
-  print(check_d2rnSA2)
-  
-  ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
-  
-  ## Add contrast matrix to dataset
-  NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% drop_na(c(intervention_combo_recode, comparison_combo_recode)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
-  NMA_data_analysis_subset_grpID_d2rnSA <- contrmat(NMA_data_analysis_subset_grpID_d2rnSA, grp1="intervention_combo_recode", grp2="comparison_combo_recode")
-  skim(NMA_data_analysis_subset_grpID_d2rnSA)
-  tabyl(NMA_data_analysis_subset_grpID_d2rnSA$intervention_combo_recode)
-  tabyl(NMA_data_analysis_subset_grpID_d2rnSA$comparison_combo_recode)
-  
-  ## Calculate the variance-covariance matrix for multi-treatment studies
-  V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d2rnSA)
-  V_list
-  
-  ##Run standard NMA
-  res_mod_d2rnSA <- rma.mv(effect_size, V_list, 
-                            mods = ~ 1,
-                            random = ~ 1 | record_id/es_id, 
-                            rho=0.60, 
-                            data=NMA_data_analysis_subset_grpID_d2rnSA)
-  summary(res_mod_d2rnSA)
-  #weights.rma.mv(res_mod_d2rnSA)   
-      
-     
-# Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "Whole Numbers"
-      
-  ## Subset analysis data frame further to just the Whole Numbers domain (d3wn)
-  tabyl(NMA_data_analysis_subset_grpID$domain)
-  NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID %>% filter(domain == "Whole Numbers")
-  tabyl(NMA_data_analysis_subset_grpID_d3wnSA$domain)
-  tabyl(NMA_data_analysis_subset_grpID_d3wnSA$intervention_combo_recode)
-  tabyl(NMA_data_analysis_subset_grpID_d3wnSA$comparison_combo_recode)
-  
-  ## Identify contrasts with recoded bundles that have all three of the following bundles: N & F & R, at any dosage and regardless of whether those bundles include any other components at any dosage level in their combo bundles
-  NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(ANi= grepl(pattern = "AN", x = intervention_combo_recode))
-  NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(AFi= grepl(pattern = "AF", x = intervention_combo_recode))
-  NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(ARi= grepl(pattern = "AR", x = intervention_combo_recode))
-  NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(ANc= grepl(pattern = "AN", x = comparison_combo_recode))
-  NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(AFc= grepl(pattern = "AF", x = comparison_combo_recode))
-  NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(ARc= grepl(pattern = "AR", x = comparison_combo_recode))
-  NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(AN_AF_AR= (ANi==TRUE & AFi== TRUE & ARi== TRUE) | (ANc==TRUE & AFc== TRUE & ARc== TRUE))
-  
-  NMA_data_analysis_subset_grpID_d3wnSA_check <- NMA_data_analysis_subset_grpID_d3wnSA %>% dplyr::select(AN_AF_AR, ANi, AFi, ARi, intervention_prelim, intervention_combo, intervention_combo_recode, ANc, AFc, ARc, comparison_prelim, comparison_combo, comparison_combo_recode)
-  print(NMA_data_analysis_subset_grpID_d3wnSA_check, n=Inf)
-  tabyl(NMA_data_analysis_subset_grpID_d3wnSA$AN_AF_AR)
-  
-  ## Reduce dataset to just those identified contrasts 
-  NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% filter(AN_AF_AR==TRUE)
-  check_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% dplyr::select(record_id, contrast_id, intervention_combo_recode, comparison_combo_recode)
-  print(check_d3wnSA, n=Inf)
-  check_d3wnSA2 <- NMA_data_analysis_subset_grpID_d3wnSA %>% distinct(contrast_id, .keep_all=TRUE)
-  check_d3wnSA2 <- check_d3wnSA2 %>% dplyr::select(contrast_id, intervention_prelim, intervention_combo, intervention_combo_recode, comparison_prelim, comparison_combo, comparison_combo_recode)
-  print(check_d3wnSA2)
-  
-  ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
-  
-  ## Add contrast matrix to dataset
-  NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% drop_na(c(intervention_combo_recode, comparison_combo_recode)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
-  NMA_data_analysis_subset_grpID_d3wnSA <- contrmat(NMA_data_analysis_subset_grpID_d3wnSA, grp1="intervention_combo_recode", grp2="comparison_combo_recode")
-  skim(NMA_data_analysis_subset_grpID_d3wnSA)
-  tabyl(NMA_data_analysis_subset_grpID_d3wnSA$intervention_combo_recode)
-  tabyl(NMA_data_analysis_subset_grpID_d3wnSA$comparison_combo_recode)
-  
-  ## Calculate the variance-covariance matrix for multi-treatment studies 
-  V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d3wnSA)
-  V_list
-  
-  ##Run standard NMA
-  res_mod_d3wnSA <- rma.mv(effect_size, V_list, 
-                           mods = ~ 1,
-                           random = ~ 1 | record_id/es_id, 
-                           rho=0.60, 
-                           data=NMA_data_analysis_subset_grpID_d3wnSA)
-  summary(res_mod_d3wnSA)
-  #weights.rma.mv(res_mod_d3wnSA)  
+#   NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% mutate(intervention_combo_recode = intervention_combo)
+#   tabyl(NMA_data_analysis_subset_grpID$intervention_combo)
+#   tabyl(NMA_data_analysis_subset_grpID$intervention_combo_recode)
+#   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("N or NL", "AN", NMA_data_analysis_subset_grpID$intervention_combo_recode)
+#   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("TEX or SEO", "AE", NMA_data_analysis_subset_grpID$intervention_combo_recode)
+#   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("SE or SEO", "AE", NMA_data_analysis_subset_grpID$intervention_combo_recode)
+#   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("VF or TV", "AV", NMA_data_analysis_subset_grpID$intervention_combo_recode)
+#   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("RS or RV", "AR", NMA_data_analysis_subset_grpID$intervention_combo_recode)
+#   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("FF or FWOF", "AF", NMA_data_analysis_subset_grpID$intervention_combo_recode)  
+#   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub(" ", "", NMA_data_analysis_subset_grpID$intervention_combo_recode)
+#   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("or", "\\+", NMA_data_analysis_subset_grpID$intervention_combo_recode)
+#   tabyl(NMA_data_analysis_subset_grpID$intervention_combo_recode)
+#   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("AN\\+AR\\+AF","AN\\+AF\\+AR", NMA_data_analysis_subset_grpID$intervention_combo_recode)
+#   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("AR\\+AN\\+AV", "AN\\+AV\\+AR", NMA_data_analysis_subset_grpID$intervention_combo_recode)
+#   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("AN\\+AV\\+AE\\+AR","AN+AE+AV+AR", NMA_data_analysis_subset_grpID$intervention_combo_recode)
+#   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("AV\\+AE\\+AF\\+AR","AE\\+AV\\+AF\\+AR", NMA_data_analysis_subset_grpID$intervention_combo_recode)
+#   NMA_data_analysis_subset_grpID$intervention_combo_recode <- gsub("AN\\+AV\\+AE\\+AF\\+AR","AN\\+AE\\+AV\\+AF\\+AR", NMA_data_analysis_subset_grpID$intervention_combo_recode)
+#   tabyl(NMA_data_analysis_subset_grpID$intervention_combo)
+#   tabyl(NMA_data_analysis_subset_grpID$intervention_combo_recode)
+# 
+#   NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% mutate(comparison_combo_recode = comparison_combo)   
+#   tabyl(NMA_data_analysis_subset_grpID$comparison_combo)
+#   tabyl(NMA_data_analysis_subset_grpID$comparison_combo_recode)
+#   NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("N or NL", "AN", NMA_data_analysis_subset_grpID$comparison_combo_recode)
+#   NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("TEX or SEO", "AE", NMA_data_analysis_subset_grpID$comparison_combo_recode)
+#   NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("SE or SEO", "AE", NMA_data_analysis_subset_grpID$comparison_combo_recode)
+#   NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("VF or TV", "AV", NMA_data_analysis_subset_grpID$comparison_combo_recode)
+#   NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("RS or RV", "AR", NMA_data_analysis_subset_grpID$comparison_combo_recode)
+#   NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("FF or FWOF", "AF", NMA_data_analysis_subset_grpID$comparison_combo_recode)  
+#   NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub(" ", "", NMA_data_analysis_subset_grpID$comparison_combo_recode)
+#   NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("or", "\\+", NMA_data_analysis_subset_grpID$comparison_combo_recode)
+#   tabyl(NMA_data_analysis_subset_grpID$comparison_combo_recode)
+#   NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("FF\\+FWOF", "AF", NMA_data_analysis_subset_grpID$comparison_combo_recode)
+#   NMA_data_analysis_subset_grpID$comparison_combo_recode <- gsub("RS\\+RV", "AR", NMA_data_analysis_subset_grpID$comparison_combo_recode)
+#   tabyl(NMA_data_analysis_subset_grpID$comparison_combo)
+#   tabyl(NMA_data_analysis_subset_grpID$comparison_combo_recode)  
+#   
+#   class(NMA_data_analysis_subset_grpID$intervention_combo)
+#   class(NMA_data_analysis_subset_grpID$comparison_combo)
+#   NMA_data_analysis_subset_grpID$intervention_combo <- as.factor(NMA_data_analysis_subset_grpID$intervention_combo)
+#   NMA_data_analysis_subset_grpID$comparison_combo <- as.factor(NMA_data_analysis_subset_grpID$comparison_combo)
+#   class(NMA_data_analysis_subset_grpID$intervention_combo)
+#   class(NMA_data_analysis_subset_grpID$comparison_combo)
+#   
+#   class(NMA_data_analysis_subset_grpID$intervention_combo_recode)
+#   class(NMA_data_analysis_subset_grpID$comparison_combo_recode)
+#   NMA_data_analysis_subset_grpID$intervention_combo_recode <- as.factor(NMA_data_analysis_subset_grpID$intervention_combo_recode)
+#   NMA_data_analysis_subset_grpID$comparison_combo_recode <- as.factor(NMA_data_analysis_subset_grpID$comparison_combo_recode)
+#   class(NMA_data_analysis_subset_grpID$intervention_combo_recode)
+#   class(NMA_data_analysis_subset_grpID$comparison_combo_recode)
+# 
+#   NMA_data_analysis_subset_grpIDu <- NMA_data_analysis_subset_grpID %>% distinct(contrast_id,  .keep_all = TRUE) # Check tabulated numbers at the contrast level
+#   tabyl(NMA_data_analysis_subset_grpIDu$intervention_prelim)  
+#   tabyl(NMA_data_analysis_subset_grpIDu$comparison_prelim)   
+#   tabyl(NMA_data_analysis_subset_grpIDu$intervention_combo)  
+#   tabyl(NMA_data_analysis_subset_grpIDu$comparison_combo)   
+#   tabyl(NMA_data_analysis_subset_grpIDu$intervention_combo_recode)  
+#   tabyl(NMA_data_analysis_subset_grpIDu$comparison_combo_recode) 
+#   
+# # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "General Mathematics Achievement"
+#       
+#   ## Subset analysis data frame further to just the General Mathematics Achievement domain (d1gma)
+#   tabyl(NMA_data_analysis_subset_grpID$domain)
+#   NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID %>% filter(domain == "General Mathematics Achievement") 
+#   tabyl(NMA_data_analysis_subset_grpID_d1gmaSA$domain)
+#   tabyl(NMA_data_analysis_subset_grpID_d1gmaSA$intervention_combo_recode)
+#   tabyl(NMA_data_analysis_subset_grpID_d1gmaSA$comparison_combo_recode)
+#   
+#   ## Identify contrasts with recoded bundles that have all three of the following bundles: N & F & R, at any dosage and regardless of whether those bundles include any other components at any dosage level in their combo bundles
+#   NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(ANi= grepl(pattern = "AN", x = intervention_combo_recode))
+#   NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(AFi= grepl(pattern = "AF", x = intervention_combo_recode))
+#   NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(ARi= grepl(pattern = "AR", x = intervention_combo_recode))
+#   NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(ANc= grepl(pattern = "AN", x = comparison_combo_recode))
+#   NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(AFc= grepl(pattern = "AF", x = comparison_combo_recode))
+#   NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(ARc= grepl(pattern = "AR", x = comparison_combo_recode))
+#   NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% mutate(AN_AF_AR= (ANi==TRUE & AFi== TRUE & ARi== TRUE) | (ANc==TRUE & AFc== TRUE & ARc== TRUE))
+#   
+#   NMA_data_analysis_subset_grpID_d1gmaSA_check <- NMA_data_analysis_subset_grpID_d1gmaSA %>% dplyr::select(AN_AF_AR, ANi, AFi, ARi, intervention_prelim, intervention_combo, intervention_combo_recode, ANc, AFc, ARc, comparison_prelim, comparison_combo, comparison_combo_recode)
+#   print(NMA_data_analysis_subset_grpID_d1gmaSA_check, n=Inf)
+#   tabyl(NMA_data_analysis_subset_grpID_d1gmaSA$AN_AF_AR)
+#   
+#   ## Reduce dataset to just those identified contrasts 
+#   NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% filter(AN_AF_AR==TRUE)
+#   check_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% dplyr::select(record_id, contrast_id, intervention_combo_recode, comparison_combo_recode)
+#   print(check_d1gmaSA)
+#   check_d1gmaSA2 <- NMA_data_analysis_subset_grpID_d1gmaSA %>% distinct(contrast_id, .keep_all=TRUE)
+#   check_d1gmaSA2 <- check_d1gmaSA2 %>% dplyr::select(contrast_id, intervention_prelim, intervention_combo, intervention_combo_recode, comparison_prelim, comparison_combo, comparison_combo_recode)
+#   print(check_d1gmaSA2)
+#   
+#   ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
+#   
+#   ## Add contrast matrix to dataset
+#   NMA_data_analysis_subset_grpID_d1gmaSA <- NMA_data_analysis_subset_grpID_d1gmaSA %>% drop_na(c(intervention_combo_recode, comparison_combo_recode)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
+#   NMA_data_analysis_subset_grpID_d1gmaSA <- contrmat(NMA_data_analysis_subset_grpID_d1gmaSA, grp1="intervention_combo_recode", grp2="comparison_combo_recode")
+#   skim(NMA_data_analysis_subset_grpID_d1gmaSA)
+#   tabyl(NMA_data_analysis_subset_grpID_d1gmaSA$intervention_combo_recode)
+#   tabyl(NMA_data_analysis_subset_grpID_d1gmaSA$comparison_combo_recode)
+#   
+#   ## Calculate the variance-covariance matrix for multi-treatment studies
+#   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d1gmaSA)
+#   V_list
+#   
+#   ##Run standard NMA
+#   res_mod_d1gmaSA <- rma.mv(effect_size, V_list, 
+#                            mods = ~ 1,
+#                            random = ~ 1 | record_id/es_id, 
+#                            rho=0.60, 
+#                            data=NMA_data_analysis_subset_grpID_d1gmaSA)
+#   summary(res_mod_d1gmaSA)
+#   #weights.rma.mv(res_mod_d1gmaSA)   
+#       
+#  
+# # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "Rational Numbers"
+#       
+#   ## Subset analysis data frame further to just the Rational Numbers domain (d2rn)
+#   tabyl(NMA_data_analysis_subset_grpID$domain)
+#   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID %>% filter(domain == "Rational Numbers")
+#   tabyl(NMA_data_analysis_subset_grpID_d2rnSA$domain)
+#   tabyl(NMA_data_analysis_subset_grpID_d2rnSA$intervention_combo_recode)
+#   tabyl(NMA_data_analysis_subset_grpID_d2rnSA$comparison_combo_recode)
+#   
+#   ## Identify contrasts with recoded bundles that have all three of the following bundles: N & F & R, at any dosage and regardless of whether those bundles include any other components at any dosage level in their combo bundles
+#   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(ANi= grepl(pattern = "AN", x = intervention_combo_recode))
+#   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(AFi= grepl(pattern = "AF", x = intervention_combo_recode))
+#   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(ARi= grepl(pattern = "AR", x = intervention_combo_recode))
+#   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(ANc= grepl(pattern = "AN", x = comparison_combo_recode))
+#   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(AFc= grepl(pattern = "AF", x = comparison_combo_recode))
+#   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(ARc= grepl(pattern = "AR", x = comparison_combo_recode))
+#   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% mutate(AN_AF_AR= (ANi==TRUE & AFi== TRUE & ARi== TRUE) | (ANc==TRUE & AFc== TRUE & ARc== TRUE))
+#   
+#   NMA_data_analysis_subset_grpID_d2rnSA_check <- NMA_data_analysis_subset_grpID_d2rnSA %>% dplyr::select(AN_AF_AR, ANi, AFi, ARi, intervention_prelim, intervention_combo, intervention_combo_recode, ANc, AFc, ARc, comparison_prelim, comparison_combo, comparison_combo_recode)
+#   print(NMA_data_analysis_subset_grpID_d2rnSA_check, n=Inf)
+#   tabyl(NMA_data_analysis_subset_grpID_d2rnSA$AN_AF_AR)
+#   
+#   ## Reduce dataset to just those identified contrasts 
+#   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% filter(AN_AF_AR==TRUE)
+#   check_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% dplyr::select(record_id, contrast_id, intervention_combo_recode, comparison_combo_recode)
+#   print(check_d2rnSA, n=Inf)
+#   check_d2rnSA2 <- NMA_data_analysis_subset_grpID_d2rnSA %>% distinct(contrast_id, .keep_all=TRUE)
+#   check_d2rnSA2 <- check_d2rnSA2 %>% dplyr::select(contrast_id, intervention_prelim, intervention_combo, intervention_combo_recode, comparison_prelim, comparison_combo, comparison_combo_recode)
+#   print(check_d2rnSA2)
+#   
+#   ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
+#   
+#   ## Add contrast matrix to dataset
+#   NMA_data_analysis_subset_grpID_d2rnSA <- NMA_data_analysis_subset_grpID_d2rnSA %>% drop_na(c(intervention_combo_recode, comparison_combo_recode)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
+#   NMA_data_analysis_subset_grpID_d2rnSA <- contrmat(NMA_data_analysis_subset_grpID_d2rnSA, grp1="intervention_combo_recode", grp2="comparison_combo_recode")
+#   skim(NMA_data_analysis_subset_grpID_d2rnSA)
+#   tabyl(NMA_data_analysis_subset_grpID_d2rnSA$intervention_combo_recode)
+#   tabyl(NMA_data_analysis_subset_grpID_d2rnSA$comparison_combo_recode)
+#   
+#   ## Calculate the variance-covariance matrix for multi-treatment studies
+#   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d2rnSA)
+#   V_list
+#   
+#   ##Run standard NMA
+#   res_mod_d2rnSA <- rma.mv(effect_size, V_list, 
+#                             mods = ~ 1,
+#                             random = ~ 1 | record_id/es_id, 
+#                             rho=0.60, 
+#                             data=NMA_data_analysis_subset_grpID_d2rnSA)
+#   summary(res_mod_d2rnSA)
+#   #weights.rma.mv(res_mod_d2rnSA)   
+#       
+#      
+# # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: domain == "Whole Numbers"
+#       
+#   ## Subset analysis data frame further to just the Whole Numbers domain (d3wn)
+#   tabyl(NMA_data_analysis_subset_grpID$domain)
+#   NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID %>% filter(domain == "Whole Numbers")
+#   tabyl(NMA_data_analysis_subset_grpID_d3wnSA$domain)
+#   tabyl(NMA_data_analysis_subset_grpID_d3wnSA$intervention_combo_recode)
+#   tabyl(NMA_data_analysis_subset_grpID_d3wnSA$comparison_combo_recode)
+#   
+#   ## Identify contrasts with recoded bundles that have all three of the following bundles: N & F & R, at any dosage and regardless of whether those bundles include any other components at any dosage level in their combo bundles
+#   NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(ANi= grepl(pattern = "AN", x = intervention_combo_recode))
+#   NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(AFi= grepl(pattern = "AF", x = intervention_combo_recode))
+#   NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(ARi= grepl(pattern = "AR", x = intervention_combo_recode))
+#   NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(ANc= grepl(pattern = "AN", x = comparison_combo_recode))
+#   NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(AFc= grepl(pattern = "AF", x = comparison_combo_recode))
+#   NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(ARc= grepl(pattern = "AR", x = comparison_combo_recode))
+#   NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% mutate(AN_AF_AR= (ANi==TRUE & AFi== TRUE & ARi== TRUE) | (ANc==TRUE & AFc== TRUE & ARc== TRUE))
+#   
+#   NMA_data_analysis_subset_grpID_d3wnSA_check <- NMA_data_analysis_subset_grpID_d3wnSA %>% dplyr::select(AN_AF_AR, ANi, AFi, ARi, intervention_prelim, intervention_combo, intervention_combo_recode, ANc, AFc, ARc, comparison_prelim, comparison_combo, comparison_combo_recode)
+#   print(NMA_data_analysis_subset_grpID_d3wnSA_check, n=Inf)
+#   tabyl(NMA_data_analysis_subset_grpID_d3wnSA$AN_AF_AR)
+#   
+#   ## Reduce dataset to just those identified contrasts 
+#   NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% filter(AN_AF_AR==TRUE)
+#   check_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% dplyr::select(record_id, contrast_id, intervention_combo_recode, comparison_combo_recode)
+#   print(check_d3wnSA, n=Inf)
+#   check_d3wnSA2 <- NMA_data_analysis_subset_grpID_d3wnSA %>% distinct(contrast_id, .keep_all=TRUE)
+#   check_d3wnSA2 <- check_d3wnSA2 %>% dplyr::select(contrast_id, intervention_prelim, intervention_combo, intervention_combo_recode, comparison_prelim, comparison_combo, comparison_combo_recode)
+#   print(check_d3wnSA2)
+#   
+#   ## Model notes: setting rho=0.60; tau^2 reflects the amount of heterogeneity for all treatment comparisons
+#   
+#   ## Add contrast matrix to dataset
+#   NMA_data_analysis_subset_grpID_d3wnSA <- NMA_data_analysis_subset_grpID_d3wnSA %>% drop_na(c(intervention_combo_recode, comparison_combo_recode)) #Drop rows in the intervention and comparison columns with missing values (i.e., <NA>).
+#   NMA_data_analysis_subset_grpID_d3wnSA <- contrmat(NMA_data_analysis_subset_grpID_d3wnSA, grp1="intervention_combo_recode", grp2="comparison_combo_recode")
+#   skim(NMA_data_analysis_subset_grpID_d3wnSA)
+#   tabyl(NMA_data_analysis_subset_grpID_d3wnSA$intervention_combo_recode)
+#   tabyl(NMA_data_analysis_subset_grpID_d3wnSA$comparison_combo_recode)
+#   
+#   ## Calculate the variance-covariance matrix for multi-treatment studies 
+#   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d3wnSA)
+#   V_list
+#   
+#   ##Run standard NMA
+#   res_mod_d3wnSA <- rma.mv(effect_size, V_list, 
+#                            mods = ~ 1,
+#                            random = ~ 1 | record_id/es_id, 
+#                            rho=0.60, 
+#                            data=NMA_data_analysis_subset_grpID_d3wnSA)
+#   summary(res_mod_d3wnSA)
+#   #weights.rma.mv(res_mod_d3wnSA)  
