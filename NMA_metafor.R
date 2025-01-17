@@ -235,7 +235,7 @@
   num_contrasts_d1gma_long2 <- num_contrasts_d1gma_long %>% distinct(record_id, contrast_id, group_intervention, .keep_all = TRUE)
   print(num_contrasts_d1gma_long2)
   tabyl(num_contrasts_d1gma_long2$contrast_id) #Should be n=2 for each contrast if reshape and distinct steps done correctly: 1 intervention & 1 comparison per unique contrast. 
-  num_contrasts_d1gma_long3 <- tabyl(num_contrasts_d1gma_long2$group_intervention)
+  tabyl(num_contrasts_d1gma_long2$group_intervention)
   num_contrasts_d1gma_long3 <- num_contrasts_d1gma_long3 %>% dplyr::select(intervention= 'num_contrasts_d1gma_long2$group_intervention', num_contrasts= 'n')
   str(num_contrasts_d1gma_long3)
   num_contrasts_d1gma_long3$intervention <- as.character(num_contrasts_d1gma_long3$intervention)
@@ -525,7 +525,7 @@
   num_contrasts_d2rn_long2 <- num_contrasts_d2rn_long %>% distinct(record_id, contrast_id, group_intervention, .keep_all = TRUE)
   print(num_contrasts_d2rn_long2)
   tabyl(num_contrasts_d2rn_long2$contrast_id) #Should be n=2 for each contrast if reshape and distinct steps done correctly: 1 intervention & 1 comparison per unique contrast. 
-  num_contrasts_d2rn_long3 <- tabyl(num_contrasts_d2rn_long2$group_intervention)
+  tabyl(num_contrasts_d2rn_long2$group_intervention)
   num_contrasts_d2rn_long3 <- num_contrasts_d2rn_long3 %>% dplyr::select(intervention= 'num_contrasts_d2rn_long2$group_intervention', num_contrasts= 'n')
   str(num_contrasts_d2rn_long3)
   num_contrasts_d2rn_long3$intervention <- as.character(num_contrasts_d2rn_long3$intervention)
@@ -815,7 +815,7 @@
   num_contrasts_d3wn_long2 <- num_contrasts_d3wn_long %>% distinct(record_id, contrast_id, group_intervention, .keep_all = TRUE)
   print(num_contrasts_d3wn_long2, n= Inf)
   tabyl(num_contrasts_d3wn_long2$contrast_id) #Should be n=2 for each contrast if reshape and distinct steps done correctly: 1 intervention & 1 comparison per unique contrast. Note that contrast id 87196 has n=3 because one measure incorrectly has FF.RS.VF for intervention_prelim instead of FF.RS. 
-  num_contrasts_d3wn_long3 <- tabyl(num_contrasts_d3wn_long2$group_intervention)
+  tabyl(num_contrasts_d3wn_long2$group_intervention)
   num_contrasts_d3wn_long3 <- num_contrasts_d3wn_long3 %>% dplyr::select(intervention= 'num_contrasts_d3wn_long2$group_intervention', num_contrasts= 'n')
   str(num_contrasts_d3wn_long3)
   num_contrasts_d3wn_long3$intervention <- as.character(num_contrasts_d3wn_long3$intervention)
