@@ -1,0 +1,121 @@
+***Domain General Mathematics Achievement (*_d1gma)
+
+	>     ### Fit model assuming consistency (tau^2_omega=0)
+	>     res_mod_d1gma <- rma.mv(effect_size, V_list, 
+	+                             mods = ~ FF + FF.RS + RS + NL.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+	+                             random = ~ 1 | record_id/es_id, 
+	+                             rho=0.60, 
+	+                             data=NMA_data_analysis_subset_grpID_d1gma,
+	+                             control = list(optimizer = "optim", method = "Nelder-Mead"))
+	>     summary(res_mod_d1gma) 
+
+	Multivariate Meta-Analysis Model (k = 14; method: REML)
+
+	  logLik  Deviance       AIC       BIC      AICc   
+	  2.7478   -5.4956    6.5044    8.3199   34.5044   
+
+	Variance Components:
+
+        	    estim    sqrt  nlvls  fixed           factor 
+	sigma^2.1  0.0000  0.0014     10     no        record_id 
+	sigma^2.2  0.0000  0.0000     14     no  record_id/es_id 
+
+	Test for Residual Heterogeneity:
+	QE(df = 10) = 5.0922, p-val = 0.8849
+
+	Test of Moderators (coefficients 1:4):
+	QM(df = 4) = 10.1680, p-val = 0.0377
+
+	Model Results:
+
+	       estimate      se    zval    pval    ci.lb   ci.ub     
+	FF       0.1557  0.1453  1.0718  0.2838  -0.1291  0.4406     
+	FF.RS    0.0651  0.1565  0.4157  0.6776  -0.2418  0.3719     
+	RS       0.2769  0.1059  2.6152  0.0089   0.0694  0.4844  ** 
+	NL.RS    0.1454  0.0986  1.4752  0.1402  -0.0478  0.3385     
+
+	---
+	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+
+***Domain Rational Numbers (*_d2rn)
+
+	>     ### Fit model assuming consistency (tau^2_omega=0)
+	>     res_mod_d2rn <- rma.mv(effect_size, V_list, 
+	+                            mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS + NL.SE.VF.RS + SE.VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+	+                            random = ~ 1 | record_id/es_id, 
+	+                            rho=0.60, 
+	+                            data=NMA_data_analysis_subset_grpID_d2rn)
+	Warning message:
+	'V' appears to be not positive definite. 
+	>     summary(res_mod_d2rn)
+
+	Multivariate Meta-Analysis Model (k = 101; method: REML)
+
+ 	 logLik  Deviance       AIC       BIC      AICc   
+	-97.1216  194.2432  210.2432  230.6742  211.9177   
+
+	Variance Components:
+
+        	    estim    sqrt  nlvls  fixed           factor 
+	sigma^2.1  0.3448  0.5872     12     no        record_id 
+	sigma^2.2  0.3451  0.5874    101     no  record_id/es_id 
+
+	Test of Moderators (coefficients 1:6):
+	QM(df = 6) = 55.7412, p-val < .0001
+
+	Model Results:
+
+        	     estimate      se    zval    pval    ci.lb   ci.ub      
+	NL.FF.RS       1.1803  0.1912  6.1727  <.0001   0.8056  1.5551  *** 
+	NL.RS          0.9404  0.3899  2.4118  0.0159   0.1762  1.7046    * 
+	NL.SE.FF.RS    1.0355  0.2796  3.7035  0.0002   0.4875  1.5835  *** 
+	NL.SE.RS       0.9987  0.3032  3.2939  0.0010   0.4045  1.5930  *** 
+	NL.SE.VF.RS    0.8764  0.6538  1.3403  0.1801  -0.4052  2.1579      
+	SE.VF.RS       1.8766  0.7338  2.5572  0.0106   0.4383  3.3149    * 
+
+	---
+	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+
+***Domain Whole Numbers (*_d3wn)	
+	
+	>     ### Fit model assuming consistency (tau^2_omega=0)
+	>     res_mod_d3wn <- rma.mv(effect_size, V_list, 
+	+                            mods = ~ FF + FF.RS + NL.FF.RS + RS + VF.FF.RS + VF.RS + NL.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+	+                            random = ~ 1 | record_id/es_id, 
+	+                            rho=0.60, 
+	+                            data=NMA_data_analysis_subset_grpID_d3wn)
+	Warning message:
+	'V' appears to be not positive definite. 
+	>     summary(res_mod_d3wn)
+
+	Multivariate Meta-Analysis Model (k = 174; method: REML)
+
+	  logLik  Deviance       AIC       BIC      AICc   
+	-69.5555  139.1109  157.1109  185.1729  158.2574   
+
+	Variance Components:
+
+        	    estim    sqrt  nlvls  fixed           factor 
+	sigma^2.1  0.0000  0.0000     32     no        record_id 
+	sigma^2.2  0.1020  0.3194    174     no  record_id/es_id 
+
+	Test of Moderators (coefficients 1:7):
+	QM(df = 7) = 154.1626, p-val < .0001
+
+	Model Results:
+
+        	  estimate      se    zval    pval    ci.lb   ci.ub      
+	FF          0.5001  0.1195  4.1838  <.0001   0.2658  0.7344  *** 
+	FF.RS       0.5735  0.0638  8.9901  <.0001   0.4485  0.6985  *** 
+	NL.FF.RS    0.4132  0.1820  2.2703  0.0232   0.0565  0.7700    * 
+	RS          0.3573  0.0450  7.9488  <.0001   0.2692  0.4454  *** 
+	VF.FF.RS    0.6251  0.1154  5.4148  <.0001   0.3989  0.8514  *** 
+	VF.RS       0.1496  0.1522  0.9833  0.3255  -0.1486  0.4479      
+	NL.RS       0.3400  0.3270  1.0397  0.2985  -0.3009  0.9809      
+
+	---
+	Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
