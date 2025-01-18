@@ -779,7 +779,7 @@
       g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
       
       num_students_d2rn_long3
-      num_students_d2rn_long4 <- num_students_d2rn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="SE+VF+RS" | intervention_comparison=="NL+SE+RS" | intervention_comparison=="NL+SE+VF+RS" | intervention_comparison=="RS"),sum_num_students_bundle*1.5,sum_num_students_bundle))
+      num_students_d2rn_long4 <- num_students_d2rn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="SE+VF+RS" | intervention_comparison=="NL+SE+RS" | intervention_comparison=="NL+SE+VF+RS" | intervention_comparison=="RS"),sum_num_students_bundle*1.,sum_num_students_bundle))
       num_students_d2rn_long4 <- num_students_d2rn_long4 %>% mutate(dist=c(0,3.65,3.25,4.9,4.25))
       num_students_d2rn_long4 <- num_students_d2rn_long4 %>% mutate(color=c("lightgray","red","green","mediumpurple1","darkorange"))
       num_students_d2rn_long4

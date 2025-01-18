@@ -1,0 +1,26 @@
+>   print(num_students_d1gma_long3)  
+# A tibble: 4 × 2
+  intervention_comparison sum_num_students_bundle
+  <chr>                                     <dbl>
+1 BAU                                         358
+2 FF                                           90
+3 FF+RS                                        75
+4 RS                                          190
+
+ NMA_data_analysis_subset4$int_comp_prelim n   percent
+                                 FF+RS_BAU 2 0.1818182
+                                    FF_BAU 3 0.2727273
+                                    RS_BAU 6 0.5454545
+
+        BAU FF FF+RS RS
+  BAU     0  0     0  0
+  FF      3  0     0  0
+  FF+RS   2  0     0  0
+  RS      6  0     0  0
+  
+  intervention_comparison sum_num_students_bundle sum_num_students_bundle2  dist color     
+  <chr>                                     <dbl>                    <dbl> <dbl> <chr>     
+1 BAU                                         358                      358  0    lightgray 
+2 FF                                           90                       90  2.25 royalblue1
+3 FF+RS                                        75                       75  2.55 burlywood1
+4 RS                                          190                      190  0    azure1    
