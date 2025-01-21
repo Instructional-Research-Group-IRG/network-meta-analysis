@@ -1073,15 +1073,17 @@
       #      #layout=layout_with_lgl(g),
       #      vertex.size=20, vertex.color=c("lightgray","red","yellow","green","orange","pink","violet","aquamarine"), vertex.label.color="black", vertex.label.font=2)   
       num_students_d3wn_long3
-      num_students_d3wn_long4 <- num_students_d3wn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="VF+FF+RS" | intervention_comparison=="FF" | intervention_comparison=="NL+FF+RS" | intervention_comparison=="VF+RS"),sum_num_students_bundle*4.5,sum_num_students_bundle))
-      num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(dist=c(0, 2.5, 3.25, 2.6, 3, 0, -2, 2.25))
+      num_students_d3wn_long4 <- num_students_d3wn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="VF+FF+RS" | intervention_comparison=="FF" | intervention_comparison=="NL+FF+RS" | intervention_comparison=="VF+RS"),sum_num_students_bundle*3.5,sum_num_students_bundle))
+      num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="FF+RS"),sum_num_students_bundle2*1.5,sum_num_students_bundle2))
+      num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(dist=c(0, 2.5, 0, 2.6, 3, 0, 0, 2.25))
       #num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(color=c("lightgray","royalblue1","burlywood1","red","azure1","yellow","pink","green"))
       num_students_d3wn_long4
       
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
            layout=layout_in_circle(g, order=c("BAU","FF","FF+RS","NL+FF+RS","RS","VF+FF+RS","VF+RS","NL+RS")),
            #vertex.size=(num_students_d3wn_long4$sum_num_students_bundle2)/50, 
-           vertex.size=c(3942,976,1224,662,555,2695,602,508)/50,
+           #vertex.size=c(3942,976,1224,662,555,2695,602,508)/50,
+           vertex.size=c(3942,760,1836,514,555,2695,1602,396)/50,
            vertex.color=c("lightgray","royalblue1","burlywood1","red","green","azure1","yellow","pink"), 
            vertex.label.color="black", 
            vertex.label.font=2, 
