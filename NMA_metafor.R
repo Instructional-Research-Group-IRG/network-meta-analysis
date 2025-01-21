@@ -1074,6 +1074,7 @@
       #      vertex.size=20, vertex.color=c("lightgray","red","yellow","green","orange","pink","violet","aquamarine"), vertex.label.color="black", vertex.label.font=2)   
       num_students_d3wn_long3
       num_students_d3wn_long4 <- num_students_d3wn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="VF+FF+RS" | intervention_comparison=="FF" | intervention_comparison=="NL+FF+RS" | intervention_comparison=="VF+RS"),sum_num_students_bundle*4.5,sum_num_students_bundle))
+      num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="FF+RS"),sum_num_students_bundle2*1.5,sum_num_students_bundle2))
       num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(dist=c(0,2.5,2.75,2.6,0,3.45,2))
       num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(color=c("lightgray","royalblue1","burlywood1","red","azure1","yellow","pink"))
       num_students_d3wn_long4
