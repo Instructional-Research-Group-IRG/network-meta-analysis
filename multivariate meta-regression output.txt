@@ -1,0 +1,95 @@
+
+
+From lines 139-147 of <<NNMA Multivariate Meta-Analysis.R>>
+
+
+
+   ## Analysis 1: High-Leverage ICs plus control covariates 
+>   NNMA_MVmodel_main <- rma.mv(yi = effect_size, 
++                               V = V_list, 
++                               random = ~1 | record_id/es_id,
++                               mods = ~ NL_TX + TES_TX + VF_TX + RS_TX + FF_TX + dosage_overall_hours_avg + group_size_average + grade_level + measure_developer_numeric + interventionist_numeric + ongoing_training + intervention_content_numeric - 1, 
++                               test = "t",
++                               data = NNMA_Data_Subset_grpID,
++                               method = "REML")
+Warning message:
+1 row with NAs omitted from model fitting. 
+>   summary(NNMA_MVmodel_main)
+
+Multivariate Meta-Analysis Model (k = 276; method: REML)
+
+   logLik   Deviance        AIC        BIC       AICc   
+-188.1788   376.3577   408.3577   465.4512   410.5781   
+
+Variance Components:
+
+            estim    sqrt  nlvls  fixed           factor 
+sigma^2.1  0.0737  0.2716     48     no        record_id 
+sigma^2.2  0.1770  0.4207    276     no  record_id/es_id 
+
+Test for Residual Heterogeneity:
+QE(df = 262) = 3216.0229, p-val < .0001
+
+Test of Moderators (coefficients 1:14):
+F(df1 = 14, df2 = 262) = 11.8426, p-val < .0001
+
+Model Results:
+
+                               estimate      se     tval   df    pval    ci.lb   ci.ub      
+NL_TX                           -0.4983  0.2591  -1.9237  262  0.0555  -1.0085  0.0118    . 
+TES_TX                          -0.1899  0.1625  -1.1683  262  0.2437  -0.5099  0.1301      
+VF_TX                            0.0056  0.1608   0.0350  262  0.9721  -0.3110  0.3222      
+RS_TX                            0.0451  0.1567   0.2880  262  0.7736  -0.2634  0.3536      
+FF_TX                            0.1555  0.1248   1.2459  262  0.2139  -0.0902  0.4012      
+dosage_overall_hours_avg         0.0014  0.0060   0.2285  262  0.8194  -0.0105  0.0133      
+group_size_average              -0.0454  0.0274  -1.6536  262  0.0994  -0.0994  0.0087    . 
+grade_level                     -0.0571  0.0611  -0.9353  262  0.3505  -0.1774  0.0631      
+measure_developer_numeric1       0.6204  0.2302   2.6956  262  0.0075   0.1672  1.0736   ** 
+measure_developer_numeric2       0.4359  0.2349   1.8559  262  0.0646  -0.0266  0.8984    . 
+interventionist_numeric2         0.1927  0.2356   0.8179  262  0.4141  -0.2712  0.6567      
+interventionist_numeric3        -0.0304  0.2245  -0.1354  262  0.8924  -0.4725  0.4117      
+ongoing_training1               -0.0827  0.1807  -0.4576  262  0.6476  -0.4384  0.2731      
+intervention_content_numeric2    1.3063  0.3530   3.7002  262  0.0003   0.6112  2.0015  *** 
+
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+>  mvcf <- coef_test(NNMA_MVmodel_main,
++                     cluster = NNMA_Data_Subset_grpID$record_id, 
++                     vcov = "CR2")
+>   mvcf
+                         Coef. Estimate      SE t-stat d.f. (Satt) p-val (Satt) Sig.
+                         NL_TX -0.49835 0.19753 -2.523        1.98      0.12864     
+                        TES_TX -0.18988 0.18594 -1.021        4.70      0.35685     
+                         VF_TX  0.00562 0.17011  0.033        4.82      0.97497     
+                         RS_TX  0.04513 0.11515  0.392        5.78      0.70918     
+                         FF_TX  0.15548 0.09921  1.567       10.19      0.14758     
+      dosage_overall_hours_avg  0.00138 0.00419  0.329       12.73      0.74723     
+            group_size_average -0.04536 0.02661 -1.705        7.92      0.12698     
+                   grade_level -0.05712 0.04024 -1.419       15.15      0.17602     
+    measure_developer_numeric1  0.62042 0.16963  3.657       11.43      0.00355   **
+    measure_developer_numeric2  0.43591 0.17738  2.457       13.02      0.02878    *
+      interventionist_numeric2  0.19272 0.19839  0.971        6.66      0.36530     
+      interventionist_numeric3 -0.03040 0.14199 -0.214        4.40      0.84003     
+             ongoing_training1 -0.08267 0.12188 -0.678       14.76      0.50809     
+ intervention_content_numeric2  1.30633 0.32852  3.976        5.31      0.00936   **
+>   
+>   mvcf_ci <- conf_int(NNMA_MVmodel_main,
++                     cluster = NNMA_Data_Subset_grpID$record_id, 
++                     vcov = "CR2")
+>   mvcf_ci
+                         Coef. Estimate      SE  d.f. Lower 95% CI Upper 95% CI
+                         NL_TX -0.49835 0.19753  1.98     -1.35448       0.3578
+                        TES_TX -0.18988 0.18594  4.70     -0.67733       0.2976
+                         VF_TX  0.00562 0.17011  4.82     -0.43664       0.4479
+                         RS_TX  0.04513 0.11515  5.78     -0.23928       0.3295
+                         FF_TX  0.15548 0.09921 10.19     -0.06502       0.3760
+      dosage_overall_hours_avg  0.00138 0.00419 12.73     -0.00768       0.0104
+            group_size_average -0.04536 0.02661  7.92     -0.10682       0.0161
+                   grade_level -0.05712 0.04024 15.15     -0.14281       0.0286
+    measure_developer_numeric1  0.62042 0.16963 11.43      0.24877       0.9921
+    measure_developer_numeric2  0.43591 0.17738 13.02      0.05275       0.8191
+      interventionist_numeric2  0.19272 0.19839  6.66     -0.28134       0.6668
+      interventionist_numeric3 -0.03040 0.14199  4.40     -0.41102       0.3502
+             ongoing_training1 -0.08267 0.12188 14.76     -0.34281       0.1775
+ intervention_content_numeric2  1.30633 0.32852  5.31      0.47655       2.1361
