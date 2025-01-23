@@ -1,6 +1,6 @@
 
 
-From lines 139-147 of <<NNMA Multivariate Meta-Analysis.R>>
+From lines 139-159 of <<NNMA Multivariate Meta-Analysis.R>>
 
 
 
