@@ -21,6 +21,9 @@ NNMA_Data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_
                                TvsT==0)
   
   ##Replace all NA values in the moderators with 0 to avoid the "Processing terminated since k <= 1" error
+  NNMA_Data_Subset$FF_TX <- as.character(NNMA_Data_Subset$FF_TX)
+  NNMA_Data_Subset$FF_TX <- as.numeric(NNMA_Data_Subset$FF_TX)
+  tabyl(NNMA_Data_Subset$FF_TX)
   NNMA_Data_Subset <- NNMA_Data_Subset %>% replace_na(list(NL_TX = 0, EX_TX = 0, VF_TX = 0, FF_TX = 0, RS_TX = 0))
   
   #Create unique group ID for each independent group within a study (record ID)
