@@ -303,7 +303,7 @@
                               data=NMA_data_analysis_subset_grpID_d1gma,
                               control = list(optimizer = "optim", method = "Nelder-Mead"))
     summary(res_mod_d1gma_J)
-      
+
     ### Estimate all pairwise differences between treatments
     contr <- data.frame(t(combn(names(coef(res_mod_d1gma)), 2)))
     contr <- contrmat(contr, "X1", "X2")
@@ -489,7 +489,8 @@
       g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
       
       num_students_d1gma_long3
-      num_students_d1gma_long4 <- num_students_d1gma_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="FF" | intervention_comparison=="FF+RS"),sum_num_students_bundle*1,sum_num_students_bundle))
+      #num_students_d1gma_long4 <- num_students_d1gma_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="FF" | intervention_comparison=="FF+RS"),sum_num_students_bundle*1,sum_num_students_bundle))
+      num_students_d1gma_long4 <- num_students_d1gma_long3 %>% mutate(sum_num_students_bundle2= sum_num_students_bundle)
       num_students_d1gma_long4 <- num_students_d1gma_long4 %>% mutate(dist=c(0,2.25,2.55,3,0))
       num_students_d1gma_long4 <- num_students_d1gma_long4 %>% mutate(color=c("lightgray","royalblue1","burlywood1","green","azure1"))
       num_students_d1gma_long4
@@ -498,7 +499,7 @@
            layout=layout_in_circle(g, order=c("BAU", "RS","FF","NL+RS","FF+RS")),
            vertex.size=(num_students_d1gma_long4$sum_num_students_bundle2)/5, vertex.color=num_students_d1gma_long4$color, 
            vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d1gma_long4$intervention_comparison, vertex.label.dist=num_students_d1gma_long4$dist)  
-      
+
       # num_students_d1gma_long4
       # num_students_d1gma_long5 <- num_students_d1gma_long4 %>% mutate(sum_num_students_bundle3= if_else(intervention_comparison=="BAU",sum_num_students_bundle*5000,sum_num_students_bundle))
       # num_students_d1gma_long5
@@ -554,8 +555,9 @@
   num_students_d2rn_long3 <- num_students_d2rn_long2 %>% group_by(intervention_comparison) %>% summarize(sum_num_students_bundle= sum(num_students_bundle)) # Sum students by intervention bundle.
   str(num_students_d2rn_long3)
   print(num_students_d2rn_long3)
-  target_d2rn <- c("BAU","NL+FF+RS","NL+RS","NL+SE+FF+RS","NL+SE+RS","NL+SE+VF+RS","SE+VF+RS")
   #target_d2rn <- c("BAU","NL+FF+RS","NL+RS","NL+SE+FF+RS","NL+SE+RS")
+  #target_d2rn <- c("BAU","NL+FF+RS","NL+RS","NL+SE+FF+RS","NL+SE+RS","NL+SE+VF+RS","SE+VF+RS")
+  target_d2rn <- c("BAU","NL+FF+RS","NL+RS","NL+SE+FF+RS","NL+SE+RS","NL+SE+VF+RS","RS","SE+RS")
   num_students_d2rn_long3 <- num_students_d2rn_long3[match(target_d2rn, num_students_d2rn_long3$intervention_comparison),]
   num_students_d2rn_long3$intervention_comparison <- as.character(num_students_d2rn_long3$intervention_comparison)
   str(num_students_d2rn_long3)  
@@ -579,7 +581,8 @@
   
     ### Fit model assuming consistency (tau^2_omega=0)
     res_mod_d2rn <- rma.mv(effect_size, V_list, 
-                           mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS + NL.SE.VF.RS + SE.VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                           #mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS + NL.SE.VF.RS + SE.VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                           mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS + NL.SE.VF.RS + RS + SE.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
                            random = ~ 1 | record_id/es_id, 
                            rho=0.60, 
                            data=NMA_data_analysis_subset_grpID_d2rn)
@@ -587,7 +590,8 @@
     
     ### Fit Jackson's model to test for inconsistency 
     res_mod_d2rn_J <- rma.mv(effect_size, V_list, 
-                           mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS + NL.SE.VF.RS + SE.VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                           #mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS + NL.SE.VF.RS + SE.VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                           mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS + NL.SE.VF.RS + RS + SE.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
                            random = list(~ 1 | record_id/es_id, ~ domain | record_id, ~ contrast_id | record_id),
                            rho=0.60, phi=1/2,
                            data=NMA_data_analysis_subset_grpID_d2rn)
@@ -663,8 +667,9 @@
       print(res_mod_d2rn_pscore)
       print(num_contrasts_d2rn_long3)
       res_mod_d2rn_pscore <- res_mod_d2rn_pscore %>% left_join(num_contrasts_d2rn_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-      res_mod_d2rn_pscore$colour <- rep(c("lightyellow","red","mediumpurple1","darkorange","green","maroon1")) 
       #res_mod_d2rn_pscore$colour <- rep(c("turquoise1","red","mediumpurple1","darkorange","green","yellow","azure1")) 
+      #res_mod_d2rn_pscore$colour <- rep(c("lightyellow","red","mediumpurple1","darkorange","green","maroon1","azure1")) 
+      res_mod_d2rn_pscore$colour <- rep(c("lavenderblush2","red","mediumpurple1","darkorange","green","maroon1","azure1"))
       str(res_mod_d2rn_pscore)   
       print(res_mod_d2rn_pscore)
       
@@ -702,7 +707,7 @@
       print(res_mod_d2rn_pscore2)
 
       LfLabels1<-data.frame(x=c(1), 
-                           y=c(6.5),
+                           y=c(7.5),
                            lab=c("Estimate (95% CI)"))
       LfLabels1      
       data_table1 <- ggplot(data = res_mod_d2rn_pscore2, aes(x, y = intervention)) +
@@ -716,7 +721,7 @@
       data_table1
       
       LfLabels2<-data.frame(x=c(1), 
-                            y=c(6.5),
+                            y=c(7.5),
                             lab=c("P-score"))
       LfLabels2      
       data_table2 <- ggplot(data = res_mod_d2rn_pscore2, aes(x, y = intervention)) +
@@ -779,13 +784,16 @@
       g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
       
       num_students_d2rn_long3
-      num_students_d2rn_long4 <- num_students_d2rn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="SE+VF+RS" | intervention_comparison=="NL+SE+RS" | intervention_comparison=="NL+SE+VF+RS" | intervention_comparison=="SE+VF+RS"),sum_num_students_bundle*1.5,sum_num_students_bundle))
-      num_students_d2rn_long4 <- num_students_d2rn_long4 %>% mutate(dist=c(0,3.65,3.25,4.9,4.25,-2.5,2.5))
-      num_students_d2rn_long4 <- num_students_d2rn_long4 %>% mutate(color=c("lightgray","red","green","mediumpurple1","darkorange","maroon1","lightyellow"))
+      #num_students_d2rn_long4 <- num_students_d2rn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="SE+VF+RS" | intervention_comparison=="NL+SE+RS" | intervention_comparison=="NL+SE+VF+RS" | intervention_comparison=="SE+VF+RS"),sum_num_students_bundle*1.5,sum_num_students_bundle))
+      num_students_d2rn_long4 <- num_students_d2rn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="NL+SE+RS" | intervention_comparison=="NL+SE+VF+RS"),sum_num_students_bundle*1.5,sum_num_students_bundle))
+      num_students_d2rn_long4 <- num_students_d2rn_long4 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="RS" | intervention_comparison=="SE+RS"),sum_num_students_bundle2*3.5,sum_num_students_bundle2))
+      num_students_d2rn_long4 <- num_students_d2rn_long4 %>% mutate(dist=c(0,3.65,3.25,4.9,3.55,-2.5,1.5,-2))
+      #num_students_d2rn_long4 <- num_students_d2rn_long4 %>% mutate(color=c("lightgray","red","green","mediumpurple1","darkorange","maroon1","lightyellow"))
+      num_students_d2rn_long4 <- num_students_d2rn_long4 %>% mutate(color=c("lightgray","red","green","mediumpurple1","darkorange","maroon1","azure1","lavenderblush2"))
       num_students_d2rn_long4
       
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
-           layout=layout_in_circle(g, order=c("BAU","SE+VF+RS","NL+FF+RS","NL+SE+FF+RS","NL+SE+RS","NL+RS","NL+SE+VF+RS")),
+           layout=layout_in_circle(g, order=c("BAU","NL+FF+RS","NL+SE+FF+RS","NL+SE+RS","NL+RS","NL+SE+VF+RS","RS","SE+RS")),
            vertex.size=(num_students_d2rn_long4$sum_num_students_bundle2)/15, vertex.color=num_students_d2rn_long4$color, 
            vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_d2rn_long4$intervention_comparison, vertex.label.dist=num_students_d2rn_long4$dist)  
 
@@ -1073,9 +1081,9 @@
       #      #layout=layout_with_lgl(g),
       #      vertex.size=20, vertex.color=c("lightgray","red","yellow","green","orange","pink","violet","aquamarine"), vertex.label.color="black", vertex.label.font=2)   
       num_students_d3wn_long3
-      num_students_d3wn_long4 <- num_students_d3wn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="VF+FF+RS" | intervention_comparison=="FF" | intervention_comparison=="NL+FF+RS" | intervention_comparison=="VF+RS"),sum_num_students_bundle*3.5,sum_num_students_bundle))
-      num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="FF+RS"),sum_num_students_bundle2*1.5,sum_num_students_bundle2))
-      num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(dist=c(0, 2.5, 0, 2.6, 3, 0, 0, 2.25))
+      num_students_d3wn_long4 <- num_students_d3wn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="FF" | intervention_comparison=="NL+FF+RS" | intervention_comparison=="VF+RS"),sum_num_students_bundle*3,sum_num_students_bundle))
+      num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="VF+FF+RS"),sum_num_students_bundle2*2,sum_num_students_bundle2))
+      num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(dist=c(0, 2.5, 0, 2.6, 3, 0, -2.25, 2.5))
       #num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(color=c("lightgray","royalblue1","burlywood1","red","azure1","yellow","pink","green"))
       num_students_d3wn_long4
       
@@ -1083,7 +1091,7 @@
            layout=layout_in_circle(g, order=c("BAU","FF","FF+RS","NL+FF+RS","RS","VF+FF+RS","VF+RS","NL+RS")),
            #vertex.size=(num_students_d3wn_long4$sum_num_students_bundle2)/50, 
            #vertex.size=c(3942,976,1224,662,555,2695,602,508)/50,
-           vertex.size=c(3942,760,1836,514,555,2695,1602,396)/50,
+           vertex.size=c(3942,760,1312,514,555,2695,712,396)/50,
            vertex.color=c("lightgray","royalblue1","burlywood1","red","green","azure1","yellow","pink"), 
            vertex.label.color="black", 
            vertex.label.font=2, 
