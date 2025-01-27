@@ -24,6 +24,9 @@ NMA_Data_Subset <- subset(NNMA_Data, (measure_type=="Main" | measure_type=="Foll
                              aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") & (TvsT==1 | TvsT==0))
 
 ##Replace all NA values in the binary moderators with 0
+NMA_Data_Subset$FF_TX <- as.character(NMA_Data_Subset$FF_TX)
+NMA_Data_Subset$FF_TX <- as.numeric(NMA_Data_Subset$FF_TX)
+tabyl(NMA_Data_Subset$FF_TX)
 NMA_Data_Subset <- NMA_Data_Subset %>% replace_na(list(NL_TX = 0, TES_TX = 0, VF_TX = 0, FF_TX = 0, RS_TX = 0, TES_TX = 0, N_TX = 0, SEO_TX = 0, TV_TX = 0, RV_TX = 0))
 
 ##Correct variable types loaded in as lists (variables as lists cannot be used as variables in the meta-regressions below)
