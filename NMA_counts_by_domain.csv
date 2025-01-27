@@ -10,9 +10,6 @@ General Mathematics Achievement,MI22216,88220,218,RS,BAU,Wechsler Individual Ach
 General Mathematics Achievement,MI22219,88224,228,RS,BAU,WIDE RANGE ACHievement TEST WRAT 3 Arithmetic,Main
 General Mathematics Achievement,MI22220,88222,230,RS,BAU,"Wide Range Achievement Test-III, arithmetic subtest",Main
 General Mathematics Achievement,MI22399,87461,233,RS,BAU,Basic Skills Algebra curriculum-based measure,Main
-General Mathematics Achievement,MI70140,90473,353,NL+RS,BAU,AIMSweb Mathematics Computation - 5th grade,Main
-General Mathematics Achievement,MI70140,90473,354,NL+RS,BAU,AIMSweb Mathematics Computation - 6th grade,Main
-General Mathematics Achievement,MI70140,90473,355,NL+RS,BAU,Algebra Readiness Progress Monitoring (ARPM),Main
 Rational Numbers,MI20758,86186,97,NL+SE+FF+RS,BAU,Fraction Battery-Revised: Addition/Subtraction,Main
 Rational Numbers,MI20758,86186,98,NL+SE+FF+RS,BAU,Fraction Battery-Revised: Fraction Magnitude Comparisons,Main
 Rational Numbers,MI20758,86186,99,NL+SE+FF+RS,BAU,Fraction Battery-Revised: Fraction Magnitude Explanations,Main
@@ -46,18 +43,11 @@ Rational Numbers,MI20762,89813,153,NL+RS,BAU,Additive Word Problems from the Fra
 Rational Numbers,MI20762,89813,154,NL+RS,BAU,Fraction Calculations,Main
 Rational Numbers,MI20762,89813,155,NL+RS,BAU,Fraction Number Line,Main
 Rational Numbers,MI20762,89813,156,NL+RS,BAU,Multiplicative Word Problems from the 2012 Fraction Battery,Main
-Rational Numbers,MI22399,87461,234,RS,BAU,Everyday Math Core Unit Assessment,Follow Up (10-14 Days)
-Rational Numbers,MI22399,87461,235,RS,BAU,Researcher generated measure,Follow Up (10-14 Days)
 Rational Numbers,MI30001,88118,236,NL+RS,BAU,Fraction Arithmetic,Main
 Rational Numbers,MI30001,88118,238,NL+RS,BAU,NAEP released items (selected items),Main
 Rational Numbers,MI30002,86415,240,NL+FF+RS,BAU,Fraction Arithmetic,Main
 Rational Numbers,MI30002,86415,242,NL+FF+RS,BAU,Fraction Concepts,Main
 Rational Numbers,MI30002,86415,244,NL+FF+RS,BAU,Fraction Number Line Estimation (FNLE),Main
-Rational Numbers,MI30058,86431,258,NL+SE+VF+RS,BAU,Test of Fraction Procedures,Main
-Rational Numbers,MI30058,86431,259,NL+SE+VF+RS,BAU,Number Line Estimation (NLE 0-1),Main
-Rational Numbers,MI30058,86431,260,NL+SE+VF+RS,BAU,Number Line Estimation (NLE 0-2),Main
-Rational Numbers,MI30058,86431,261,NL+SE+VF+RS,BAU,"Test for Understanding of Fractions, Fifth-Grade (TUF-5)",Main
-Rational Numbers,MI30058,86431,262,NL+SE+VF+RS,BAU,"Test for Understanding of Fractions, Fourth-Grade (TUF-4)",Main
 Rational Numbers,MI30060,88710,281,NL+FF+RS,BAU,13 released items from 1990-2009 National Assessment of Educational Progress (NAEP),Main
 Rational Numbers,MI30060,88710,282,NL+FF+RS,BAU,"Fraction Battery-Revised Addition and Subtraction (Malone & Fuchs, 2017)",Main
 Rational Numbers,MI30060,88710,283,NL+FF+RS,BAU,"Fraction Battery-Revised Number Line (Malone & Fuchs, 2017)",Main
@@ -103,9 +93,6 @@ Rational Numbers,MI40006,86189,331,NL+SE+FF+RS,BAU,National Assessment of Educat
 Rational Numbers,MI40006,87221,332,NL+SE+FF+RS,NL+SE+RS,Fraction Calculations,Main
 Rational Numbers,MI40006,87221,333,NL+SE+FF+RS,NL+SE+RS,Fraction Number Line,Main
 Rational Numbers,MI40006,87221,334,NL+SE+FF+RS,NL+SE+RS,National Assessment of Educational Progress (NAEP) selected items,Main
-Rational Numbers,MI70352,90508,360,SE+RS,BAU,easyCBM for Numbers and Operations,Main
-Rational Numbers,MI70352,90508,361,SE+RS,BAU,Quality of mathematical reasoning,Main
-Rational Numbers,MI70352,90508,362,SE+RS,BAU,Rhetorical elements,Main
 Rational Numbers,MI70737,90582_disagg_a,387,NL+FF+RS,BAU,0-2 Fraction Number Line,Main
 Rational Numbers,MI70737,90582_disagg_a,389,NL+FF+RS,BAU,Equivalence from Go Math!,Main
 Rational Numbers,MI70737,90582_disagg_a,391,NL+FF+RS,BAU,"Fraction Calculations from Go Math! (Houghton-Mifflin Harcourt, 2015)",Main
@@ -196,7 +183,6 @@ Whole Numbers,MI20760,87215,142,FF+RS,BAU,KeyMath-Revised Problem Solving,Main
 Whole Numbers,MI20760,87215,143,FF+RS,BAU,Number Combinations Factor Score,Main
 Whole Numbers,MI20760,87215,144,FF+RS,BAU,Number Sentences,Main
 Whole Numbers,MI20760,87215,145,FF+RS,BAU,Procedural Calculations Factor Score,Main
-Whole Numbers,MI20802,86426,167,NL+RS,BAU,Test of Early Mathematics Ability (TEMA-3),Main
 Whole Numbers,MI21079,85370,170,RS,BAU,"Word Problem Solving (WPS; Jitendra et al., 2007)",Main
 Whole Numbers,MI21085,86422,172,RS,BAU,Addition and Subtraction Number Combinations Automaticity,Main
 Whole Numbers,MI21085,86422,174,RS,BAU,Mathematical WPS,Main

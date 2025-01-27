@@ -489,7 +489,8 @@
       g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
       
       num_students_d1gma_long3
-      num_students_d1gma_long4 <- num_students_d1gma_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="FF" | intervention_comparison=="FF+RS"),sum_num_students_bundle*1,sum_num_students_bundle))
+      #num_students_d1gma_long4 <- num_students_d1gma_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="FF" | intervention_comparison=="FF+RS"),sum_num_students_bundle*1,sum_num_students_bundle))
+      num_students_d1gma_long4 <- num_students_d1gma_long3 %>% mutate(sum_num_students_bundle2=sum_num_students_bundle)
       num_students_d1gma_long4 <- num_students_d1gma_long4 %>% mutate(dist=c(0,2.25,2.55,0))
       num_students_d1gma_long4 <- num_students_d1gma_long4 %>% mutate(color=c("lightgray","royalblue1","burlywood1","azure1"))
       num_students_d1gma_long4
@@ -537,7 +538,8 @@
   print(num_contrasts_d2rn_long3)
   tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID_d2rn$comparison_prelim)
-  NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% filter(intervention_prelim!="NL+SE+VF+RS" & intervention_prelim!="SE+VF+RS")
+  NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% filter(intervention_prelim!="NL+SE+VF+RS" & intervention_prelim!="RS" & intervention_prelim!="SE+RS")
+  #NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% filter(intervention_prelim!="NL+SE+VF+RS" & intervention_prelim!="SE+VF+RS")
   #NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% filter(comparison_prelim!="NL+SE+VF+RS" & comparison_prelim!="SE+VF+RS")
   tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID_d2rn$comparison_prelim)  
@@ -554,8 +556,8 @@
   num_students_d2rn_long3 <- num_students_d2rn_long2 %>% group_by(intervention_comparison) %>% summarize(sum_num_students_bundle= sum(num_students_bundle)) # Sum students by intervention bundle.
   str(num_students_d2rn_long3)
   print(num_students_d2rn_long3)
-  #target_d2rn <- c("BAU","NL+FF+RS","NL+RS","NL+SE+FF+RS","NL+SE+RS","NL+SE+VF+RS","RS","SE+VF+RS")
   target_d2rn <- c("BAU","NL+FF+RS","NL+RS","NL+SE+FF+RS","NL+SE+RS")
+  #target_d2rn <- c("BAU","NL+FF+RS","NL+RS","NL+SE+FF+RS","NL+SE+RS","NL+SE+VF+RS","RS","SE+VF+RS")
   num_students_d2rn_long3 <- num_students_d2rn_long3[match(target_d2rn, num_students_d2rn_long3$intervention_comparison),]
   num_students_d2rn_long3$intervention_comparison <- as.character(num_students_d2rn_long3$intervention_comparison)
   str(num_students_d2rn_long3)  
@@ -1073,9 +1075,10 @@
       #      #layout=layout_with_lgl(g),
       #      vertex.size=20, vertex.color=c("lightgray","red","yellow","green","orange","pink","violet","aquamarine"), vertex.label.color="black", vertex.label.font=2)   
       num_students_d3wn_long3
-      num_students_d3wn_long4 <- num_students_d3wn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="VF+FF+RS" | intervention_comparison=="FF" | intervention_comparison=="NL+FF+RS" | intervention_comparison=="VF+RS"),sum_num_students_bundle*4.5,sum_num_students_bundle))
+      num_students_d3wn_long4 <- num_students_d3wn_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="FF" | intervention_comparison=="NL+FF+RS" | intervention_comparison=="VF+RS"),sum_num_students_bundle*4.5,sum_num_students_bundle))
+      num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="VF+FF+RS"),sum_num_students_bundle2*2.5,sum_num_students_bundle2))
       num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="FF+RS"),sum_num_students_bundle2*1.5,sum_num_students_bundle2))
-      num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(dist=c(0,2.5,2.75,2.6,0,3.45,2))
+      num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(dist=c(0,1.75,0,2.6,0,2.85,2))
       num_students_d3wn_long4 <- num_students_d3wn_long4 %>% mutate(color=c("lightgray","royalblue1","burlywood1","red","azure1","yellow","pink"))
       num_students_d3wn_long4
       
