@@ -1098,13 +1098,16 @@
 # Combine final analysis files by domain
       NMA_data_analysis_subset_grpID_final <- bind_rows(NMA_data_analysis_subset_grpID_d1gma, NMA_data_analysis_subset_grpID_d2rn, NMA_data_analysis_subset_grpID_d3wn)
       tabyl(NMA_data_analysis_subset_grpID_final$domain)
+      NMA_data_analysis_subset_grpID_final$simple_number <- as.character(NMA_data_analysis_subset_grpID_final$simple_number)
+      NMA_data_analysis_subset_grpID_final$simple_number <- as.numeric(NMA_data_analysis_subset_grpID_final$simple_number)
+      tabyl(NMA_data_analysis_subset_grpID_final$simple_number)
       
 # Check counts of final NMA analysis file
       
       ### Number of effect sizes
       NMA_data_analysis_subset_grpID_final %>% count()
       tabyl(NMA_data_analysis_subset_grpID_final$es_id)
-      NMA_study_contrast_list_es_final <- NMA_data_analysis_subset_grpID_final %>% dplyr::select(record_id, "Abbreviated Citation", contrast_id, contrast_name, domain, measure_name, es_id) #Create list of study-contrasts included in NMA.
+      NMA_study_contrast_list_es_final <- NMA_data_analysis_subset_grpID_final %>% dplyr::select(record_id, "Abbreviated Citation", contrast_id, simple_number, contrast_name, domain, measure_name, es_id) #Create list of study-contrasts included in NMA.
       NMA_study_contrast_list_es_final <- NMA_study_contrast_list_es_final %>% arrange(record_id, contrast_id, es_id)
       print(NMA_study_contrast_list_es_final)
       write_csv(NMA_study_contrast_list_es_final, 'NMA_study_contrast_list_es_final.csv')
