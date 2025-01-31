@@ -291,8 +291,7 @@
                             mods = ~ FF + FF.RS + RS + NL.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
                             random = ~ 1 | record_id/es_id, 
                             rho=0.60, 
-                            data=NMA_data_analysis_subset_grpID_d1gma,
-                            control = list(optimizer = "optim", method = "Nelder-Mead"))
+                            data=NMA_data_analysis_subset_grpID_d1gma)
     summary(res_mod_d1gma) 
 
     ### Fit Jackson's model to test for inconsistency 
@@ -300,8 +299,7 @@
                               mods = ~ FF + FF.RS + RS + NL.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons 
                               random = list(~ 1 | record_id/es_id, ~ domain | record_id, ~ contrast_id | record_id),
                               rho=0.60, phi=1/2,
-                              data=NMA_data_analysis_subset_grpID_d1gma,
-                              control = list(optimizer = "optim", method = "Nelder-Mead"))
+                              data=NMA_data_analysis_subset_grpID_d1gma)
     summary(res_mod_d1gma_J)
 
     ### Estimate all pairwise differences between treatments
