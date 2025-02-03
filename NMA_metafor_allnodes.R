@@ -196,6 +196,9 @@
   NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% drop_na(c(intervention_prelim, comparison_prelim)) 
   NMA_data_analysis_subset_grpID %>% count()
   
+  ## Correct variable names
+  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% rename(contrast_name= contrast_name...14)
+  
   ## Check counts of final NMA analysis file
     
     ### NUmber of domains
@@ -840,7 +843,7 @@
   
   ## Calculate the number of students within each intervention bundle across all unique study-contrasts
   num_students_d3wn <- NMA_data_analysis_subset_grpID_d3wn %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
-  print(num_students_d3wn)
+  print(num_students_d3wn, n=Inf)
   num_students_d3wn2 <- num_students_d3wn %>% distinct(record_id, contrast_id, .keep_all = TRUE) #Keep only unique entries of each unique study-contrast so that each group of students is not summed more than once (because of multiple measures within some contrasts).
   print(num_students_d3wn2) 
   num_students_d3wn_long <- num_students_d3wn2 %>% pivot_longer(c(intervention_prelim, comparison_prelim ), names_to= "group_IC", values_to="intervention_comparison") #Put intervention and comparison groups in same row for summing students receiving the same intervention bundle regardless of whether it was received in the intervention or comparison group assignment.
@@ -923,6 +926,8 @@
     ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod_d3wn)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
     contr <- contrmat(contr, "X1", "X2", last="BAU", append=FALSE)
+    contr <- contr[, c("FF","FF.RS","NL.FF.RS","RS","VF.FF.RS","VF.RS","NL.RS", "BAU")] # Reorder the contrast matrix to match the order of the coefficients in the model output
+    #contr <- contrmat(contr, "X1", "X2", append=FALSE)
     b <- c(coef(res_mod_d3wn),0) # add 0 for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
     vb <- bldiag(vcov(res_mod_d3wn),0) # add 0 row/column for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
     pvals <- apply(contr, 1, function(x) pnorm((x%*%b) / sqrt(t(x)%*%vb%*%x)))
@@ -959,7 +964,7 @@
       print(res_mod_d3wn_pscore)
       print(num_contrasts_d3wn_long3)
       res_mod_d3wn_pscore <- res_mod_d3wn_pscore %>% left_join(num_contrasts_d3wn_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-      res_mod_d3wn_pscore$colour <- rep(c("green", "burlywood1","royalblue1","red","yellow","pink","azure1"))
+      res_mod_d3wn_pscore$colour <- rep(c("yellow","burlywood1","royalblue1","red","green","azure1","pink"))
       str(res_mod_d3wn_pscore)     
       print(res_mod_d3wn_pscore)
 
@@ -1106,6 +1111,7 @@
 
 # Combine final analysis files by domain
       NMA_data_analysis_subset_grpID_final <- bind_rows(NMA_data_analysis_subset_grpID_d1gma, NMA_data_analysis_subset_grpID_d2rn, NMA_data_analysis_subset_grpID_d3wn)
+      NMA_data_analysis_subset_grpID_final <- NMA_data_analysis_subset_grpID_final %>% rename(contrast_name= contrast_name...14)
       tabyl(NMA_data_analysis_subset_grpID_final$domain)
       NMA_data_analysis_subset_grpID_final$simple_number <- as.character(NMA_data_analysis_subset_grpID_final$simple_number)
       NMA_data_analysis_subset_grpID_final$simple_number <- as.numeric(NMA_data_analysis_subset_grpID_final$simple_number)

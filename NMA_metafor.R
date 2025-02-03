@@ -196,6 +196,9 @@
   NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% drop_na(c(intervention_prelim, comparison_prelim)) 
   NMA_data_analysis_subset_grpID %>% count()
   
+  ## Correct variable names
+  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% mutate(contrast_name= contrast_name...14)
+  
   ## Check counts of final NMA analysis file
     
     ### NUmber of domains
@@ -1097,6 +1100,7 @@
 
 # Combine final analysis files by domain
       NMA_data_analysis_subset_grpID_final <- bind_rows(NMA_data_analysis_subset_grpID_d1gma, NMA_data_analysis_subset_grpID_d2rn, NMA_data_analysis_subset_grpID_d3wn)
+      NMA_data_analysis_subset_grpID_final <- NMA_data_analysis_subset_grpID_final %>% rename(contrast_name= contrast_name...14)
       tabyl(NMA_data_analysis_subset_grpID_final$domain)
       NMA_data_analysis_subset_grpID_final$simple_number <- as.character(NMA_data_analysis_subset_grpID_final$simple_number)
       NMA_data_analysis_subset_grpID_final$simple_number <- as.numeric(NMA_data_analysis_subset_grpID_final$simple_number)
