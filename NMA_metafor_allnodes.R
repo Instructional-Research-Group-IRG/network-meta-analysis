@@ -339,6 +339,7 @@
     ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod_d1gma)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
     contr <- contrmat(contr, "X1", "X2", last="BAU", append=FALSE)
+    contr <- contr[, c("FF","FF.RS","RS","NL.RS","BAU")] # Reorder the contrast matrix to match the order of the coefficients in the model output
     b <- c(coef(res_mod_d1gma),0) # add 0 for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
     vb <- bldiag(vcov(res_mod_d1gma),0) # add 0 row/column for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
     pvals <- apply(contr, 1, function(x) pnorm((x%*%b) / sqrt(t(x)%*%vb%*%x)))
@@ -632,6 +633,7 @@
     ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod_d2rn)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
     contr <- contrmat(contr, "X1", "X2", last="BAU", append=FALSE)
+    
     b <- c(coef(res_mod_d2rn),0) # add 0 for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
     vb <- bldiag(vcov(res_mod_d2rn),0) # add 0 row/column for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
     pvals <- apply(contr, 1, function(x) pnorm((x%*%b) / sqrt(t(x)%*%vb%*%x)))
@@ -1094,7 +1096,7 @@
            layout=layout_in_circle(g, order=c("BAU","FF","FF+RS","NL+FF+RS","RS","VF+FF+RS","VF+RS","NL+RS")),
            #vertex.size=(num_students_d3wn_long4$sum_num_students_bundle2)/50, 
            #vertex.size=c(3942,976,1224,662,555,2695,602,508)/50,
-           vertex.size=c(3942,760,1312,514,555,2695,712,396)/50,
+           vertex.size=c(3942,654,1362,441,555,2740,712,339)/50,
            vertex.color=c("lightgray","royalblue1","burlywood1","red","green","azure1","yellow","pink"), 
            vertex.label.color="black", 
            vertex.label.font=2, 
