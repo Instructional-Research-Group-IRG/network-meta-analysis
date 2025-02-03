@@ -291,7 +291,7 @@
 
     ### Fit model assuming consistency (tau^2_omega=0)
     res_mod_d1gma <- rma.mv(effect_size, V_list, 
-                            mods = ~ FF + FF.RS + RS + NL.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                            mods = ~ FF + FF.RS + NL.RS + RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
                             random = ~ 1 | record_id/es_id, 
                             rho=0.60, 
                             data=NMA_data_analysis_subset_grpID_d1gma)
@@ -299,7 +299,7 @@
 
     ### Fit Jackson's model to test for inconsistency 
     res_mod_d1gma_J <- rma.mv(effect_size, V_list,
-                              mods = ~ FF + FF.RS + RS + NL.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons 
+                              mods = ~ FF + FF.RS + NL.RS + RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons 
                               random = list(~ 1 | record_id/es_id, ~ domain | record_id, ~ contrast_id | record_id),
                               rho=0.60, phi=1/2,
                               data=NMA_data_analysis_subset_grpID_d1gma)
@@ -339,7 +339,7 @@
     ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod_d1gma)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
     contr <- contrmat(contr, "X1", "X2", last="BAU", append=FALSE)
-    contr <- contr[, c("FF","FF.RS","RS","NL.RS","BAU")] # Reorder the contrast matrix to match the order of the coefficients in the model output
+    #contr <- contr[, c("FF","FF.RS","RS","NL.RS","BAU")] # Reorder the contrast matrix to match the order of the coefficients in the model output
     b <- c(coef(res_mod_d1gma),0) # add 0 for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
     vb <- bldiag(vcov(res_mod_d1gma),0) # add 0 row/column for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
     pvals <- apply(contr, 1, function(x) pnorm((x%*%b) / sqrt(t(x)%*%vb%*%x)))
@@ -633,7 +633,6 @@
     ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod_d2rn)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
     contr <- contrmat(contr, "X1", "X2", last="BAU", append=FALSE)
-    
     b <- c(coef(res_mod_d2rn),0) # add 0 for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
     vb <- bldiag(vcov(res_mod_d2rn),0) # add 0 row/column for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
     pvals <- apply(contr, 1, function(x) pnorm((x%*%b) / sqrt(t(x)%*%vb%*%x)))
@@ -880,7 +879,8 @@
   
     ### Fit model assuming consistency (tau^2_omega=0)
     res_mod_d3wn <- rma.mv(effect_size, V_list, 
-                           mods = ~ FF + FF.RS + NL.FF.RS + RS + VF.FF.RS + VF.RS + NL.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                           #mods = ~ FF + FF.RS + NL.FF.RS + RS + VF.FF.RS + VF.RS + NL.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                           mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
                            random = ~ 1 | record_id/es_id, 
                            rho=0.60, 
                            data=NMA_data_analysis_subset_grpID_d3wn)
@@ -928,7 +928,7 @@
     ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod_d3wn)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
     contr <- contrmat(contr, "X1", "X2", last="BAU", append=FALSE)
-    contr <- contr[, c("FF","FF.RS","NL.FF.RS","RS","VF.FF.RS","VF.RS","NL.RS", "BAU")] # Reorder the contrast matrix to match the order of the coefficients in the model output
+    #contr <- contr[, c("FF","FF.RS","NL.FF.RS","RS","VF.FF.RS","VF.RS","NL.RS", "BAU")] # Reorder the contrast matrix to match the order of the coefficients in the model output
     #contr <- contrmat(contr, "X1", "X2", append=FALSE)
     b <- c(coef(res_mod_d3wn),0) # add 0 for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
     vb <- bldiag(vcov(res_mod_d3wn),0) # add 0 row/column for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)

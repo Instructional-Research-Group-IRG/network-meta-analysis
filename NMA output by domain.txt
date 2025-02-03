@@ -93,29 +93,29 @@ Warning message:
 'V' appears to be not positive definite. 
 >     summary(res_mod_d3wn)
 
-Multivariate Meta-Analysis Model (k = 176; method: REML)
+Multivariate Meta-Analysis Model (k = 182; method: REML)
 
   logLik  Deviance       AIC       BIC      AICc   
--68.8324  137.6648  153.6648  178.7512  154.5592   
+-68.2858  136.5717  152.5717  177.9355  153.4339   
 
 Variance Components:
 
             estim    sqrt  nlvls  fixed           factor 
 sigma^2.1  0.0000  0.0000     31     no        record_id 
-sigma^2.2  0.0994  0.3153    176     no  record_id/es_id 
+sigma^2.2  0.0953  0.3086    182     no  record_id/es_id 
 
 Test of Moderators (coefficients 1:6):
-QM(df = 6) = 156.9789, p-val < .0001
+QM(df = 6) = 161.4423, p-val < .0001
 
 Model Results:
 
           estimate      se    zval    pval    ci.lb   ci.ub      
-FF          0.5005  0.1188  4.2142  <.0001   0.2677  0.7333  *** 
-FF.RS       0.5779  0.0608  9.5026  <.0001   0.4587  0.6971  *** 
-NL.FF.RS    0.4125  0.1805  2.2854  0.0223   0.0587  0.7662    * 
-RS          0.3494  0.0447  7.8158  <.0001   0.2618  0.4371  *** 
-VF.FF.RS    0.6275  0.1143  5.4919  <.0001   0.4036  0.8515  *** 
-VF.RS       0.1494  0.1511  0.9892  0.3226  -0.1467  0.4456      
+FF          0.5168  0.1208  4.2766  <.0001   0.2799  0.7536  *** 
+FF.RS       0.5800  0.0596  9.7372  <.0001   0.4632  0.6967  *** 
+NL.FF.RS    0.4102  0.1780  2.3044  0.0212   0.0613  0.7591    * 
+RS          0.3467  0.0438  7.9131  <.0001   0.2609  0.4326  *** 
+VF.FF.RS    0.6252  0.1127  5.5473  <.0001   0.4043  0.8462  *** 
+VF.RS       0.1491  0.1493  0.9988  0.3179  -0.1435  0.4417      
 
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1

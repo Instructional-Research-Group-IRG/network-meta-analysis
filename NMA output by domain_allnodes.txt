@@ -31,8 +31,8 @@ Model Results:
        estimate      se    zval    pval    ci.lb   ci.ub     
 FF       0.1671  0.1448  1.1545  0.2483  -0.1166  0.4508     
 FF.RS    0.0469  0.1566  0.2996  0.7645  -0.2600  0.3538     
-RS       0.2769  0.1059  2.6152  0.0089   0.0694  0.4844  ** 
-NL.RS    0.1454  0.0986  1.4752  0.1402  -0.0478  0.3385     
+NL.RS    0.1454  0.0985  1.4753  0.1401  -0.0478  0.3385     
+RS       0.2769  0.1059  2.6152  0.0089   0.0694  0.4844  **   
 
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1	
@@ -86,7 +86,8 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 	
 >     ### Fit model assuming consistency (tau^2_omega=0)
 >     res_mod_d3wn <- rma.mv(effect_size, V_list, 
-+                            mods = ~ FF + FF.RS + NL.FF.RS + RS + VF.FF.RS + VF.RS + NL.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
++                            #mods = ~ FF + FF.RS + NL.FF.RS + RS + VF.FF.RS + VF.RS + NL.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
++                            mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
 +                            random = ~ 1 | record_id/es_id, 
 +                            rho=0.60, 
 +                            data=NMA_data_analysis_subset_grpID_d3wn)
@@ -94,30 +95,30 @@ Warning message:
 'V' appears to be not positive definite. 
 >     summary(res_mod_d3wn)
 
-Multivariate Meta-Analysis Model (k = 177; method: REML)
+Multivariate Meta-Analysis Model (k = 183; method: REML)
 
   logLik  Deviance       AIC       BIC      AICc   
--68.8324  137.6648  155.6648  183.8870  156.7898   
+-68.2858  136.5717  154.5717  183.1060  155.6560   
 
 Variance Components:
 
             estim    sqrt  nlvls  fixed           factor 
 sigma^2.1  0.0000  0.0000     32     no        record_id 
-sigma^2.2  0.0994  0.3153    177     no  record_id/es_id 
+sigma^2.2  0.0953  0.3086    183     no  record_id/es_id 
 
 Test of Moderators (coefficients 1:7):
-QM(df = 7) = 158.0868, p-val < .0001
+QM(df = 7) = 162.5960, p-val < .0001
 
 Model Results:
 
           estimate      se    zval    pval    ci.lb   ci.ub      
-FF          0.5005  0.1188  4.2142  <.0001   0.2677  0.7333  *** 
-FF.RS       0.5779  0.0608  9.5026  <.0001   0.4587  0.6971  *** 
-NL.FF.RS    0.4125  0.1805  2.2854  0.0223   0.0587  0.7662    * 
-RS          0.3494  0.0447  7.8158  <.0001   0.2618  0.4371  *** 
-VF.FF.RS    0.6275  0.1143  5.4919  <.0001   0.4036  0.8515  *** 
-VF.RS       0.1494  0.1511  0.9892  0.3226  -0.1467  0.4456      
-NL.RS       0.3400  0.3230  1.0526  0.2925  -0.2931  0.9731      
+FF          0.5168  0.1208  4.2766  <.0001   0.2799  0.7536  *** 
+FF.RS       0.5800  0.0596  9.7372  <.0001   0.4632  0.6967  *** 
+NL.FF.RS    0.4102  0.1780  2.3044  0.0212   0.0613  0.7591    * 
+NL.RS       0.3400  0.3165  1.0741  0.2828  -0.2804  0.9604      
+RS          0.3467  0.0438  7.9131  <.0001   0.2609  0.4326  *** 
+VF.FF.RS    0.6252  0.1127  5.5473  <.0001   0.4043  0.8462  *** 
+VF.RS       0.1491  0.1493  0.9988  0.3179  -0.1435  0.4417      
 
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
