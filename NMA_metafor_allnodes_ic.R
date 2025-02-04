@@ -506,6 +506,7 @@
       #num_students_icW_long4 <- num_students_icW_long3 %>% mutate(sum_num_students_bundle2= sum_num_students_bundle)
       num_students_icW_long4 <- num_students_icW_long4 %>% mutate(dist=c(0,1.75,0,1.5,2.5,0,-2,-2))
       num_students_icW_long4 <- num_students_icW_long4 %>% mutate(color=c("lightgray","royalblue1","burlywood1","red","green","azure1","yellow","pink"))
+      num_students_icW_long4 <- num_students_icW_long4 %>% mutate(intervention_comparison= ifelse(intervention_comparison == "BAU", "Control", intervention_comparison))
       num_students_icW_long4
       
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
@@ -802,6 +803,7 @@
       num_students_icR_long4 <- num_students_icR_long4 %>% mutate(dist=c(0,3.65,3.25,4.9,3.55,-2.5,1.5,-2))
       #num_students_icR_long4 <- num_students_icR_long4 %>% mutate(color=c("lightgray","red","green","mediumpurple1","darkorange","maroon1","lightyellow"))
       num_students_icR_long4 <- num_students_icR_long4 %>% mutate(color=c("lightgray","red","green","mediumpurple1","darkorange","maroon1","azure1","lavenderblush2"))
+      num_students_icR_long4 <- num_students_icR_long4 %>% mutate(intervention_comparison= ifelse(intervention_comparison == "BAU", "Control", intervention_comparison))
       num_students_icR_long4
       
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
