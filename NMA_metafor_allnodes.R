@@ -280,8 +280,8 @@
   ## Calculate the variance-covariance matrix for multi-treatment studies
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d1gma)
   V_list    
-  V_list_d1gma <- data.frame(V_list)
-  write_csv(V_list_d1gma, 'V_list_d1gma.csv')
+  V_list_d1gma_allnodes <- data.frame(V_list)
+  write_csv(V_list_d1gma_allnodes, 'V_list_d1gma_allnodes.csv')
         
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID_d1gma$intervention_prelim)
@@ -572,8 +572,8 @@
   ## Calculate the variance-covariance matrix for multi-treatment studies
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d2rn)
   V_list
-  V_list_d2rn <- data.frame(V_list)
-  write_csv(V_list_d2rn, 'V_list_d2rn.csv')
+  V_list_d2rn_allnodes <- data.frame(V_list)
+  write_csv(V_list_d2rn_allnodes, 'V_list_d2rn_allnodes.csv')
       
   ##Run standard NMA with the unique interventions bundles as moderators: exclude one-contrast bundles  
   tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
@@ -868,8 +868,8 @@
   ## Calculate the variance-covariance matrix for multi-treatment studies
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_d3wn)
   V_list
-  V_list_d3wn <- data.frame(V_list)
-  write_csv(V_list_d3wn, 'V_list_d3wn.csv')
+  V_list_d3wn_allnodes <- data.frame(V_list)
+  write_csv(V_list_d3wn_allnodes, 'V_list_d3wn_allnodes.csv')
   
   ##Run standard NMA with the unique interventions bundles as moderators  
   tabyl(NMA_data_analysis_subset_grpID_d3wn$intervention_prelim)
