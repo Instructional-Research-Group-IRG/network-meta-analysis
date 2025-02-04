@@ -32,7 +32,32 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 
 Rational Numbers (R)
 
+>     summary(res_mod_icR)
 
+Multivariate Meta-Analysis Model (k = 21; method: REML)
+
+  logLik  Deviance       AIC       BIC      AICc   
+-14.4728   28.9455   40.9455   45.9448   49.3455   
+
+Variance Components:
+
+            estim    sqrt  nlvls  fixed           factor 
+sigma^2.1  0.3567  0.5972     11     no        record_id 
+sigma^2.2  0.0876  0.2959     21     no  record_id/es_id 
+
+Test of Moderators (coefficients 1:4):
+QM(df = 4) = 50.8781, p-val < .0001
+
+Model Results:
+
+             estimate      se    zval    pval    ci.lb   ci.ub      
+NL.FF.RS       1.3372  0.2073  6.4517  <.0001   0.9310  1.7435  *** 
+NL.RS          0.4485  0.3412  1.3144  0.1887  -0.2202  1.1172      
+NL.SE.FF.RS    1.4386  0.2949  4.8788  <.0001   0.8607  2.0166  *** 
+NL.SE.RS       1.3613  0.2941  4.6283  <.0001   0.7848  1.9377  *** 
+
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 ==============================================================================
