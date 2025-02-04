@@ -1,7 +1,21 @@
-intervention_content...33
-intervention_content...36
 
 ========================================================
+
+>     summary(res_mod_icW) 
+
+Multivariate Meta-Analysis Model (k = 54; method: REML)
+
+  logLik  Deviance       AIC       BIC      AICc   
+-14.9385   29.8770   47.8770   64.5283   52.7418   
+
+Variance Components:
+
+            estim    sqrt  nlvls  fixed           factor 
+sigma^2.1  0.1005  0.3171     32     no        record_id 
+sigma^2.2  0.0119  0.1090     54     no  record_id/es_id 
+
+Test of Moderators (coefficients 1:7):
+QM(df = 7) = 58.9875, p-val < .0001
 
 Model Results:
 
@@ -18,71 +32,24 @@ VF.RS       0.1898  0.2729  0.6952  0.4869  -0.3452  0.7247
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
->     pscores
-          [,1]
-VF.FF.RS 0.873
-FF.RS    0.740
-NL.FF.RS 0.632
-FF       0.627
-NL.RS    0.436
-RS       0.365
-VF.RS    0.268
-BAU      0.058
-
->     res_mod_icW_pscore
-# A tibble: 7 × 9
-  intervention type    estimate     se  zval     pval  ci.lb ci.ub Pscore
-  <chr>        <chr>      <dbl>  <dbl> <dbl>    <dbl>  <dbl> <dbl>  <dbl>
-1 FF           summary    0.509 0.133  3.82  1.31e- 4  0.248 0.770  0.627
-2 FF.RS        summary    0.577 0.0864 6.69  2.30e-11  0.408 0.747  0.74 
-3 NL.FF.RS     summary    0.521 0.202  2.58  9.81e- 3  0.126 0.916  0.632
-4 NL.RS        summary    0.34  0.343  0.992 3.21e- 1 -0.331 1.01   0.436
-5 RS           summary    0.344 0.0720 4.78  1.78e- 6  0.203 0.485  0.365
-6 VF.FF.RS     summary    0.672 0.150  4.48  7.37e- 6  0.378 0.965  0.873
-7 VF.RS        summary    0.190 0.273  0.695 4.87e- 1 -0.345 0.725  0.268
-
->       tab
-          
-           BAU FF FF+RS NL+FF+RS NL+RS RS VF+FF+RS VF+RS
-  BAU        0  0     0        0     0  0        0     0
-  FF         5  0     0        0     0  0        0     0
-  FF+RS     14  1     0        0     0  3        0     0
-  NL+FF+RS   1  0     0        0     0  0        0     0
-  NL+RS      1  0     0        0     0  0        0     0
-  RS        21  1     0        0     0  0        0     0
-  VF+FF+RS   3  0     2        0     0  0        0     0
-  VF+RS      2  0     0        0     0  0        0     0
-  
-  
->       num_students_icW_long4
-# A tibble: 8 × 5
-  intervention_comparison sum_num_students_bundle sum_num_students_bundle2  dist color     
-  <chr>                                     <dbl>                    <dbl> <dbl> <chr>     
-1 BAU                                        3901                     3901  0    lightgray 
-2 FF                                          218                      327  1.75 royalblue1
-3 FF+RS                                      1362                     1362  0    burlywood1
-4 NL+FF+RS                                     92                      184  1.5  red       
-5 NL+RS                                       555                      555  2.5  green     
-6 RS                                         2755                     2755  0    azure1    
-7 VF+FF+RS                                    356                      534 -2    yellow    
-8 VF+RS                                       113                      226 -2    pink   
-
->   print(num_students_icW_long3)    
-# A tibble: 8 × 2
-  intervention_comparison sum_num_students_bundle
-  <chr>                                     <dbl>
-1 BAU                                        3901
-2 FF                                          218
-3 FF+RS                                      1362
-4 NL+FF+RS                                     92
-5 NL+RS                                       555
-6 RS                                         2755
-7 VF+FF+RS                                    356
-8 VF+RS                                       113
-
 
 =======================================
 
+>     summary(res_mod_icR)
+
+Multivariate Meta-Analysis Model (k = 24; method: REML)
+
+  logLik  Deviance       AIC       BIC      AICc   
+-14.4728   28.9455   46.9455   54.4444   72.6598   
+
+Variance Components:
+
+            estim    sqrt  nlvls  fixed           factor 
+sigma^2.1  0.3567  0.5972     14     no        record_id 
+sigma^2.2  0.0876  0.2959     24     no  record_id/es_id 
+
+Test of Moderators (coefficients 1:7):
+QM(df = 7) = 54.2094, p-val < .0001
 
 Model Results:
 
@@ -98,70 +65,5 @@ SE.RS          0.4790  0.7171  0.6680  0.5041  -0.9264  1.8844
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-
->     pscores
-             [,1]
-NL.SE.FF.RS 0.816
-NL.SE.RS    0.755
-NL.FF.RS    0.737
-NL.SE.VF.RS 0.596
-RS          0.358
-SE.RS       0.341
-NL.RS       0.303
-BAU         0.094
-
->     res_mod_icR_pscore
-# A tibble: 7 × 9
-  intervention type    estimate    se  zval     pval  ci.lb ci.ub Pscore
-  <chr>        <chr>      <dbl> <dbl> <dbl>    <dbl>  <dbl> <dbl>  <dbl>
-1 NL.FF.RS     summary    1.34  0.207 6.45  1.11e-10  0.931  1.74  0.737
-2 NL.RS        summary    0.448 0.341 1.31  1.89e- 1 -0.220  1.12  0.303
-3 NL.SE.FF.RS  summary    1.44  0.295 4.88  1.07e- 6  0.861  2.02  0.816
-4 NL.SE.RS     summary    1.36  0.294 4.63  3.69e- 6  0.785  1.94  0.755
-5 NL.SE.VF.RS  summary    1.07  0.685 1.56  1.19e- 1 -0.274  2.41  0.596
-6 RS           summary    0.51  0.757 0.673 5.01e- 1 -0.975  1.99  0.358
-7 SE.RS        summary    0.479 0.717 0.668 5.04e- 1 -0.926  1.88  0.341
-
-              BAU NL+FF+RS NL+RS NL+SE+FF+RS NL+SE+RS NL+SE+VF+RS RS SE+RS
-  BAU           0        0     0           0        0           0  0     0
-  NL+FF+RS      7        0     0           0        0           0  0     0
-  NL+RS         5        0     0           0        0           0  0     0
-  NL+SE+FF+RS   5        2     0           0        1           0  0     0
-  NL+SE+RS      1        0     0           0        0           0  0     0
-  NL+SE+VF+RS   1        0     0           0        0           0  0     0
-  RS            1        0     0           0        0           0  0     0
-  SE+RS         1        0     0           0        0           0  0     0
-
-
-
->       num_students_icR_long4
-# A tibble: 8 × 5
-  intervention_comparison sum_num_students_bundle sum_num_students_bundle2  dist color         
-  <chr>                                     <dbl>                    <dbl> <dbl> <chr>         
-1 BAU                                        1263                   1263    0    lightgray     
-2 NL+FF+RS                                    405                    405    3.65 red           
-3 NL+RS                                       407                    407    3.25 green         
-4 NL+SE+FF+RS                                 550                    550    4.9  mediumpurple1 
-5 NL+SE+RS                                    158                    237    3.55 darkorange    
-6 NL+SE+VF+RS                                  86                    129   -2.5  maroon1       
-7 RS                                           15                     52.5  1.5  azure1        
-8 SE+RS                                        28                     98   -2    lavenderblush2
-
-
->   print(num_students_icR_long3)  
-# A tibble: 8 × 2
-  intervention_comparison sum_num_students_bundle
-  <chr>                                     <dbl>
-1 BAU                                        1263
-2 NL+FF+RS                                    405
-3 NL+RS                                       407
-4 NL+SE+FF+RS                                 550
-5 NL+SE+RS                                    158
-6 NL+SE+VF+RS                                  86
-7 RS                                           15
-8 SE+RS                                        28
-
-
-==============================================================================
-
+========================================
 

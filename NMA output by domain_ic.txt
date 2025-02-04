@@ -1,0 +1,40 @@
+========================================================
+
+>     summary(res_mod_icW) 
+
+Multivariate Meta-Analysis Model (k = 52; method: REML)
+
+  logLik  Deviance       AIC       BIC      AICc   
+-14.9385   29.8770   43.8770   56.8280   46.7488   
+
+Variance Components:
+
+            estim    sqrt  nlvls  fixed           factor 
+sigma^2.1  0.1005  0.3171     31     no        record_id 
+sigma^2.2  0.0119  0.1090     52     no  record_id/es_id 
+
+Test of Moderators (coefficients 1:5):
+QM(df = 5) = 57.9656, p-val < .0001
+
+Model Results:
+
+          estimate      se    zval    pval    ci.lb   ci.ub      
+FF          0.5090  0.1331  3.8249  0.0001   0.2482  0.7699  *** 
+FF.RS       0.5775  0.0864  6.6854  <.0001   0.4082  0.7468  *** 
+RS          0.3440  0.0720  4.7768  <.0001   0.2029  0.4852  *** 
+VF.FF.RS    0.6718  0.1499  4.4827  <.0001   0.3780  0.9655  *** 
+VF.RS       0.1898  0.2729  0.6952  0.4869  -0.3452  0.7247      
+
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+=======================================
+
+Rational Numbers (R)
+
+
+
+
+==============================================================================
+
+

@@ -257,14 +257,13 @@
   str(num_contrasts_icW_long3)
   print(num_contrasts_icW_long3) 
  
-  # ## Remove one-contrast bundles
-  # print(num_contrasts_icW_long3) ##NL+RS bundle is in only one contrast
-  # tabyl(NMA_data_analysis_subset_grpID_icW$intervention_prelim)
-  # tabyl(NMA_data_analysis_subset_grpID_icW$comparison_prelim)
-  # NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% filter(intervention_prelim!="NL+RS")
-  # #NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% filter(comparison_prelim!="NL+RS")
-  # tabyl(NMA_data_analysis_subset_grpID_icW$intervention_prelim)
-  # tabyl(NMA_data_analysis_subset_grpID_icW$comparison_prelim)  
+  ## Remove one-contrast bundles
+  print(num_contrasts_icW_long3) ##NL+RS bundle is in only one contrast
+  tabyl(NMA_data_analysis_subset_grpID_icW$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID_icW$comparison_prelim)
+  NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% filter(intervention_prelim!="NL+FF+RS" & intervention_prelim!="NL+RS")
+  tabyl(NMA_data_analysis_subset_grpID_icW$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID_icW$comparison_prelim)
    
   ## Calculate the number of students within each intervention bundle across all unique study-contrasts
   num_students_icW <- NMA_data_analysis_subset_grpID_icW %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
@@ -278,7 +277,7 @@
   num_students_icW_long3 <- num_students_icW_long2 %>% group_by(intervention_comparison) %>% summarize(sum_num_students_bundle= sum(num_students_bundle)) # Sum students by intervention bundle.
   str(num_students_icW_long3)
   print(num_students_icW_long3)
-  target_icW <- c("BAU","FF","FF+RS","NL+FF+RS","NL+RS","RS","VF+FF+RS","VF+RS")
+  target_icW <- c("BAU","FF","FF+RS","RS","VF+FF+RS","VF+RS")
   num_students_icW_long3 <- num_students_icW_long3[match(target_icW, num_students_icW_long3$intervention_comparison),]
   num_students_icW_long3$intervention_comparison <- as.character(num_students_icW_long3$intervention_comparison)
   str(num_students_icW_long3)  
@@ -302,7 +301,7 @@
 
     ### Fit model assuming consistency (tau^2_omega=0)
     res_mod_icW <- rma.mv(effect_size, V_list, 
-                            mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                            mods = ~ FF + FF.RS + RS + VF.FF.RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
                             random = ~ 1 | record_id/es_id, 
                             rho=0.60, 
                             data=NMA_data_analysis_subset_grpID_icW)
@@ -310,7 +309,7 @@
 
     ### Fit Jackson's model to test for inconsistency 
     res_mod_icW_J <- rma.mv(effect_size, V_list,
-                              mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons 
+                              mods = ~ FF + FF.RS + RS + VF.FF.RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons 
                               random = list(~ 1 | record_id/es_id, ~ domain | record_id, ~ contrast_id | record_id),
                               rho=0.60, phi=1/2,
                               data=NMA_data_analysis_subset_grpID_icW)
@@ -344,8 +343,8 @@
     lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis")
     lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
     print(lt_info_df3)
-    write_csv(lt_info_df3, 'nma_league_table_icW_allnodes.csv')
-    #write_xlsx(lt_info_df3, 'nma_league_table_icW_allnodes.xlsx')
+    write_csv(lt_info_df3, 'nma_league_table_icW.csv')
+    #write_xlsx(lt_info_df3, 'nma_league_table_icW.xlsx')
     
     ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod_icW)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
@@ -386,7 +385,7 @@
       print(res_mod_icW_pscore)
       print(num_contrasts_icW_long3)
       res_mod_icW_pscore <- res_mod_icW_pscore %>% left_join(num_contrasts_icW_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-      res_mod_icW_pscore$colour <- rep(c("yellow","burlywood1","red","royalblue1","green","azure1","pink"))
+      res_mod_icW_pscore$colour <- rep(c("yellow","burlywood1","royalblue1","azure1","pink"))
       str(res_mod_icW_pscore)
       print(res_mod_icW_pscore)
 
@@ -424,7 +423,7 @@
       print(res_mod_icW_pscore2)
           
       LfLabels1<-data.frame(x=c(1), 
-                            y=c(7.5),
+                            y=c(5.5),
                             lab=c("Estimate (95% CI)"))
       LfLabels1      
       data_table1 <- ggplot(data = res_mod_icW_pscore2, aes(x, y = intervention)) +
@@ -438,7 +437,7 @@
       data_table1
       
       LfLabels2<-data.frame(x=c(1), 
-                            y=c(7.5),
+                            y=c(5.5),
                             lab=c("P-score"))
       LfLabels2      
       data_table2 <- ggplot(data = res_mod_icW_pscore2, aes(x, y = intervention)) +
@@ -504,13 +503,13 @@
       num_students_icW_long4 <- num_students_icW_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="NL+FF+RS" | intervention_comparison=="VF+RS"),sum_num_students_bundle*2,sum_num_students_bundle))
       num_students_icW_long4 <- num_students_icW_long4 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="FF" | intervention_comparison=="VF+FF+RS"),sum_num_students_bundle2*1.5,sum_num_students_bundle2))
       #num_students_icW_long4 <- num_students_icW_long3 %>% mutate(sum_num_students_bundle2= sum_num_students_bundle)
-      num_students_icW_long4 <- num_students_icW_long4 %>% mutate(dist=c(0,1.75,0,1.5,2.5,0,-2,-2))
-      num_students_icW_long4 <- num_students_icW_long4 %>% mutate(color=c("lightgray","royalblue1","burlywood1","red","green","azure1","yellow","pink"))
+      num_students_icW_long4 <- num_students_icW_long4 %>% mutate(dist=c(0,1.75,0,0,-2,-2))
+      num_students_icW_long4 <- num_students_icW_long4 %>% mutate(color=c("lightgray","royalblue1","burlywood1","azure1","yellow","pink"))
       num_students_icW_long4 <- num_students_icW_long4 %>% mutate(intervention_comparison= ifelse(intervention_comparison == "BAU", "Control", intervention_comparison))
       num_students_icW_long4
       
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
-           layout=layout_in_circle(g, order=c("BAU","FF","FF+RS","NL+FF+RS","NL+RS","RS","VF+FF+RS","VF+RS")),
+           layout=layout_in_circle(g, order=c("BAU","FF","FF+RS","RS","VF+FF+RS","VF+RS")),
            vertex.size=(num_students_icW_long4$sum_num_students_bundle2)/50, vertex.color=num_students_icW_long4$color, 
            vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_icW_long4$intervention_comparison, vertex.label.dist=num_students_icW_long4$dist)  
 
@@ -550,14 +549,14 @@
   str(num_contrasts_icR_long3)
   print(num_contrasts_icR_long3)
   
-  ## Remove one-contrast bundles
-  # print(num_contrasts_icR_long3)
-  # tabyl(NMA_data_analysis_subset_grpID_icR$intervention_prelim)
-  # tabyl(NMA_data_analysis_subset_grpID_icR$comparison_prelim)
-  # NMA_data_analysis_subset_grpID_icR <- NMA_data_analysis_subset_grpID_icR %>% filter(intervention_prelim!="NL+SE+VF+RS" & intervention_prelim!="SE+VF+RS")
-  # #NMA_data_analysis_subset_grpID_icR <- NMA_data_analysis_subset_grpID_icR %>% filter(comparison_prelim!="NL+SE+VF+RS" & comparison_prelim!="SE+VF+RS")
-  # tabyl(NMA_data_analysis_subset_grpID_icR$intervention_prelim)
-  # tabyl(NMA_data_analysis_subset_grpID_icR$comparison_prelim)  
+  # Remove one-contrast bundles
+  print(num_contrasts_icR_long3)
+  tabyl(NMA_data_analysis_subset_grpID_icR$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID_icR$comparison_prelim)
+  NMA_data_analysis_subset_grpID_icR <- NMA_data_analysis_subset_grpID_icR %>% filter(intervention_prelim!="NL+SE+VF+RS" & intervention_prelim!="RS" & intervention_prelim!="SE+RS")
+  NMA_data_analysis_subset_grpID_icR <- NMA_data_analysis_subset_grpID_icR %>% filter(comparison_prelim!="NL+SE+VF+RS" & comparison_prelim!="RS" & comparison_prelim!="SE+RS")  
+  tabyl(NMA_data_analysis_subset_grpID_icR$intervention_prelim)
+  tabyl(NMA_data_analysis_subset_grpID_icR$comparison_prelim)
 
   ## Calculate the number of students within each intervention bundle across all unique study-contrasts
   num_students_icR <- NMA_data_analysis_subset_grpID_icR %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
@@ -571,7 +570,7 @@
   num_students_icR_long3 <- num_students_icR_long2 %>% group_by(intervention_comparison) %>% summarize(sum_num_students_bundle= sum(num_students_bundle)) # Sum students by intervention bundle.
   str(num_students_icR_long3)
   print(num_students_icR_long3)
-  target_icR <- c("BAU","NL+FF+RS","NL+RS","NL+SE+FF+RS","NL+SE+RS","NL+SE+VF+RS","RS","SE+RS")
+  target_icR <- c("BAU","NL+FF+RS","NL+RS","NL+SE+FF+RS","NL+SE+RS")
   num_students_icR_long3 <- num_students_icR_long3[match(target_icR, num_students_icR_long3$intervention_comparison),]
   num_students_icR_long3$intervention_comparison <- as.character(num_students_icR_long3$intervention_comparison)
   str(num_students_icR_long3)  
@@ -584,8 +583,8 @@
   ## Calculate the variance-covariance matrix for multi-treatment studies
   V_list <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_icR)
   V_list
-  V_list_icR_allnodes <- data.frame(V_list)
-  write_csv(V_list_icR_allnodes, 'V_list_icR_allnodes.csv')
+  V_list_icR <- data.frame(V_list)
+  write_csv(V_list_icR, 'V_list_icR.csv')
       
   ##Run standard NMA with the unique interventions bundles as moderators: exclude one-contrast bundles  
   tabyl(NMA_data_analysis_subset_grpID_icR$intervention_prelim)
@@ -595,7 +594,7 @@
   
     ### Fit model assuming consistency (tau^2_omega=0)
     res_mod_icR <- rma.mv(effect_size, V_list, 
-                           mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS + NL.SE.VF.RS + RS + SE.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                           mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
                            random = ~ 1 | record_id/es_id, 
                            rho=0.60, 
                            data=NMA_data_analysis_subset_grpID_icR)
@@ -603,8 +602,7 @@
     
     ### Fit Jackson's model to test for inconsistency 
     res_mod_icR_J <- rma.mv(effect_size, V_list, 
-                           #mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS + NL.SE.VF.RS + SE.VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
-                           mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS + NL.SE.VF.RS + RS + SE.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                           mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
                            random = list(~ 1 | record_id/es_id, ~ domain | record_id, ~ contrast_id | record_id),
                            rho=0.60, phi=1/2,
                            data=NMA_data_analysis_subset_grpID_icR)
@@ -638,8 +636,8 @@
     lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #To-do: possible to format ci below? + color code by sig
     lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
     print(lt_info_df3)
-    write_csv(lt_info_df3, 'nma_league_table_icR_allnodes.csv')
-    #write_xlsx(lt_info_df3, 'nma_league_table_icR_allnodes.xlsx')
+    write_csv(lt_info_df3, 'nma_league_table_icR.csv')
+    #write_xlsx(lt_info_df3, 'nma_league_table_icR.xlsx')
       
     ### Compute p-values
     contr <- data.frame(t(combn(c(names(coef(res_mod_icR)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
@@ -680,9 +678,7 @@
       print(res_mod_icR_pscore)
       print(num_contrasts_icR_long3)
       res_mod_icR_pscore <- res_mod_icR_pscore %>% left_join(num_contrasts_icR_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-      #res_mod_icR_pscore$colour <- rep(c("turquoise1","red","mediumpurple1","darkorange","green","yellow","azure1")) 
-      #res_mod_icR_pscore$colour <- rep(c("lightyellow","red","mediumpurple1","darkorange","green","maroon1","azure1")) 
-      res_mod_icR_pscore$colour <- rep(c("mediumpurple1","darkorange","red","maroon1","azure1","lavenderblush2","green"))
+      res_mod_icR_pscore$colour <- rep(c("mediumpurple1","darkorange","red","green"))
       str(res_mod_icR_pscore)   
       print(res_mod_icR_pscore)
       
@@ -720,7 +716,7 @@
       print(res_mod_icR_pscore2)
 
       LfLabels1<-data.frame(x=c(1), 
-                           y=c(7.5),
+                           y=c(4.5),
                            lab=c("Estimate (95% CI)"))
       LfLabels1      
       data_table1 <- ggplot(data = res_mod_icR_pscore2, aes(x, y = intervention)) +
@@ -734,7 +730,7 @@
       data_table1
       
       LfLabels2<-data.frame(x=c(1), 
-                            y=c(7.5),
+                            y=c(4.5),
                             lab=c("P-score"))
       LfLabels2      
       data_table2 <- ggplot(data = res_mod_icR_pscore2, aes(x, y = intervention)) +
@@ -800,14 +796,14 @@
       #num_students_icR_long4 <- num_students_icR_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="SE+VF+RS" | intervention_comparison=="NL+SE+RS" | intervention_comparison=="NL+SE+VF+RS" | intervention_comparison=="SE+VF+RS"),sum_num_students_bundle*1.5,sum_num_students_bundle))
       num_students_icR_long4 <- num_students_icR_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="NL+SE+RS" | intervention_comparison=="NL+SE+VF+RS"),sum_num_students_bundle*1.5,sum_num_students_bundle))
       num_students_icR_long4 <- num_students_icR_long4 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="RS" | intervention_comparison=="SE+RS"),sum_num_students_bundle2*3.5,sum_num_students_bundle2))
-      num_students_icR_long4 <- num_students_icR_long4 %>% mutate(dist=c(0,3.65,3.25,4.9,3.55,-2.5,1.5,-2))
+      num_students_icR_long4 <- num_students_icR_long4 %>% mutate(dist=c(0,3.65,0,4.9,3.55))
       #num_students_icR_long4 <- num_students_icR_long4 %>% mutate(color=c("lightgray","red","green","mediumpurple1","darkorange","maroon1","lightyellow"))
-      num_students_icR_long4 <- num_students_icR_long4 %>% mutate(color=c("lightgray","red","green","mediumpurple1","darkorange","maroon1","azure1","lavenderblush2"))
+      num_students_icR_long4 <- num_students_icR_long4 %>% mutate(color=c("lightgray","red","green","mediumpurple1","darkorange"))
       num_students_icR_long4 <- num_students_icR_long4 %>% mutate(intervention_comparison= ifelse(intervention_comparison == "BAU", "Control", intervention_comparison))
       num_students_icR_long4
       
       plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
-           layout=layout_in_circle(g, order=c("BAU","NL+FF+RS","NL+SE+FF+RS","NL+SE+RS","NL+RS","NL+SE+VF+RS","RS","SE+RS")),
+           layout=layout_in_circle(g, order=c("BAU","NL+FF+RS","NL+SE+FF+RS","NL+SE+RS","NL+RS")),
            vertex.size=(num_students_icR_long4$sum_num_students_bundle2)/15, vertex.color=num_students_icR_long4$color, 
            vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_icR_long4$intervention_comparison, vertex.label.dist=num_students_icR_long4$dist)  
 
@@ -840,7 +836,7 @@
       NMA_study_contrast_list_es_final <- NMA_data_analysis_subset_grpID_final %>% dplyr::select(record_id, "Abbreviated Citation", contrast_id, simple_number, contrast_name, domain, measure_name, es_id) #Create list of study-contrasts included in NMA.
       NMA_study_contrast_list_es_final <- NMA_study_contrast_list_es_final %>% arrange(record_id, contrast_id, es_id)
       print(NMA_study_contrast_list_es_final)
-      write_csv(NMA_study_contrast_list_es_final, 'NMA_study_contrast_list_es_final_allnodes.csv')
+      write_csv(NMA_study_contrast_list_es_final, 'NMA_study_contrast_list_es_final.csv')
       
       ### Number of contrasts
       NMA_data_analysis_subset_grpID_final_c <- NMA_data_analysis_subset_grpID_final %>% distinct(contrast_id, .keep_all = TRUE)
@@ -849,7 +845,7 @@
       NMA_study_contrast_list_final <- NMA_data_analysis_subset_grpID_final_c %>% dplyr::select(record_id, "Abbreviated Citation", contrast_id, contrast_name) #Create list of study-contrasts included in NMA.
       NMA_study_contrast_list_final <- NMA_study_contrast_list_final %>% arrange(record_id, contrast_id)
       print(NMA_study_contrast_list_final)
-      write_csv(NMA_study_contrast_list_final, 'NMA_study_contrast_list_final_allnodes.csv')
+      write_csv(NMA_study_contrast_list_final, 'NMA_study_contrast_list_final.csv')
       
       ### Number of studies
       NMA_data_analysis_subset_grpID_final_s <- NMA_data_analysis_subset_grpID_final %>% distinct(record_id, .keep_all = TRUE)
