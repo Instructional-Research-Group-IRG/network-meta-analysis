@@ -294,7 +294,7 @@
                             mods = ~ FF + FF.RS + NL.RS + RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
                             random = ~ 1 | record_id/es_id, 
                             rho=0.60, 
-                            data=NMA_data_analysis_subset_grpID_d1gma) 
+                            data=NMA_data_analysis_subset_grpID_d1gma)
     summary(res_mod_d1gma) 
 
     ### Fit Jackson's model to test for inconsistency 
