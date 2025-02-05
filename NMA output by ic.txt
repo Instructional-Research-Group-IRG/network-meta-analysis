@@ -1,29 +1,29 @@
 ========================================================
  
->     summary(res_mod_icW) 
+>    summary(res_mod_icW) 
 
-Multivariate Meta-Analysis Model (k = 52; method: REML)
+Multivariate Meta-Analysis Model (k = 188; method: REML)
 
   logLik  Deviance       AIC       BIC      AICc   
--14.9385   29.8770   43.8770   56.8280   46.7488   
+-69.3901  138.7802  152.7802  175.2466  153.4202   
 
 Variance Components:
 
             estim    sqrt  nlvls  fixed           factor 
-sigma^2.1  0.1005  0.3171     31     no        record_id 
-sigma^2.2  0.0119  0.1090     52     no  record_id/es_id 
+sigma^2.1  0.0000  0.0000     31     no        record_id 
+sigma^2.2  0.0921  0.3034    188     no  record_id/es_id 
 
 Test of Moderators (coefficients 1:5):
-QM(df = 5) = 57.9656, p-val < .0001
+QM(df = 5) = 158.3883, p-val < .0001
 
 Model Results:
 
           estimate      se    zval    pval    ci.lb   ci.ub      
-FF          0.5090  0.1331  3.8249  0.0001   0.2482  0.7699  *** 
-FF.RS       0.5775  0.0864  6.6854  <.0001   0.4082  0.7468  *** 
-RS          0.3440  0.0720  4.7768  <.0001   0.2029  0.4852  *** 
-VF.FF.RS    0.6718  0.1499  4.4827  <.0001   0.3780  0.9655  *** 
-VF.RS       0.1898  0.2729  0.6952  0.4869  -0.3452  0.7247      
+FF          0.4816  0.1163  4.1419  <.0001   0.2537  0.7096  *** 
+FF.RS       0.5673  0.0588  9.6539  <.0001   0.4521  0.6825  *** 
+RS          0.3421  0.0424  8.0685  <.0001   0.2590  0.4252  *** 
+VF.FF.RS    0.6137  0.1116  5.4972  <.0001   0.3949  0.8325  *** 
+VF.RS       0.1488  0.1479  1.0064  0.3142  -0.1410  0.4387      
 
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
@@ -32,29 +32,29 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 
 Rational Numbers (R)
 
->     summary(res_mod_icR)
+>    summary(res_mod_icR) 
 
-Multivariate Meta-Analysis Model (k = 21; method: REML)
+Multivariate Meta-Analysis Model (k = 98; method: REML)
 
   logLik  Deviance       AIC       BIC      AICc   
--14.4728   28.9455   40.9455   45.9448   49.3455   
+-93.5578  187.1155  199.1155  214.3753  200.0810   
 
 Variance Components:
 
             estim    sqrt  nlvls  fixed           factor 
-sigma^2.1  0.3567  0.5972     11     no        record_id 
-sigma^2.2  0.0876  0.2959     21     no  record_id/es_id 
+sigma^2.1  0.3486  0.5904     11     no        record_id 
+sigma^2.2  0.3174  0.5633     98     no  record_id/es_id 
 
 Test of Moderators (coefficients 1:4):
-QM(df = 4) = 50.8781, p-val < .0001
+QM(df = 4) = 47.4039, p-val < .0001
 
 Model Results:
 
-             estimate      se    zval    pval    ci.lb   ci.ub      
-NL.FF.RS       1.3372  0.2073  6.4517  <.0001   0.9310  1.7435  *** 
-NL.RS          0.4485  0.3412  1.3144  0.1887  -0.2202  1.1172      
-NL.SE.FF.RS    1.4386  0.2949  4.8788  <.0001   0.8607  2.0166  *** 
-NL.SE.RS       1.3613  0.2941  4.6283  <.0001   0.7848  1.9377  *** 
+             estimate      se    zval    pval   ci.lb   ci.ub      
+NL.FF.RS       1.1706  0.1880  6.2257  <.0001  0.8021  1.5391  *** 
+NL.RS          0.7437  0.3378  2.2015  0.0277  0.0816  1.4058    * 
+NL.SE.FF.RS    1.0291  0.2756  3.7342  0.0002  0.4890  1.5692  *** 
+NL.SE.RS       0.9953  0.2945  3.3795  0.0007  0.4181  1.5726  *** 
 
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
