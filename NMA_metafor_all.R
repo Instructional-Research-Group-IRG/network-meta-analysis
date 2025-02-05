@@ -228,8 +228,8 @@
       
   tabyl(NMA_data_analysis_subset_grpID$intervention_content)
   NMA_data_analysis_subset_grpID_all <- NMA_data_analysis_subset_grpID 
-  NMA_data_analysis_subset_grpID_all <- NMA_data_analysis_subset_grpID_all %>% distinct(contrast_id, .keep_all = TRUE)
-  NMA_data_analysis_subset_grpID_all %>% count()
+  NMA_data_analysis_subset_grpID_all_c <- NMA_data_analysis_subset_grpID_all %>% distinct(contrast_id, .keep_all = TRUE)
+  NMA_data_analysis_subset_grpID_all_c %>% count()
 
   # tabyl(NMA_data_analysis_subset_grpID$intervention_content...33)
   # NMA_data_analysis_subset_grpID_all <- NMA_data_analysis_subset_grpID %>% filter(intervention_content...33 == "W")
@@ -384,7 +384,7 @@
       print(res_mod_all_pscore)
       print(num_contrasts_all_long3)
       res_mod_all_pscore <- res_mod_all_pscore %>% left_join(num_contrasts_all_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-      res_mod_all_pscore$colour <- rep(c("darkorange","mediumpurple1","red","maroon1","yellow","burlywood1","lavenderblush2","royalblue1","green","azure1","pink"))
+      res_mod_all_pscore$colour <- rep(c("lavenderblush2","red","darkorange","mediumpurple1","maroon1","yellow","green","burlywood1","royalblue1","azure1","pink"))
       str(res_mod_all_pscore)
       print(res_mod_all_pscore)
 
