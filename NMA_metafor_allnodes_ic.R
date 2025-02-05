@@ -148,7 +148,7 @@
     as.factor(x)
   }  
   NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq","intervention_prelim","comparison_prelim")] <- lapply(NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq","intervention_prelim","comparison_prelim")], convert_to_factor)
-  NMA_data_analysis_subset_grpID[c("domain_numeric","control_nature_numeric","measure_developer_numeric","interventionist_numeric","intervention_content_numeric","TvsT")] <- lapply(NMA_data_analysis_subset_grpID[c("domain_numeric","control_nature_numeric","measure_developer_numeric","interventionist_numeric","intervention_content_numeric","TvsT")], convert_to_factor)
+  NMA_data_analysis_subset_grpID[c("domain_numeric","control_nature_numeric","measure_developer_numeric","interventionist_numeric","TvsT")] <- lapply(NMA_data_analysis_subset_grpID[c("domain_numeric","control_nature_numeric","measure_developer_numeric","interventionist_numeric","TvsT")], convert_to_factor)
   
   NMA_data_analysis_subset_grpID$group_size_average <- as.character(NMA_data_analysis_subset_grpID$group_size_average)
   NMA_data_analysis_subset_grpID$group_size_average <- as.numeric(NMA_data_analysis_subset_grpID$group_size_average)
@@ -198,10 +198,10 @@
   
   ## Correct variable names
   NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% rename(contrast_name= contrast_name...14)
-  tabyl(NMA_data_analysis_subset_grpID$intervention_content...33)
-  tabyl(NMA_data_analysis_subset_grpID$intervention_content...36)
-  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% rename(intervention_content= intervention_content...36)
-  
+  # tabyl(NMA_data_analysis_subset_grpID$intervention_content...33)
+  # tabyl(NMA_data_analysis_subset_grpID$intervention_content...36)
+  # NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% rename(intervention_content= intervention_content...36)
+
   ## Check counts of final NMA analysis file
     
     ### NUmber of domains
@@ -230,14 +230,8 @@
   tabyl(NMA_data_analysis_subset_grpID$intervention_content)
   NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID %>% filter(intervention_content == "W")
   tabyl(NMA_data_analysis_subset_grpID_icW$intervention_content)
-  NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% distinct(contrast_id, .keep_all = TRUE)
-  NMA_data_analysis_subset_grpID_icW %>% count()
-
-  # tabyl(NMA_data_analysis_subset_grpID$intervention_content...33)
-  # NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID %>% filter(intervention_content...33 == "W")
-  # tabyl(NMA_data_analysis_subset_grpID_icW$intervention_content...33)
-  # NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% distinct(contrast_id, .keep_all = TRUE)
-  # NMA_data_analysis_subset_grpID_icW %>% count()
+  NMA_data_analysis_subset_grpID_icW_c <- NMA_data_analysis_subset_grpID_icW %>% distinct(contrast_id, .keep_all = TRUE)
+  NMA_data_analysis_subset_grpID_icW_c %>% count()
   
   ## Calculate the number of unique contrasts in which each intervention bundle is included
   tabyl(NMA_data_analysis_subset_grpID_icW$intervention_prelim)
@@ -386,14 +380,14 @@
       print(res_mod_icW_pscore)
       print(num_contrasts_icW_long3)
       res_mod_icW_pscore <- res_mod_icW_pscore %>% left_join(num_contrasts_icW_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
-      res_mod_icW_pscore$colour <- rep(c("yellow","burlywood1","red","royalblue1","green","azure1","pink"))
+      res_mod_icW_pscore$colour <- rep(c("yellow","burlywood1","royalblue1","green","azure1","red","pink"))
       str(res_mod_icW_pscore)
       print(res_mod_icW_pscore)
 
       res_mod_icW_pscore_forest <- ggplot(res_mod_icW_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) +  
         geom_hline(aes(yintercept = intervention, colour = colour), size=15) +
         geom_pointrange(shape = 22, fill = "black", size = res_mod_icW_pscore$num_contrasts/5) + 
-        geom_text(label = res_mod_icW_pscore$num_contrasts, hjust = 0.5, vjust = 2.25, colour = "black", size =9, family= "Times New Roman") +        
+        geom_text(label = res_mod_icW_pscore$num_contrasts, hjust = 0.5, vjust = 2.25, colour = "black", size =7, family= "Times New Roman") +        
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change (compared to Control)") +
         labs(caption = "*Values under points indicate number of contrasts                                                        ") +
@@ -430,7 +424,7 @@
       data_table1 <- ggplot(data = res_mod_icW_pscore2, aes(x, y = intervention)) +
         geom_hline(aes(yintercept = intervention, colour = colour), size = 15) + 
         geom_text(aes(x = 1, label = estimate_cis), size= 9.25, family= "Times New Roman") + 
-        geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=10, family= "Times New Roman") + 
+        geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=8, family= "Times New Roman") + 
         scale_colour_identity() +
         theme_void() + 
         theme(text= element_text(family = "Times New Roman")) +
@@ -444,7 +438,7 @@
       data_table2 <- ggplot(data = res_mod_icW_pscore2, aes(x, y = intervention)) +
         geom_hline(aes(yintercept = intervention, colour = colour), size = 15) + 
         geom_text(aes(x = 1, label = Pscore), size= 9.25, family= "Times New Roman") +
-        geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=10, family= "Times New Roman") +
+        geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=8, family= "Times New Roman") +
         scale_colour_identity() +
         theme_void() + 
         theme(text= element_text(family = "Times New Roman")) +
@@ -529,8 +523,8 @@
   tabyl(NMA_data_analysis_subset_grpID$intervention_content)
   NMA_data_analysis_subset_grpID_icR <- NMA_data_analysis_subset_grpID %>% filter(intervention_content == "R")
   tabyl(NMA_data_analysis_subset_grpID_icR$intervention_content)
-  NMA_data_analysis_subset_grpID_icR <- NMA_data_analysis_subset_grpID_icR %>% distinct(contrast_id, .keep_all = TRUE)
-  NMA_data_analysis_subset_grpID_icR %>% count()
+  NMA_data_analysis_subset_grpID_icR_c <- NMA_data_analysis_subset_grpID_icR %>% distinct(contrast_id, .keep_all = TRUE)
+  NMA_data_analysis_subset_grpID_icR_c %>% count()
   
   ## Calculate the number of unique contrasts in which each intervention bundle is included
   tabyl(NMA_data_analysis_subset_grpID_icR$intervention_prelim)
@@ -603,7 +597,6 @@
     
     ### Fit Jackson's model to test for inconsistency 
     res_mod_icR_J <- rma.mv(effect_size, V_list, 
-                           #mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS + NL.SE.VF.RS + SE.VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
                            mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS + NL.SE.VF.RS + RS + SE.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
                            random = list(~ 1 | record_id/es_id, ~ domain | record_id, ~ contrast_id | record_id),
                            rho=0.60, phi=1/2,
@@ -682,14 +675,14 @@
       res_mod_icR_pscore <- res_mod_icR_pscore %>% left_join(num_contrasts_icR_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
       #res_mod_icR_pscore$colour <- rep(c("turquoise1","red","mediumpurple1","darkorange","green","yellow","azure1")) 
       #res_mod_icR_pscore$colour <- rep(c("lightyellow","red","mediumpurple1","darkorange","green","maroon1","azure1")) 
-      res_mod_icR_pscore$colour <- rep(c("mediumpurple1","darkorange","red","maroon1","azure1","lavenderblush2","green"))
+      res_mod_icR_pscore$colour <- rep(c("lavenderblush2","red","mediumpurple1","darkorange","maroon1","green","azure1"))
       str(res_mod_icR_pscore)   
       print(res_mod_icR_pscore)
       
       res_mod_icR_pscore_forest <- ggplot(res_mod_icR_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
         geom_hline(aes(yintercept = intervention, colour = colour), size=15) +
         geom_pointrange(shape = 22, fill = "black", size = res_mod_icR_pscore$num_contrasts/5) + 
-        geom_text(label = res_mod_icR_pscore$num_contrasts, hjust = 0.5, vjust = 2.25, colour = "black", size =9, family= "Times New Roman") +        
+        geom_text(label = res_mod_icR_pscore$num_contrasts, hjust = 0.5, vjust = 2.25, colour = "black", size =7, family= "Times New Roman") +        
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change (compared to Control)") +
         labs(caption = "*Values under points indicate number of contrasts                                               ") +
@@ -726,7 +719,7 @@
       data_table1 <- ggplot(data = res_mod_icR_pscore2, aes(x, y = intervention)) +
         geom_hline(aes(yintercept = intervention, colour = colour), size = 15) +
         geom_text(aes(x = 1, label = estimate_cis), size=9.25, family= "Times New Roman") +
-        geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=10, family= "Times New Roman") +
+        geom_text(data=LfLabels1,aes(x,y,label=lab, fontface="bold"), size=8, family= "Times New Roman") +
         scale_colour_identity() +
         theme_void() + 
         theme(text= element_text(family = "Times New Roman")) +
@@ -740,7 +733,7 @@
       data_table2 <- ggplot(data = res_mod_icR_pscore2, aes(x, y = intervention)) +
         geom_hline(aes(yintercept = intervention, colour = colour), size = 15) +
         geom_text(aes(x = 1, label = Pscore), size= 9.25, family= "Times New Roman") +
-        geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=10, family= "Times New Roman") +
+        geom_text(data=LfLabels2,aes(x,y,label=lab, fontface="bold"), size=8, family= "Times New Roman") +
         scale_colour_identity() +
         theme_void() + 
         theme(text= element_text(family = "Times New Roman")) +
@@ -826,7 +819,7 @@
 # Combine final analysis files by domain
       NMA_data_analysis_subset_grpID_final <- bind_rows(NMA_data_analysis_subset_grpID_icW, NMA_data_analysis_subset_grpID_icR)
       NMA_data_analysis_subset_grpID_final <- NMA_data_analysis_subset_grpID_final %>% rename(contrast_name= contrast_name...14)
-      NMA_data_analysis_subset_grpID_final <- NMA_data_analysis_subset_grpID_final %>% rename(intervention_content= intervention_content...36)
+      #NMA_data_analysis_subset_grpID_final <- NMA_data_analysis_subset_grpID_final %>% rename(intervention_content= intervention_content...36)
       tabyl(NMA_data_analysis_subset_grpID_final$domain)
       NMA_data_analysis_subset_grpID_final$simple_number <- as.character(NMA_data_analysis_subset_grpID_final$simple_number)
       NMA_data_analysis_subset_grpID_final$simple_number <- as.numeric(NMA_data_analysis_subset_grpID_final$simple_number)

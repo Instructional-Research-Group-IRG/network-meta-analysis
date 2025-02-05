@@ -3,64 +3,65 @@
 
 >     summary(res_mod_icW) 
 
-Multivariate Meta-Analysis Model (k = 54; method: REML)
+Multivariate Meta-Analysis Model (k = 192; method: REML)
 
   logLik  Deviance       AIC       BIC      AICc   
--14.9385   29.8770   47.8770   64.5283   52.7418   
+-69.7195  139.4390  157.4390  186.4222  158.4676   
 
 Variance Components:
 
             estim    sqrt  nlvls  fixed           factor 
-sigma^2.1  0.1005  0.3171     32     no        record_id 
-sigma^2.2  0.0119  0.1090     54     no  record_id/es_id 
+sigma^2.1  0.0000  0.0000     32     no        record_id 
+sigma^2.2  0.0919  0.3031    192     no  record_id/es_id 
 
 Test of Moderators (coefficients 1:7):
-QM(df = 7) = 58.9875, p-val < .0001
+QM(df = 7) = 159.8225, p-val < .0001
 
 Model Results:
 
           estimate      se    zval    pval    ci.lb   ci.ub      
-FF          0.5090  0.1331  3.8249  0.0001   0.2482  0.7699  *** 
-FF.RS       0.5775  0.0864  6.6854  <.0001   0.4082  0.7468  *** 
-NL.FF.RS    0.5210  0.2018  2.5823  0.0098   0.1256  0.9164   ** 
-NL.RS       0.3400  0.3426  0.9925  0.3210  -0.3314  1.0114      
-RS          0.3440  0.0720  4.7768  <.0001   0.2029  0.4852  *** 
-VF.FF.RS    0.6718  0.1499  4.4827  <.0001   0.3780  0.9655  *** 
-VF.RS       0.1898  0.2729  0.6952  0.4869  -0.3452  0.7247      
+FF          0.4817  0.1162  4.1436  <.0001   0.2538  0.7095  *** 
+FF.RS       0.5673  0.0587  9.6574  <.0001   0.4521  0.6824  *** 
+NL.FF.RS    0.2297  0.2102  1.0925  0.2746  -0.1824  0.6417      
+NL.RS       0.3400  0.3111  1.0927  0.2745  -0.2698  0.9498      
+RS          0.3421  0.0424  8.0729  <.0001   0.2590  0.4251  *** 
+VF.FF.RS    0.6136  0.1116  5.4997  <.0001   0.3949  0.8323  *** 
+VF.RS       0.1488  0.1478  1.0068  0.3140  -0.1409  0.4385      
 
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
 
 
 =======================================
 
 >     summary(res_mod_icR)
 
-Multivariate Meta-Analysis Model (k = 24; method: REML)
+>     summary(res_mod_icR)
 
-  logLik  Deviance       AIC       BIC      AICc   
--14.4728   28.9455   46.9455   54.4444   72.6598   
+Multivariate Meta-Analysis Model (k = 108; method: REML)
+
+   logLik   Deviance        AIC        BIC       AICc   
+-101.2881   202.5762   220.5762   244.1122   222.5542   
 
 Variance Components:
 
             estim    sqrt  nlvls  fixed           factor 
-sigma^2.1  0.3567  0.5972     14     no        record_id 
-sigma^2.2  0.0876  0.2959     24     no  record_id/es_id 
+sigma^2.1  0.3488  0.5906     14     no        record_id 
+sigma^2.2  0.3276  0.5724    108     no  record_id/es_id 
 
 Test of Moderators (coefficients 1:7):
-QM(df = 7) = 54.2094, p-val < .0001
+QM(df = 7) = 55.3954, p-val < .0001
 
 Model Results:
 
              estimate      se    zval    pval    ci.lb   ci.ub      
-NL.FF.RS       1.3372  0.2073  6.4517  <.0001   0.9310  1.7435  *** 
-NL.RS          0.4485  0.3412  1.3144  0.1887  -0.2202  1.1172      
-NL.SE.FF.RS    1.4386  0.2949  4.8788  <.0001   0.8607  2.0166  *** 
-NL.SE.RS       1.3613  0.2941  4.6283  <.0001   0.7848  1.9377  *** 
-NL.SE.VF.RS    1.0680  0.6849  1.5594  0.1189  -0.2743  2.4103      
-RS             0.5100  0.7575  0.6733  0.5008  -0.9747  1.9947      
-SE.RS          0.4790  0.7171  0.6680  0.5041  -0.9264  1.8844      
+NL.FF.RS       1.1728  0.1893  6.1945  <.0001   0.8017  1.5439  *** 
+NL.RS          0.7445  0.3388  2.1973  0.0280   0.0804  1.4085    * 
+NL.SE.FF.RS    1.0303  0.2774  3.7143  0.0002   0.4866  1.5740  *** 
+NL.SE.RS       0.9960  0.2978  3.3442  0.0008   0.4123  1.5798  *** 
+NL.SE.VF.RS    0.8763  0.6542  1.3393  0.1805  -0.4060  2.1586      
+RS             0.3442  0.7841  0.4390  0.6607  -1.1926  1.8810      
+SE.RS          1.8715  0.7326  2.5546  0.0106   0.4356  3.3073    * 
 
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
