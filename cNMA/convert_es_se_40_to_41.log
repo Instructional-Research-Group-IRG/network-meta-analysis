@@ -1,0 +1,186 @@
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  convert_es_se
+       log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41.log
+  log type:  text
+ opened on:  19 Feb 2025, 10:23:59
+
+. 
+. 
+. *************************************************************************************************
+. ***                                                                                           ***
+. *** Program name: convert_es_se_40_to_41.do                                                   ***
+. *** Project: Component Network Analysis                                                                   ***
+. *** Purpose: Clean TBF Market Garden 2024 data                                                ***    
+. ***                                                                                                                                                                               ***
+. *** Contents:                                                                                             ***
+. ***    0) SET UP CODE                                                                                         ***
+. ***    I) LOAD RAW DATA                                                                       ***
+. ***    II) MANAGE VARIABLES                                                                   ***
+. ***    III) CLEAN DATA                                                                        ***
+. ***    IV) DESCRIPTIVE STATISTICS                                                             ***
+. ***                                                                                           ***
+. *** Authors: Seth B. Morgan                                                                               ***
+. *** Start date: February 19, 2025                                                                                                 ***
+. *** Last date modified: February 19, 2025                                                    ***
+. ***                                                                                           ***
+. *** Notes:                                                                                    ***
+. ***                                                                                           ***
+. ***                                                                                           ***
+. *************************************************************************************************
+. 
+. clear all
+
+. version 18.5
+
+. set more off
+
+. set varabbrev off
+
+. pause off
+
+. 
+. 
+. *=========================================================================================
+. * 0) SET UP CODE
+. *=========================================================================================      
+. 
+. /* Set seed */
+.         set seed 7122024
+
+.         
+. /* Define globals */
+. 
+.         *Root
+.         global root "C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA"
+
+.     adopath ++ "$root"
+  [1]              "C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA"
+  [2]  (BASE)      "C:\Program Files\Stata18\ado\base/"
+  [3]  (SITE)      "C:\Program Files\Stata18\ado\site/"
+  [4]              "."
+  [5]  (PERSONAL)  "C:\Users\sethb\ado\personal/"
+  [6]  (PLUS)      "C:\Users\sethb\ado\plus/"
+  [7]  (OLDPLACE)  "c:\ado/"
+
+.     
+. 
+. *=========================================================================================
+. * I) LOAD CNMA DATABASE
+. *=========================================================================================
+. 
+.         /* Load in cNMA database */
+.         import excel "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 v5_Data inventory for 4.0 to 4.xlsx", sheet("DATABASE Converting ESs and SEs") firstrow clear
+(53 vars, 506 obs)
+
+. 
+.         /* Clean up variable names */
+.         include "$root\convert_es_se_40_to_41_cleanup_variable_names.do"
+
+. 
+. rename ContrastNumbersimple_number contrast_simple_number
+
+. rename MRGlink mrg_link
+
+. rename LevelofAssignmentSource level_of_assignment
+
+. rename Analysismethodeffectsizecalc analysis_method
+
+. 
+.         
+.         /*Keep only valid rows */
+.         count
+  506
+
+.         drop if missing(contrast_simple_number)
+(110 observations deleted)
+
+.         count
+  396
+
+.         
+.         /* Drop uneccesary columns */
+.         drop mrg_link
+
+.         
+.         /* Save cNMA database as .dta */
+.         save "$root\Data inventory for 4.0 to 4.dta", replace
+file C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\Data inventory for 4.0 to 4.dta saved
+
+.         
+.         /* Explore key variables */
+.         tab1 level_of_assignment analysis_method, missing
+
+-> tabulation of level_of_assignment  
+
+   Level of |
+ Assignment |
+
+
+
+[Source: |
+MRG]
+
+[drop |
+ down list] |      Freq.     Percent        Cum.
+------------+-----------------------------------
+            |        139       35.10       35.10
+    cluster |         14        3.54       38.64
+ individual |        243       61.36      100.00
+------------+-----------------------------------
+      Total |        396      100.00
+
+-> tabulation of analysis_method  
+
+    Analysis method/effect |
+          size calculation |
+               
+
+
+[Source: |
+     MRG]
+
+[dropdown list] |      Freq.     Percent        Cum.
+---------------------------+-----------------------------------
+                           |        144       36.36       36.36
+ HLM/multilevel regression |         31        7.83       44.19
+                    ANCOVA |         63       15.91       60.10
+              ANOVA F-test |         10        2.53       62.63
+            OLS regression |          5        1.26       63.89
+             no adjustment |        142       35.86       99.75
+                    t-stat |          1        0.25      100.00
+---------------------------+-----------------------------------
+                     Total |        396      100.00
+
+.         
+.   
+. *=========================================================================================
+. * II) CONVERT EFFECT SIZES FROM 4.0 to 4.1
+. *=========================================================================================  
+. 
+.         /* */
+. 
+.         /* */
+. 
+.         /* */
+.         
+.     
+. *=========================================================================================
+. * III) CONVERT STANDARD ERRORS FROM 4.0 to 4.1
+. *=========================================================================================     
+. 
+.         /* */
+.                 
+.                 
+.          
+. *=========================================================================================
+. * IV) DESCRIPTIVE STATISTICS
+. *=========================================================================================     
+.         
+. 
+. 
+. log close convert_es_se
+      name:  convert_es_se
+       log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41.log
+  log type:  text
+ closed on:  19 Feb 2025, 10:23:59
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
