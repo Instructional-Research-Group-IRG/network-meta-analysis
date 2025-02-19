@@ -2,7 +2,7 @@
       name:  convert_es_se
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41.log
   log type:  text
- opened on:  19 Feb 2025, 16:16:24
+ opened on:  19 Feb 2025, 16:20:00
 
 . 
 . 
@@ -119,6 +119,7 @@
 .         
 .         /* Save cNMA database as .dta */
 .         save "$root\Data inventory for 4.0 to 4.dta", replace
+(file C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\Data inventory for 4.0 to 4.dta not found)
 file C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\Data inventory for 4.0 to 4.dta saved
 
 .         
@@ -1388,5 +1389,5 @@ es_conver~41 |        137    .7389124    .8263228       -.43       4.08
       name:  convert_es_se
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41.log
   log type:  text
- closed on:  19 Feb 2025, 16:16:24
+ closed on:  19 Feb 2025, 16:20:01
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
