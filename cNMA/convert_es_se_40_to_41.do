@@ -125,6 +125,9 @@ pause off
 			tablist level_of_assignment analytic_method outcome_type es_nochange, sort(v)
 			replace es_converted_41=es_official_40 if es_nochange==1
 			bysort es_nochange: summarize es_converted_41
+			
+		*-> Additional adjustment if officially reported effect size calculated with unadjusted means but adjusted means are available
+			// Note: TBD
 		
 	/* Effect sizes that are calculated differently under 4.0 and 4.1 */
 	
@@ -136,8 +139,15 @@ pause off
 			// Note: Revise the student-level ES from studies using cluster-level assignment using the unbiased formula in Table 1 of the Supplement, 
 			//	     which imposes a bias correction, in place of [E.5.1] on page E-9 of v4.1 Procedures/biased formula in Table 1 of the Supplement.
 			//       (?) All cluster-level assignment studies report student-level effect sizes (i.e., there are no cluster-level effect sizes reported in the cNMA database).
-			generate b=1 // (!) Placeholder. Needs to updated with the estimate of the unstandardized difference between intervention and comparison group means, the column for which depends on the analyic method used.
-			generate icc=1 // (!) Placeholder. Needs to updated by team.
+			
+			tablist level_of_assignment analytic_method regression_coef /*study_need_to_cluster*/ regression_coef_se_uc regression_coef_se_cc model_Rsqrd t_stata anova_f_stat /*mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj mean_i_sd mean_c_sd*/ if level_of_assignment=="cluster", sort(v) ab(32)
+			generate b_cluster=.
+**# Bookmark #1
+			replace b_cluster= regression_coef if level_of_assignment=="cluster" & analytic_method=="HLM/multilevel regression"
+			tablist level_of_assignment analytic_method b_cluster regression_coef /*study_need_to_cluster*/ regression_coef_se_uc regression_coef_se_cc model_Rsqrd t_stata anova_f_stat /*mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj mean_i_sd mean_c_sd*/ if level_of_assignment=="cluster", sort(v) ab(32)
+			
+			generate icc=0.6 // (!) Placeholder. Needs to updated by team.
+			
 			replace es_converted_41 = ((omega*b)/S_pooled_sd) * sqrt( 1 - ( (2*(n_avg_cluster-1)*icc) / n_t_indiv-2) ) if level_of_assignment=="cluster"
 			tablist es_official_40 es_converted_41 omega b icc S_pooled_sd n_avg_cluster n_t_indiv if level_of_assignment=="cluster", sort(v) ab(32)
     
