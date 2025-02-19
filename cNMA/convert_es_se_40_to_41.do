@@ -11,7 +11,7 @@ log using "C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network met
 ***																							  ***
 *** Contents:																				  ***
 ***    0) SET UP CODE																		  ***
-***    I) LOAD CNMA DATABASE																  ***
+***    I) PREPARE CNMA DATABASE																  ***
 ***    II) CONVERT EFFECT SIZES FROM 4.0 to 4.1												  ***
 ***    III) CONVERT STANDARD ERRORS OF EFFECT SIZES FROM 4.0 to 4.1     					  ***
 ***																							  ***
@@ -46,7 +46,7 @@ pause off
     
 
 *=========================================================================================
-* I) LOAD CNMA DATABASE
+* I) PREPARE CNMA DATABASE
 *=========================================================================================
 
 	/* Load in cNMA database */
@@ -69,6 +69,22 @@ pause off
 	/* Explore key variables */
 	tab1 level_of_assignment analytic_method outcome_type, missing
 	tablist level_of_assignment analytic_method outcome_type, sort(v)
+	
+	/* Clean up string variables */
+	foreach var of varlist _all {
+		capture confirm string variable `var'
+		if _rc==0 {
+			display as input _n "String variable: `var'"
+			replace `var'= strtrim(stritrim(`var'))
+		}
+	}
+	
+	/* Clean up numeric variables */
+	foreach var of varlist mean_?_adj {
+		display as input _n "Numeric variable: `var'"
+		destring `var', replace
+	}
+
 	
 	/* Calculate necessary variables from study-reported data */
 			
@@ -140,16 +156,29 @@ pause off
 			//	     which imposes a bias correction, in place of [E.5.1] on page E-9 of v4.1 Procedures/biased formula in Table 1 of the Supplement.
 			//       (?) All cluster-level assignment studies report student-level effect sizes (i.e., there are no cluster-level effect sizes reported in the cNMA database).
 			
-			tablist level_of_assignment analytic_method regression_coef /*study_need_to_cluster*/ regression_coef_se_uc regression_coef_se_cc model_Rsqrd t_stata anova_f_stat /*mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj mean_i_sd mean_c_sd*/ if level_of_assignment=="cluster", sort(v) ab(32)
-			generate b_cluster=.
-**# Bookmark #1
-			replace b_cluster= regression_coef if level_of_assignment=="cluster" & analytic_method=="HLM/multilevel regression"
-			tablist level_of_assignment analytic_method b_cluster regression_coef /*study_need_to_cluster*/ regression_coef_se_uc regression_coef_se_cc model_Rsqrd t_stata anova_f_stat /*mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj mean_i_sd mean_c_sd*/ if level_of_assignment=="cluster", sort(v) ab(32)
+			*Put estimated impacts across cluster studies into single variable for use as b in the unbiased [E.5.1] formula of Table 1 of the Supplement
+			generate b_cluster=. // This is the estimated difference between the intervention and comparison groups the source of which will differe depending on the analytic method used and data available.
+			tablist analytic_method if level_of_assignment=="cluster", sort(v) ab(32)
 			
-			generate icc=0.6 // (!) Placeholder. Needs to updated by team.
+				**HLM & OLS: use regression coefficient if reported
+				tablist level_of_assignment analytic_method regression_coef regression_coef_se_uc regression_coef_se_cc model_Rsqrd if level_of_assignment=="cluster" & inlist(analytic_method,"HLM/multilevel regression","OLS regression"), sort(v) ab(32)
+				replace b_cluster= regression_coef if level_of_assignment=="cluster" & inlist(analytic_method,"HLM/multilevel regression","OLS regression")
+				tablist analytic_method b_cluster regression_coef /*study_need_to_cluster*/ regression_coef_se_uc regression_coef_se_cc model_Rsqrd if level_of_assignment=="cluster" & inlist(analytic_method,"HLM/multilevel regression","OLS regression"), sort(v) ab(32)
+				tablist study_id contrast_id regression_coef regression_coef_se_uc regression_coef_se_cc mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj mean_i_sd mean_c_sd if missing(b_cluster) & level_of_assignment=="cluster" & inlist(analytic_method,"HLM/multilevel regression","OLS regression"), sort(v) ab(32) 
 			
-			replace es_converted_41 = ((omega*b)/S_pooled_sd) * sqrt( 1 - ( (2*(n_avg_cluster-1)*icc) / n_t_indiv-2) ) if level_of_assignment=="cluster"
-			tablist es_official_40 es_converted_41 omega b icc S_pooled_sd n_avg_cluster n_t_indiv if level_of_assignment=="cluster", sort(v) ab(32)
+				**No adjustment
+				tablist level_of_assignment analytic_method b_cluster regression_coef mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj mean_i_sd mean_c_sd if level_of_assignment=="cluster" & analytic_method=="no adjustment", sort(v) ab(32)
+				replace b_cluster=  mean_i_adj-mean_c_adj if !missing(mean_i_adj) & !missing(mean_c_adj) & level_of_assignment=="cluster" & analytic_method=="no adjustment"
+				replace b_cluster=  mean_i_unadj-mean_c_unadj if !missing(mean_i_unadj) & !missing(mean_c_unadj) & missing(b_cluster) & level_of_assignment=="cluster" & analytic_method=="no adjustment"
+				tablist level_of_assignment analytic_method b_cluster regression_coef mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj mean_i_sd mean_c_sd if level_of_assignment=="cluster" & analytic_method=="no adjustment", sort(v) ab(32)
+
+				replace icc="." if inlist(icc,"Not in article","Not in article but see comment","Not presented in report") 
+				destring icc, replace
+				replace icc= 0.2 if icc==. & level_of_assignment=="cluster" // (!) Placeholder. Needs to be updated by team. "As defaults, the WWC uses the ICC values of .20 for achievement outcomes and .10 for all other outcomes, but will use study-reported ICC values when available. (Procedures handbook 4.1, p. 20)"
+			
+			*Calculate 4.1 effect size for outcome measures of cluster-level assignment studies: unbiased [E.5.1] formula of Table 1 of the Supplement
+			replace es_converted_41 = ((omega*b_cluster)/S_pooled_sd) * sqrt( 1 - ( (2*(n_avg_cluster-1)*icc) / n_t_indiv-2) ) if level_of_assignment=="cluster"
+			tablist analytic_method es_official_40 es_converted_41 omega b_cluster icc S_pooled_sd n_avg_cluster n_t_indiv if level_of_assignment=="cluster", sort(v) ab(32)
     
 	
 *=========================================================================================

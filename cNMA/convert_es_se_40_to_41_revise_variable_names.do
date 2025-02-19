@@ -1,5 +1,6 @@
 
 rename ContrastNumbersimple_number contrast_simple_number
+rename Studyrecord_idSourceNNM study_id
 rename MRGlink mrg_link
 rename LevelofAssignmentSource level_of_assignment
 rename Outcometypecontinuousdichoto outcome_type

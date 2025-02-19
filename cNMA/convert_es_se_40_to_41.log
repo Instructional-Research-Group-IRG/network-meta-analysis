@@ -2,7 +2,7 @@
       name:  convert_es_se
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41.log
   log type:  text
- opened on:  19 Feb 2025, 15:26:05
+ opened on:  19 Feb 2025, 16:16:24
 
 . 
 . 
@@ -14,7 +14,7 @@
 . ***                                                                                                                                                                                       ***
 . *** Contents:                                                                                                                                                             ***
 . ***    0) SET UP CODE                                                                                                                                             ***
-. ***    I) LOAD CNMA DATABASE                                                                                                                              ***
+. ***    I) PREPARE CNMA DATABASE                                                                                                                           ***
 . ***    II) CONVERT EFFECT SIZES FROM 4.0 to 4.1                                                                                           ***
 . ***    III) CONVERT STANDARD ERRORS OF EFFECT SIZES FROM 4.0 to 4.1                                               ***
 . ***                                                                                                                                                                                       ***
@@ -64,7 +64,7 @@
 .     
 . 
 . *=========================================================================================
-. * I) LOAD CNMA DATABASE
+. * I) PREPARE CNMA DATABASE
 . *=========================================================================================
 . 
 .         /* Load in cNMA database */
@@ -77,6 +77,8 @@
 
 . 
 . rename ContrastNumbersimple_number contrast_simple_number
+
+. rename Studyrecord_idSourceNNM study_id
 
 . rename MRGlink mrg_link
 
@@ -117,7 +119,6 @@
 .         
 .         /* Save cNMA database as .dta */
 .         save "$root\Data inventory for 4.0 to 4.dta", replace
-(file C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\Data inventory for 4.0 to 4.dta not found)
 file C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\Data inventory for 4.0 to 4.dta saved
 
 .         
@@ -208,6 +209,101 @@ dichotomous |          2        0.51      100.00
   | individual                       t-stat    continuous        1     0.25       396    100.00 |
   +---------------------------------------------------------------------------------------------+
 
+.         
+.         /* Clean up string variables */
+.         foreach var of varlist _all {
+  2.                 capture confirm string variable `var'
+  3.                 if _rc==0 {
+  4.                         display as input _n "String variable: `var'"
+  5.                         replace `var'= strtrim(stritrim(`var'))
+  6.                 }
+  7.         }
+
+String variable: contrast_simple_number
+(0 real changes made)
+
+String variable: contrast_id
+(0 real changes made)
+
+String variable: study_id
+(0 real changes made)
+
+String variable: StudyCitationfull_citation
+(0 real changes made)
+
+String variable: ContrastNamecontrast_name
+(0 real changes made)
+
+String variable: DomainSourceNNMAdatabase
+(0 real changes made)
+
+String variable: OutcomeSourceNNMAdatabase
+(0 real changes made)
+
+String variable: outcome_type
+(0 real changes made)
+
+String variable: level_of_assignment
+(0 real changes made)
+
+String variable: analytic_method
+(31 real changes made)
+
+String variable: mean_i_adj
+(0 real changes made)
+
+String variable: mean_c_adj
+(0 real changes made)
+
+String variable: mean_i_sd
+(0 real changes made)
+
+String variable: Adjustedgroupmeandifference
+(1 real change made)
+
+String variable: regression_coef_se_uc
+(0 real changes made)
+
+String variable: regression_coef_se_cc
+(0 real changes made)
+
+String variable: model_Rsqrd
+(1 real change made)
+
+String variable: dof
+(0 real changes made)
+
+String variable: anova_f_stat
+(1 real change made)
+
+String variable: icc
+(0 real changes made)
+
+String variable: log_odds_ratio
+(1 real change made)
+
+String variable: AZ
+(8 real changes made)
+
+String variable: BA
+(3 real changes made)
+
+.         
+.         /* Clean up numeric variables */
+.         foreach var of varlist mean_?_adj {
+  2.                 display as input _n "Numeric variable: `var'"
+  3.                 destring `var', replace
+  4.         }
+
+Numeric variable: mean_i_adj
+mean_i_adj: all characters numeric; replaced as double
+(261 missing values generated)
+
+Numeric variable: mean_c_adj
+mean_c_adj: all characters numeric; replaced as double
+(262 missing values generated)
+
+. 
 .         
 .         /* Calculate necessary variables from study-reported data */
 .                         
@@ -1007,24 +1103,24 @@ mean_i_sd: all characters numeric; replaced as double
 
 .                         tablist level_of_assignment analytic_method outcome_type es_nochange, sort(v)
 
-  +--------------------------------------------------------------------------------------------------------+
-  | level_of~t              analytic_method   outcome_t~e   es_noc~e   _Freq_   _Perc_   _CFreq_   _CPerc_ |
-  |--------------------------------------------------------------------------------------------------------|
-  |                                                                0      139    35.10       139     35.10 |
-  |    cluster    HLM/multilevel regression    continuous          0       11     2.78       150     37.88 |
-  |    cluster                no adjustment    continuous          0        3     0.76       153     38.64 |
-  | individual                                 continuous          1        5     1.26       158     39.90 |
-  | individual    HLM/multilevel regression    continuous          1       20     5.05       178     44.95 |
-  |--------------------------------------------------------------------------------------------------------|
-  | individual                       ANCOVA                        0        3     0.76       181     45.71 |
-  | individual                       ANCOVA    continuous          1       60    15.15       241     60.86 |
-  | individual                 ANOVA F-test    continuous          1       10     2.53       251     63.38 |
-  | individual               OLS regression    continuous          1        5     1.26       256     64.65 |
-  | individual                no adjustment    continuous          1      137    34.60       393     99.24 |
-  |--------------------------------------------------------------------------------------------------------|
-  | individual                no adjustment   dichotomous          0        2     0.51       395     99.75 |
-  | individual                       t-stat    continuous          1        1     0.25       396    100.00 |
-  +--------------------------------------------------------------------------------------------------------+
+  +-------------------------------------------------------------------------------------------------------+
+  | level_of~t             analytic_method   outcome_t~e   es_noc~e   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |-------------------------------------------------------------------------------------------------------|
+  |                                                               0      139    35.10       139     35.10 |
+  |    cluster   HLM/multilevel regression    continuous          0       11     2.78       150     37.88 |
+  |    cluster               no adjustment    continuous          0        3     0.76       153     38.64 |
+  | individual                                continuous          1        5     1.26       158     39.90 |
+  | individual                      ANCOVA                        0        3     0.76       161     40.66 |
+  |-------------------------------------------------------------------------------------------------------|
+  | individual                      ANCOVA    continuous          1       60    15.15       221     55.81 |
+  | individual                ANOVA F-test    continuous          1       10     2.53       231     58.33 |
+  | individual   HLM/multilevel regression    continuous          1       20     5.05       251     63.38 |
+  | individual              OLS regression    continuous          1        5     1.26       256     64.65 |
+  | individual               no adjustment    continuous          1      137    34.60       393     99.24 |
+  |-------------------------------------------------------------------------------------------------------|
+  | individual               no adjustment   dichotomous          0        2     0.51       395     99.75 |
+  | individual                      t-stat    continuous          1        1     0.25       396    100.00 |
+  +-------------------------------------------------------------------------------------------------------+
 
 .                         replace es_converted_41=es_official_40 if es_nochange==1
 (238 real changes made)
@@ -1061,55 +1157,236 @@ es_conver~41 |        238    .5864076    .7399782      -1.44       4.08
 .                         //           which imposes a bias correction, in place of [E.5.1] on page E-9 of v4.1 Procedures/biased formula in Table 1 of the Supplement.
 .                         //       (?) All cluster-level assignment studies report student-level effect sizes (i.e., there are no cluster-level effect sizes reported in the cNMA database).
 .                         
-.                         tablist level_of_assignment analytic_method regression_coef /*study_need_to_cluster*/ regression_coef_se_uc regression_coef_se_cc model_Rsqrd t_stata anova_f_stat /*mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj mean_i_sd mea
-> n_c_sd*/ if level_of_assignment=="cluster", sort(v) ab(32)
-
-  +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-  | level_of_assignment              analytic_method   regression_coef     regression_coef_se_uc     regression_coef_se_cc               model_Rsqrd   t_stata   anova_f_stat   _Freq_   _Perc_   _CFreq_   _CPerc_ |
-  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-  |             cluster    HLM/multilevel regression               .26                                                                                       .                       2    14.29         2     14.29 |
-  |             cluster    HLM/multilevel regression              1.24                                                                                       .                       1     7.14         3     21.43 |
-  |             cluster    HLM/multilevel regression              1.86                                                                                       .                       1     7.14         4     28.57 |
-  |             cluster    HLM/multilevel regression              3.77                                               1.016                                   .                       1     7.14         5     35.71 |
-  |             cluster    HLM/multilevel regression              5.46                                               1.965                                   .                       1     7.14         6     42.86 |
-  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-  |             cluster    HLM/multilevel regression             31.97                                               8.137                                   .                       1     7.14         7     50.00 |
-  |             cluster    HLM/multilevel regression                 .   Not presented in report                       .82   Not presented in report         .                       1     7.14         8     57.14 |
-  |             cluster    HLM/multilevel regression                 .   Not presented in report   Not presented in report                                   .                       3    21.43        11     78.57 |
-  |             cluster                no adjustment                 .                                                                                       .                       3    21.43        14    100.00 |
-  +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-
-.                         generate b_cluster=.
+.                         *Put estimated impacts across cluster studies into single variable for use as b in the unbiased [E.5.1] formula of Table 1 of the Supplement
+.                         generate b_cluster=. // This is the estimated difference between the intervention and comparison groups the source of which will differe depending on the analytic method used and data available.
 (396 missing values generated)
 
-. **# Bookmark #1
-.                         replace b_cluster= regression_coef if level_of_assignment=="cluster" & analytic_method=="HLM/multilevel regression"
-(0 real changes made)
+.                         tablist analytic_method if level_of_assignment=="cluster", sort(v) ab(32)
 
-.                         tablist level_of_assignment analytic_method b_cluster regression_coef /*study_need_to_cluster*/ regression_coef_se_uc regression_coef_se_cc model_Rsqrd t_stata anova_f_stat /*mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj mea
-> n_i_sd mean_c_sd*/ if level_of_assignment=="cluster", sort(v) ab(32)
-
-  +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-  | level_of_assignment              analytic_method   b_cluster   regression_coef     regression_coef_se_uc     regression_coef_se_cc               model_Rsqrd   t_stata   anova_f_stat   _Freq_   _Perc_   _CFreq_   _CPerc_ |
-  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-  |             cluster    HLM/multilevel regression           .               .26                                                                                       .                       2    14.29         2     14.29 |
-  |             cluster    HLM/multilevel regression           .              1.24                                                                                       .                       1     7.14         3     21.43 |
-  |             cluster    HLM/multilevel regression           .              1.86                                                                                       .                       1     7.14         4     28.57 |
-  |             cluster    HLM/multilevel regression           .              3.77                                               1.016                                   .                       1     7.14         5     35.71 |
-  |             cluster    HLM/multilevel regression           .              5.46                                               1.965                                   .                       1     7.14         6     42.86 |
-  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-  |             cluster    HLM/multilevel regression           .             31.97                                               8.137                                   .                       1     7.14         7     50.00 |
-  |             cluster    HLM/multilevel regression           .                 .   Not presented in report                       .82   Not presented in report         .                       1     7.14         8     57.14 |
-  |             cluster    HLM/multilevel regression           .                 .   Not presented in report   Not presented in report                                   .                       3    21.43        11     78.57 |
-  |             cluster                no adjustment           .                 .                                                                                       .                       3    21.43        14    100.00 |
-  +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  +-----------------------------------------------------------------+
+  |           analytic_method   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |-----------------------------------------------------------------|
+  | HLM/multilevel regression       11    78.57        11     78.57 |
+  |             no adjustment        3    21.43        14    100.00 |
+  +-----------------------------------------------------------------+
 
 .                         
-.                         generate icc=0.6 // (!) Placeholder. Needs to updated by team.
-variable icc already defined
-r(110);
+.                                 **HLM & OLS: use regression coefficient if reported
+.                                 tablist level_of_assignment analytic_method regression_coef regression_coef_se_uc regression_coef_se_cc model_Rsqrd if level_of_assignment=="cluster" & inlist(analytic_method,"HLM/multilevel regression","OLS regression
+> "), sort(v) ab(32)
 
-end of do-file
+  +---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment             analytic_method   regression_coef     regression_coef_se_uc     regression_coef_se_cc               model_Rsqrd   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |             cluster   HLM/multilevel regression               .26                                                                                      2    18.18         2     18.18 |
+  |             cluster   HLM/multilevel regression              1.24                                                                                      1     9.09         3     27.27 |
+  |             cluster   HLM/multilevel regression              1.86                                                                                      1     9.09         4     36.36 |
+  |             cluster   HLM/multilevel regression              3.77                                               1.016                                  1     9.09         5     45.45 |
+  |             cluster   HLM/multilevel regression              5.46                                               1.965                                  1     9.09         6     54.55 |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |             cluster   HLM/multilevel regression             31.97                                               8.137                                  1     9.09         7     63.64 |
+  |             cluster   HLM/multilevel regression                 .   Not presented in report                       .82   Not presented in report        1     9.09         8     72.73 |
+  |             cluster   HLM/multilevel regression                 .   Not presented in report   Not presented in report                                  3    27.27        11    100.00 |
+  +---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-r(110);
+.                                 replace b_cluster= regression_coef if level_of_assignment=="cluster" & inlist(analytic_method,"HLM/multilevel regression","OLS regression")
+(7 real changes made)
 
+.                                 tablist analytic_method b_cluster regression_coef /*study_need_to_cluster*/ regression_coef_se_uc regression_coef_se_cc model_Rsqrd if level_of_assignment=="cluster" & inlist(analytic_method,"HLM/multilevel regression"
+> ,"OLS regression"), sort(v) ab(32)
+
+  +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  |           analytic_method   b_cluster   regression_coef     regression_coef_se_uc     regression_coef_se_cc               model_Rsqrd   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | HLM/multilevel regression         .26               .26                                                                                      2    18.18         2     18.18 |
+  | HLM/multilevel regression        1.24              1.24                                                                                      1     9.09         3     27.27 |
+  | HLM/multilevel regression        1.86              1.86                                                                                      1     9.09         4     36.36 |
+  | HLM/multilevel regression        3.77              3.77                                               1.016                                  1     9.09         5     45.45 |
+  | HLM/multilevel regression        5.46              5.46                                               1.965                                  1     9.09         6     54.55 |
+  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | HLM/multilevel regression       31.97             31.97                                               8.137                                  1     9.09         7     63.64 |
+  | HLM/multilevel regression           .                 .   Not presented in report                       .82   Not presented in report        1     9.09         8     72.73 |
+  | HLM/multilevel regression           .                 .   Not presented in report   Not presented in report                                  3    27.27        11    100.00 |
+  +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+.                                 tablist study_id contrast_id regression_coef regression_coef_se_uc regression_coef_se_cc mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj mean_i_sd mean_c_sd if missing(b_cluster) & level_of_assignment=="cluster" & inli
+> st(analytic_method,"HLM/multilevel regression","OLS regression"), sort(v) ab(32) 
+
+  +--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | study_id   contrast_id   regression_coef     regression_coef_se_uc     regression_coef_se_cc   mean_i_unadj   mean_c_unadj   mean_i_adj   mean_c_adj   mean_i_sd   mean_c_sd   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |  MI20755         89849                 .   Not presented in report   Not presented in report          20.37          20.42            .            .       14.79       12.86        1    25.00         1     25.00 |
+  |  MI20755         89849                 .   Not presented in report   Not presented in report          37.46          21.77            .            .       14.46       14.66        1    25.00         2     50.00 |
+  |  MI20755         89849                 .   Not presented in report   Not presented in report          72.82          45.41            .            .       23.64       21.24        1    25.00         3     75.00 |
+  |  MI20802         86426                 .   Not presented in report                       .82              .              .        88.32        84.04       12.64       12.74        1    25.00         4    100.00 |
+  +--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+.                         
+.                                 **No adjustment
+.                                 tablist level_of_assignment analytic_method b_cluster regression_coef mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj mean_i_sd mean_c_sd if level_of_assignment=="cluster" & analytic_method=="no adjustment", sort(v) ab
+> (32)
+
+  +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment   analytic_method   b_cluster   regression_coef   mean_i_unadj   mean_c_unadj   mean_i_adj   mean_c_adj   mean_i_sd   mean_c_sd   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |             cluster     no adjustment           .                 .              .              .         10.8          3.3         3.5         1.7        1    33.33         1     33.33 |
+  |             cluster     no adjustment           .                 .              .              .            .            .           .           .        2    66.67         3    100.00 |
+  +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+.                                 replace b_cluster=  mean_i_adj-mean_c_adj if !missing(mean_i_adj) & !missing(mean_c_adj) & level_of_assignment=="cluster" & analytic_method=="no adjustment"
+(1 real change made)
+
+.                                 replace b_cluster=  mean_i_unadj-mean_c_unadj if !missing(mean_i_unadj) & !missing(mean_c_unadj) & missing(b_cluster) & level_of_assignment=="cluster" & analytic_method=="no adjustment"
+(0 real changes made)
+
+.                                 tablist level_of_assignment analytic_method b_cluster regression_coef mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj mean_i_sd mean_c_sd if level_of_assignment=="cluster" & analytic_method=="no adjustment", sort(v) ab
+> (32)
+
+  +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment   analytic_method   b_cluster   regression_coef   mean_i_unadj   mean_c_unadj   mean_i_adj   mean_c_adj   mean_i_sd   mean_c_sd   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |             cluster     no adjustment         7.5                 .              .              .         10.8          3.3         3.5         1.7        1    33.33         1     33.33 |
+  |             cluster     no adjustment           .                 .              .              .            .            .           .           .        2    66.67         3    100.00 |
+  +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+. 
+.                                 replace icc="." if inlist(icc,"Not in article","Not in article but see comment","Not presented in report") 
+(12 real changes made)
+
+.                                 destring icc, replace
+icc: all characters numeric; replaced as double
+(395 missing values generated)
+
+.                                 replace icc= 0.2 if icc==. & level_of_assignment=="cluster" // (!) Placeholder. Needs to be updated by team. "As defaults, the WWC uses the ICC values of .20 for achievement outcomes and .10 for all other outcomes, but
+>  will use study-reported ICC values when available. (Procedures handbook 4.1, p. 20)"
+(13 real changes made)
+
+.                         
+.                         *Calculate 4.1 effect size for outcome measures of cluster-level assignment studies: unbiased [E.5.1] formula of Table 1 of the Supplement
+.                         replace es_converted_41 = ((omega*b_cluster)/S_pooled_sd) * sqrt( 1 - ( (2*(n_avg_cluster-1)*icc) / n_t_indiv-2) ) if level_of_assignment=="cluster"
+(7 real changes made)
+
+.                         tablist analytic_method es_official_40 es_converted_41 omega b_cluster icc S_pooled_sd n_avg_cluster n_t_indiv if level_of_assignment=="cluster", sort(v) ab(32)
+
+  +---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  |           analytic_method   es_official_40   es_converted_41      omega   b_cluster   icc   S_pooled_sd   n_avg_cluster   n_t_indiv   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | HLM/multilevel regression            -.016          .6197482   .9955022         .26    .2      .7228905       2.6825397         169        1     7.14         1      7.14 |
+  | HLM/multilevel regression            -.004                 .   .9953632           .    .2      14.16427       1.3781513         164        1     7.14         2     14.29 |
+  | HLM/multilevel regression              .34                 .   .9991465           .    .2      12.67707       11.592105         881        1     7.14         3     21.43 |
+  | HLM/multilevel regression             .341           .590427   .9955022        1.24    .2      3.618845       2.6825397         169        1     7.14         4     28.57 |
+  | HLM/multilevel regression             .358          .6197482   .9955022         .26    .2      .7228905       2.6825397         169        1     7.14         5     35.71 |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | HLM/multilevel regression             .482                 .   .9955022        1.86    .2      3.841476               .         169        1     7.14         6     42.86 |
+  | HLM/multilevel regression              .76          1.301859   .9890909        5.46    .2      7.176754         2.21875          71        1     7.14         7     50.00 |
+  | HLM/multilevel regression              .95           1.62351   .9890909        3.77    .2      3.973613         2.21875          71        1     7.14         8     57.14 |
+  | HLM/multilevel regression              .99          1.707499   .9890909       31.97    .2      32.03918         2.21875          71        1     7.14         9     64.29 |
+  | HLM/multilevel regression            1.075                 .   .9953632           .    .2      14.52821       1.3781513         164        1     7.14        10     71.43 |
+  |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | HLM/multilevel regression            1.194                 .   .9953632           .    .2      22.85346       1.3781513         164        1     7.14        11     78.57 |
+  |             no adjustment             .479                 .   .9867842           .    .2             .               .          59        1     7.14        12     85.71 |
+  |             no adjustment            2.735          4.710438   .9867842         7.5    .2      2.706231             5.9          59        1     7.14        13     92.86 |
+  |             no adjustment             2.74                 .   .9867842           .    .2             .               .          59        1     7.14        14    100.00 |
+  +---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+.     
+.         
+. *=========================================================================================
+. * III) CONVERT STANDARD ERRORS OF EFFECT SIZES FROM 4.0 to 4.1
+. *=========================================================================================     
+.         
+.         //Note: Effect size standard errors (SEs) were not calculated under 4.0. The SEs in this database were calculated using equation [E.1.4] of Procedures Handbook Version 4.1 (page E.3).
+. 
+.         /* Prepare data and variables for SE conversions */
+.         summarize se_e14_40, detail
+
+         Effect size standard error
+
+
+[Source: NNMA
+                          database]
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%          .07            .07
+ 5%          .08            .07
+10%           .1            .07       Obs                 395
+25%          .15            .07       Sum of wgt.         395
+
+50%          .19                      Mean           .2089367
+                        Largest       Std. dev.      .0948731
+75%          .26            .59
+90%          .34            .61       Variance       .0090009
+95%          .37            .61       Skewness       1.548419
+99%          .59            .75       Kurtosis       7.472535
+
+.         generate se_converted_41=.
+(396 missing values generated)
+
+.         label variable se_converted_41 "standard error of effect size converted from 4.0 to 4.1"
+
+.         
+.         /* Effect sizes that are calculated the same under 4.0 and 4.1 */       
+.         generate se_nochange=0
+
+.         
+.                 *-> Individual-level assignment, analytic method "no adjustment"", continuous outcomes
+.                 replace se_nochange=1 if level_of_assignment=="individual" & analytic_method=="no adjustment" & outcome_type=="continuous"
+(137 real changes made)
+
+.                 tablist level_of_assignment analytic_method outcome_type se_nochange, sort(v)
+
+  +-------------------------------------------------------------------------------------------------------+
+  | level_of~t             analytic_method   outcome_t~e   se_noc~e   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |-------------------------------------------------------------------------------------------------------|
+  |                                                               0      139    35.10       139     35.10 |
+  |    cluster   HLM/multilevel regression    continuous          0       11     2.78       150     37.88 |
+  |    cluster               no adjustment    continuous          0        3     0.76       153     38.64 |
+  | individual                                continuous          0        5     1.26       158     39.90 |
+  | individual                      ANCOVA                        0        3     0.76       161     40.66 |
+  |-------------------------------------------------------------------------------------------------------|
+  | individual                      ANCOVA    continuous          0       60    15.15       221     55.81 |
+  | individual                ANOVA F-test    continuous          0       10     2.53       231     58.33 |
+  | individual   HLM/multilevel regression    continuous          0       20     5.05       251     63.38 |
+  | individual              OLS regression    continuous          0        5     1.26       256     64.65 |
+  | individual               no adjustment    continuous          1      137    34.60       393     99.24 |
+  |-------------------------------------------------------------------------------------------------------|
+  | individual               no adjustment   dichotomous          0        2     0.51       395     99.75 |
+  | individual                      t-stat    continuous          0        1     0.25       396    100.00 |
+  +-------------------------------------------------------------------------------------------------------+
+
+.                 replace se_converted_41=se_e14_40 if se_nochange==1
+(137 real changes made)
+
+.                 bysort se_nochange: summarize es_converted_41
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-> se_nochange = 0
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+es_conver~41 |        108    .4584003    .6958465      -1.44   4.710438
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-> se_nochange = 1
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+es_conver~41 |        137    .7389124    .8263228       -.43       4.08
+
+
+.         
+.         /* Standard errors that are calculated the differently under 4.0 and 4.1 */
+.                 
+.          
+. *=========================================================================================
+. * IV) DESCRIPTIVE STATISTICS
+. *=========================================================================================     
+.         
+. 
+. 
+. log close convert_es_se
+      name:  convert_es_se
+       log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41.log
+  log type:  text
+ closed on:  19 Feb 2025, 16:16:24
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
