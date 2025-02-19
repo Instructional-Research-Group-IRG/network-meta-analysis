@@ -6,8 +6,8 @@ log using "C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network met
 *************************************************************************************************
 ***                                                                                           ***
 *** Program name: convert_es_se_40_to_41.do                                                   ***
-*** Project: Component Network Analysis														  ***
-*** Purpose: Clean TBF Market Garden 2024 data                                                ***    
+*** Project: Component Network Meta-Analysis												  ***
+*** Purpose: Convert effect sizes and their standard errors from 4.0 to 4.1 WWC Standards     ***    
 ***																							  ***
 *** Contents:																				  ***
 ***    0) SET UP CODE																		  ***
