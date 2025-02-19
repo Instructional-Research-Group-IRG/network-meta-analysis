@@ -1,0 +1,12 @@
+
+rename ContrastNumbersimple_number contrast_simple_number
+rename MRGlink mrg_link
+rename LevelofAssignmentSource level_of_assignment
+rename Outcometypecontinuousdichoto outcome_type
+rename Analysismethodeffectsizecalc analytic_method
+rename (Interventionindividualanalytic Comparisonindividualanalytics Totalindividualanalyticsample Interventionclusteranalyticsa Comparisonclusteranalyticsamp TotalclusteranalyticsampleN AveragenperclusterNavg) ///
+	   (n_i_indiv n_c_indiv n_t_indiv n_i_cluster n_c_cluster n_t_cluster n_avg_cluster)
+rename (Interventionoutcomeadjustedme Comparisonoutcomeadjustedmean Interventionoutcomeunadjusted Comparisonoutcomeunadjustedme X Comparisonoutcomeunadjustedst) ///
+	   (mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj mean_i_sd mean_c_sd)
+rename Outcomeeffectsizereportedas es_official_40
+rename EffectsizestandarderrorSo se_e14_40
