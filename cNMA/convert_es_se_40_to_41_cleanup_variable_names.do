@@ -2,4 +2,7 @@
 rename ContrastNumbersimple_number contrast_simple_number
 rename MRGlink mrg_link
 rename LevelofAssignmentSource level_of_assignment
-rename Analysismethodeffectsizecalc analysis_method
+rename Outcometypecontinuousdichoto outcome_type
+rename Analysismethodeffectsizecalc analytic_method
+rename Outcomeeffectsizereportedas es_official_40
+rename EffectsizestandarderrorSo se_e14_40

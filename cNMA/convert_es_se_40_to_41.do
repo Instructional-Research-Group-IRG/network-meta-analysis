@@ -68,27 +68,58 @@ pause off
 	save "$root\Data inventory for 4.0 to 4.dta", replace
 	
 	/* Explore key variables */
-	tab1 level_of_assignment analysis_method, missing
-	tablist level_of_assignment analysis_method, sort(v)
+	tab1 level_of_assignment analytic_method outcome_type, missing
+	tablist level_of_assignment analytic_method outcome_type, sort(v)
 	
   
 *=========================================================================================
 * II) CONVERT EFFECT SIZES FROM 4.0 to 4.1
 *=========================================================================================  
 
-	/* */
+	/* Prepare data and variables for ES conversions */
+	summarize es_official_40, detail
+	generate es_converted_41=.
+	label variable es_converted_41 "effect size converted from 4.0 to 4.1"
 
-	/* */
-
-	/* */
+	/* Effect sizes that are calculated the same under 4.0 and 4.1 */
+	generate es_nochange=0
 	
+		*-> Individual-level assignment, analytic method other than difference-in-differences, continuous outcomes
+		replace es_nochange=1 if level_of_assignment=="individual" & analytic_method!="difference-in-differences" & outcome_type=="continuous"
+		tablist level_of_assignment analytic_method outcome_type es_nochange, sort(v)
+		replace es_converted_41=es_official_40 if es_nochange==1
+		bysort es_nochange: summarize es_converted_41
+		
+	/* Effect sizes that are calculated the differently under 4.0 and 4.1 */
+	
+		*-> Individual-level assignment, analytic method other than difference-in-differences, dichotomous outcomes
+		
+		*-> Individual-level assignment, analytic method difference-in-differences, continuous outcomes
+		
+		*-> Cluster-level assignment
     
+	
 *=========================================================================================
 * III) CONVERT STANDARD ERRORS FROM 4.0 to 4.1
 *=========================================================================================     
+	
+	//Note: Effect size standard errors (SEs) were not calculated under 4.0. The SEs in this database were calculated using equation [E.1.4] of Procedures Handbook Version 4.1 (page E.3).
 
-	/* */
-		
+	/* Prepare data and variables for SE conversions */
+	summarize se_e14_40, detail
+	generate se_converted_41=.
+	label variable se_converted_41 "standard error of effect size converted from 4.0 to 4.1"
+	
+	/* Effect sizes that are calculated the same under 4.0 and 4.1 */	
+	generate se_nochange=0
+	
+		*-> Individual-level assignment, analytic method "no adjustment"", continuous outcomes
+		replace se_nochange=1 if level_of_assignment=="individual" & analytic_method=="no adjustment" & outcome_type=="continuous"
+		tablist level_of_assignment analytic_method outcome_type se_nochange, sort(v)
+		replace se_converted_41=se_e14_40 if se_nochange==1
+		bysort se_nochange: summarize es_converted_41
+	
+	/* Standard errors that are calculated the differently under 4.0 and 4.1 */
  		
 	 
 *=========================================================================================

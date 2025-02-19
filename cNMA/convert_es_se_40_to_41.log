@@ -2,30 +2,30 @@
       name:  convert_es_se
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41.log
   log type:  text
- opened on:  19 Feb 2025, 10:23:59
+ opened on:  19 Feb 2025, 11:18:10
 
 . 
 . 
 . *************************************************************************************************
 . ***                                                                                           ***
 . *** Program name: convert_es_se_40_to_41.do                                                   ***
-. *** Project: Component Network Analysis                                                                   ***
+. *** Project: Component Network Analysis                                                                                                           ***
 . *** Purpose: Clean TBF Market Garden 2024 data                                                ***    
-. ***                                                                                                                                                                               ***
-. *** Contents:                                                                                             ***
-. ***    0) SET UP CODE                                                                                         ***
-. ***    I) LOAD RAW DATA                                                                       ***
-. ***    II) MANAGE VARIABLES                                                                   ***
-. ***    III) CLEAN DATA                                                                        ***
-. ***    IV) DESCRIPTIVE STATISTICS                                                             ***
-. ***                                                                                           ***
-. *** Authors: Seth B. Morgan                                                                               ***
-. *** Start date: February 19, 2025                                                                                                 ***
-. *** Last date modified: February 19, 2025                                                    ***
-. ***                                                                                           ***
-. *** Notes:                                                                                    ***
-. ***                                                                                           ***
-. ***                                                                                           ***
+. ***                                                                                                                                                                                       ***
+. *** Contents:                                                                                                                                                             ***
+. ***    0) SET UP CODE                                                                                                                                             ***
+. ***    I) LOAD RAW DATA                                                                                                                                           ***
+. ***    II) MANAGE VARIABLES                                                                                                                                       ***
+. ***    III) CLEAN DATA                                                                                                                                            ***
+. ***    IV) DESCRIPTIVE STATISTICS                                                                                                                     ***
+. ***                                                                                                                                                                                       ***
+. *** Authors: Seth B. Morgan                                                                                                                                   ***
+. *** Start date: February 19, 2025                                                                                                                         ***
+. *** Last date modified: February 19, 2025                                                                                                     ***
+. ***                                                                                                                                                                                       ***
+. *** Notes:                                                                                                                                                                        ***
+. ***                                                                                                                                                                                       ***
+. ***                                                                                                                                                                                   ***
 . *************************************************************************************************
 . 
 . clear all
@@ -83,7 +83,13 @@
 
 . rename LevelofAssignmentSource level_of_assignment
 
-. rename Analysismethodeffectsizecalc analysis_method
+. rename Outcometypecontinuousdichoto outcome_type
+
+. rename Analysismethodeffectsizecalc analytic_method
+
+. rename Outcomeeffectsizereportedas es_official_40
+
+. rename EffectsizestandarderrorSo se_e14_40
 
 . 
 .         
@@ -108,7 +114,7 @@ file C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-anal
 
 .         
 .         /* Explore key variables */
-.         tab1 level_of_assignment analysis_method, missing
+.         tab1 level_of_assignment analytic_method outcome_type, missing
 
 -> tabulation of level_of_assignment  
 
@@ -129,7 +135,7 @@ MRG]
 ------------+-----------------------------------
       Total |        396      100.00
 
--> tabulation of analysis_method  
+-> tabulation of analytic_method  
 
     Analysis method/effect |
           size calculation |
@@ -151,25 +157,228 @@ MRG]
 ---------------------------+-----------------------------------
                      Total |        396      100.00
 
+-> tabulation of outcome_type  
+
+    Outcome |
+       type |
+(continuous |
+/dichotomou |
+s)
+
+
+[Sourc |
+         e: |
+MRG]
+
+[drop |
+ down list] |      Freq.     Percent        Cum.
+------------+-----------------------------------
+            |        142       35.86       35.86
+ continuous |        252       63.64       99.49
+dichotomous |          2        0.51      100.00
+------------+-----------------------------------
+      Total |        396      100.00
+
+.         tablist level_of_assignment analytic_method outcome_type, sort(v)
+
+  +---------------------------------------------------------------------------------------------+
+  | level_of~t              analytic_method   outcome_t~e   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |---------------------------------------------------------------------------------------------|
+  |                                                            139    35.10       139     35.10 |
+  |    cluster    HLM/multilevel regression    continuous       11     2.78       150     37.88 |
+  |    cluster                no adjustment    continuous        3     0.76       153     38.64 |
+  | individual                                 continuous        5     1.26       158     39.90 |
+  | individual    HLM/multilevel regression    continuous       20     5.05       178     44.95 |
+  |---------------------------------------------------------------------------------------------|
+  | individual                       ANCOVA                      3     0.76       181     45.71 |
+  | individual                       ANCOVA    continuous       60    15.15       241     60.86 |
+  | individual                 ANOVA F-test    continuous       10     2.53       251     63.38 |
+  | individual               OLS regression    continuous        5     1.26       256     64.65 |
+  | individual                no adjustment    continuous      137    34.60       393     99.24 |
+  |---------------------------------------------------------------------------------------------|
+  | individual                no adjustment   dichotomous        2     0.51       395     99.75 |
+  | individual                       t-stat    continuous        1     0.25       396    100.00 |
+  +---------------------------------------------------------------------------------------------+
+
 .         
 .   
 . *=========================================================================================
 . * II) CONVERT EFFECT SIZES FROM 4.0 to 4.1
 . *=========================================================================================  
 . 
-.         /* */
+.         /* Prepare data and variables for ES conversions */
+.         summarize es_official_40, detail
+
+        Outcome effect size reported as official
+(g /
+              gpost) 
+
+
+[Source: NNMA database]
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%        -.381          -1.44
+ 5%        -.173           -.43
+10%         -.04          -.397       Obs                 395
+25%         .118          -.381       Sum of wgt.         395
+
+50%          .35                      Mean           .5326268
+                        Largest       Std. dev.      .6727823
+75%          .78           3.26
+90%        1.194           3.88       Variance        .452636
+95%        1.867           3.99       Skewness       2.040739
+99%         3.26           4.08       Kurtosis       9.507791
+
+.         generate es_converted_41=.
+(396 missing values generated)
+
+.         label variable es_converted_41 "effect size converted from 4.0 to 4.1"
+
 . 
-.         /* */
-. 
-.         /* */
+.         /* Effect sizes that are calculated the same under 4.0 and 4.1 */
+.         generate es_nochange=0
+
 .         
+.                 *-> Individual-level assignment, analytic method other than difference-in-differences, continuous outcomes
+.                 replace es_nochange=1 if level_of_assignment=="individual" & analytic_method!="difference-in-differences" & outcome_type=="continuous"
+(238 real changes made)
+
+.                 tablist level_of_assignment analytic_method outcome_type es_nochange, sort(v)
+
+  +--------------------------------------------------------------------------------------------------------+
+  | level_of~t              analytic_method   outcome_t~e   es_noc~e   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |--------------------------------------------------------------------------------------------------------|
+  |                                                                0      139    35.10       139     35.10 |
+  |    cluster    HLM/multilevel regression    continuous          0       11     2.78       150     37.88 |
+  |    cluster                no adjustment    continuous          0        3     0.76       153     38.64 |
+  | individual                                 continuous          1        5     1.26       158     39.90 |
+  | individual    HLM/multilevel regression    continuous          1       20     5.05       178     44.95 |
+  |--------------------------------------------------------------------------------------------------------|
+  | individual                       ANCOVA                        0        3     0.76       181     45.71 |
+  | individual                       ANCOVA    continuous          1       60    15.15       241     60.86 |
+  | individual                 ANOVA F-test    continuous          1       10     2.53       251     63.38 |
+  | individual               OLS regression    continuous          1        5     1.26       256     64.65 |
+  | individual                no adjustment    continuous          1      137    34.60       393     99.24 |
+  |--------------------------------------------------------------------------------------------------------|
+  | individual                no adjustment   dichotomous          0        2     0.51       395     99.75 |
+  | individual                       t-stat    continuous          1        1     0.25       396    100.00 |
+  +--------------------------------------------------------------------------------------------------------+
+
+.                 replace es_converted_41=es_official_40 if es_nochange==1
+(238 real changes made)
+
+.                 bysort es_nochange: summarize es_converted_41
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-> es_nochange = 0
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+es_conver~41 |          0
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-> es_nochange = 1
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+es_conver~41 |        238    .5864076    .7399782      -1.44       4.08
+
+
+.                 
+.         /* Effect sizes that are calculated the differently under 4.0 and 4.1 */
+.         
+.                 *-> Individual-level assignment, analytic method other than difference-in-differences, dichotomous outcomes
+.                 
+.                 *-> Individual-level assignment, analytic method difference-in-differences, continuous outcomes
+.                 
+.                 *-> Cluster-level assignment
 .     
+.         
 . *=========================================================================================
 . * III) CONVERT STANDARD ERRORS FROM 4.0 to 4.1
 . *=========================================================================================     
+.         
+.         //Note: Effect size standard errors (SEs) were not calculated under 4.0. The SEs in this database were calculated using equation [E.1.4] of Procedures Handbook Version 4.1 (page E.3).
 . 
-.         /* */
-.                 
+.         /* Prepare data and variables for SE conversions */
+.         summarize se_e14_40, detail
+
+         Effect size standard error
+
+
+[Source: NNMA
+                          database]
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%          .07            .07
+ 5%          .08            .07
+10%           .1            .07       Obs                 395
+25%          .15            .07       Sum of wgt.         395
+
+50%          .19                      Mean           .2089367
+                        Largest       Std. dev.      .0948731
+75%          .26            .59
+90%          .34            .61       Variance       .0090009
+95%          .37            .61       Skewness       1.548419
+99%          .59            .75       Kurtosis       7.472535
+
+.         generate se_converted_41=.
+(396 missing values generated)
+
+.         label variable se_converted_41 "standard error of effect size converted from 4.0 to 4.1"
+
+.         
+.         /* Effect sizes that are calculated the same under 4.0 and 4.1 */       
+.         generate se_nochange=0
+
+.         
+.                 *-> Individual-level assignment, analytic method "no adjustment"", continuous outcomes
+.                 replace se_nochange=1 if level_of_assignment=="individual" & analytic_method=="no adjustment" & outcome_type=="continuous"
+(137 real changes made)
+
+.                 tablist level_of_assignment analytic_method outcome_type se_nochange, sort(v)
+
+  +--------------------------------------------------------------------------------------------------------+
+  | level_of~t              analytic_method   outcome_t~e   se_noc~e   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |--------------------------------------------------------------------------------------------------------|
+  |                                                                0      139    35.10       139     35.10 |
+  |    cluster    HLM/multilevel regression    continuous          0       11     2.78       150     37.88 |
+  |    cluster                no adjustment    continuous          0        3     0.76       153     38.64 |
+  | individual                                 continuous          0        5     1.26       158     39.90 |
+  | individual    HLM/multilevel regression    continuous          0       20     5.05       178     44.95 |
+  |--------------------------------------------------------------------------------------------------------|
+  | individual                       ANCOVA                        0        3     0.76       181     45.71 |
+  | individual                       ANCOVA    continuous          0       60    15.15       241     60.86 |
+  | individual                 ANOVA F-test    continuous          0       10     2.53       251     63.38 |
+  | individual               OLS regression    continuous          0        5     1.26       256     64.65 |
+  | individual                no adjustment    continuous          1      137    34.60       393     99.24 |
+  |--------------------------------------------------------------------------------------------------------|
+  | individual                no adjustment   dichotomous          0        2     0.51       395     99.75 |
+  | individual                       t-stat    continuous          0        1     0.25       396    100.00 |
+  +--------------------------------------------------------------------------------------------------------+
+
+.                 replace se_converted_41=se_e14_40 if se_nochange==1
+(137 real changes made)
+
+.                 bysort se_nochange: summarize es_converted_41
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-> se_nochange = 0
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+es_conver~41 |        101    .3795446    .5422467      -1.44        2.5
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-> se_nochange = 1
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+es_conver~41 |        137    .7389124    .8263228       -.43       4.08
+
+
+.         
+.         /* Standard errors that are calculated the differently under 4.0 and 4.1 */
 .                 
 .          
 . *=========================================================================================
@@ -182,5 +391,5 @@ MRG]
       name:  convert_es_se
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41.log
   log type:  text
- closed on:  19 Feb 2025, 10:23:59
+ closed on:  19 Feb 2025, 11:18:10
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
