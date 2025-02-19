@@ -6,23 +6,23 @@ log using "C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network met
 *************************************************************************************************
 ***                                                                                           ***
 *** Program name: convert_es_se_40_to_41.do                                                   ***
-*** Project: Component Network Analysis                               				          ***
+*** Project: Component Network Analysis														  ***
 *** Purpose: Clean TBF Market Garden 2024 data                                                ***    
-***																	 				          ***
-*** Contents:                                                       				          ***
-***    0) SET UP CODE                              				                              ***
-***    I) LOAD RAW DATA                                                                       ***
-***    II) MANAGE VARIABLES                                                                   ***
-***    III) CLEAN DATA                                                                        ***
-***    IV) DESCRIPTIVE STATISTICS                                                             ***
-***                                                                                           ***
-*** Authors: Seth B. Morgan                                 				                  ***
-*** Start date: February 19, 2025 	   					 	     			                  ***
-*** Last date modified: February 19, 2025                                                    ***
-***                                                                                           ***
-*** Notes:                                                                                    ***
-***                                                                                           ***
-***                                                                                           ***
+***																							  ***
+*** Contents:																				  ***
+***    0) SET UP CODE																		  ***
+***    I) LOAD RAW DATA																		  ***
+***    II) MANAGE VARIABLES																	  ***
+***    III) CLEAN DATA																		  ***
+***    IV) DESCRIPTIVE STATISTICS														      ***
+***																							  ***
+*** Authors: Seth B. Morgan																      ***
+*** Start date: February 19, 2025															  ***
+*** Last date modified: February 19, 2025												      ***
+***																							  ***
+*** Notes:																					  ***
+***																							  ***
+***																						      ***
 *************************************************************************************************
 
 clear all
