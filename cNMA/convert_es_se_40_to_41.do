@@ -117,7 +117,7 @@ pause off
 		*-> Pooled standard deviation (S)
 			replace mean_i_sd="10.4" if  mean_i_sd=="`10.4"
 			destring mean_i_sd, replace
-			generate S_pooled_sd = sqrt( ( ( (n_i_indiv-1)*mean_i_sd^2) + ( (n_c_indiv-1)*mean_c_sd^2) ) / (n_i_indiv + n_c_indiv - 2) )
+			generate S_pooled_sd = sqrt( ( ((n_i_indiv-1)*mean_i_sd^2) + ((n_c_indiv-1)*mean_c_sd^2) ) / (n_i_indiv + n_c_indiv - 2) )
 			label variable S_pooled_sd "pooled standard deviation"
 			tablist S_pooled_sd n_i_indiv n_c_indiv mean_i_sd mean_c_sd, sort(v) ab(32)
 		
