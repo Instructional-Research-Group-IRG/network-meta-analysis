@@ -197,7 +197,7 @@
   NMA_data_analysis_subset_grpID %>% count()
   
   ## Correct variable names
-  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% rename(contrast_name= contrast_name...14)
+  NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% rename(contrast_name= contrast_name...15)
   # tabyl(NMA_data_analysis_subset_grpID$intervention_content...33)
   # tabyl(NMA_data_analysis_subset_grpID$intervention_content...36)
   # NMA_data_analysis_subset_grpID <- NMA_data_analysis_subset_grpID %>% rename(intervention_content= intervention_content...36)
@@ -545,7 +545,7 @@
 
 # Combine final analysis files by domain
       NMA_data_analysis_subset_grpID_final <- NMA_data_analysis_subset_grpID
-      #NMA_data_analysis_subset_grpID_final <- NMA_data_analysis_subset_grpID_final %>% rename(contrast_name= contrast_name...14)
+      #NMA_data_analysis_subset_grpID_final <- NMA_data_analysis_subset_grpID_final %>% rename(contrast_name= contrast_name...15)
       #NMA_data_analysis_subset_grpID_final <- NMA_data_analysis_subset_grpID_final %>% rename(intervention_content= intervention_content...36)
       tabyl(NMA_data_analysis_subset_grpID_final$domain)
       NMA_data_analysis_subset_grpID_final$simple_number <- as.character(NMA_data_analysis_subset_grpID_final$simple_number)
