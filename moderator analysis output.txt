@@ -1,612 +1,404 @@
+From lines 174-312 and lines 362-380 of <<NMA Tests for Controls.R>>
 
 
-From lines 160-367 and lines 442-460 of <<NMA Tests for Controls.R>>
-
-
-####################################################################################################
-> 
-> NNMA_control_publication_year <- rma.mv(yi = effect_size, 
-+                             V = V_list, 
-+                             random = ~ 1 | record_id/es_id,
-+                             mods = ~ publication_year - 1,
-+                             test =  "t", 
-+                             data = NMA_Data_Subset_grpID, 
-+                             method = "REML")
-Warning messages:
-1: 1 row with NAs omitted from model fitting. 
-2: 'V' appears to be not positive definite. 
-> summary(NNMA_control_publication_year)  
-
-Multivariate Meta-Analysis Model (k = 367; method: REML)
-
-   logLik   Deviance        AIC        BIC       AICc   
--302.8354   605.6707   611.6707   623.3786   611.7370   
-
-Variance Components:
-
-            estim    sqrt  nlvls  fixed           factor 
-sigma^2.1  0.0513  0.2265     51     no        record_id 
-sigma^2.2  0.1932  0.4396    367     no  record_id/es_id 
-
-Model Results:
-
-                  estimate      se    tval   df    pval   ci.lb   ci.ub      
-publication_year    0.0002  0.0000  9.8525  366  <.0001  0.0002  0.0003  *** 
-
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-> 
-> ##Use RVE for robustness
-> mvcf <- coef_test(NNMA_control_publication_year,
-+                   cluster = NMA_Data_Subset_grpID$record_id, 
-+                   vcov = "CR2")
-> mvcf
-            Coef. Estimate       SE t-stat d.f. (Satt) p-val (Satt) Sig.
- publication_year 0.000229 2.33e-05   9.83        42.6       <0.001  ***
-> 
-> ####################################################################################################
-> 
-> NNMA_control_domain_numeric <- rma.mv(yi = effect_size, 
-+                               V = V_list, 
-+                               random = ~ 1 | record_id/es_id,
-+                               mods = ~ domain_numeric - 1,
-+                               test =  "t", 
-+                               data = NMA_Data_Subset_grpID, 
-+                               method = "REML")
-Warning messages:
-1: 1 row with NAs omitted from model fitting. 
-2: 'V' appears to be not positive definite. 
-> summary(NNMA_control_domain_numeric)  
-
-Multivariate Meta-Analysis Model (k = 367; method: REML)
-
-   logLik   Deviance        AIC        BIC       AICc   
--292.2634   584.5267   594.5267   614.0125   594.6943   
-
-Variance Components:
-
-            estim    sqrt  nlvls  fixed           factor 
-sigma^2.1  0.0224  0.1498     51     no        record_id 
-sigma^2.2  0.1943  0.4408    367     no  record_id/es_id 
-
-Test of Moderators (coefficients 1:3):
-F(df1 = 3, df2 = 364) = 54.2231, p-val < .0001
-
-Model Results:
-
-                 estimate      se     tval   df    pval    ci.lb   ci.ub      
-domain_numeric1    0.2242  0.1329   1.6872  364  0.0924  -0.0371  0.4854    . 
-domain_numeric2    0.3583  0.0468   7.6576  364  <.0001   0.2663  0.4503  *** 
-domain_numeric3    0.7349  0.0713  10.3122  364  <.0001   0.5947  0.8750  *** 
-
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-> 
-> ##Use RVE for robustness
-> mvcf <- coef_test(NNMA_control_domain_numeric,
-+                   cluster = NMA_Data_Subset_grpID$record_id, 
-+                   vcov = "CR2")
-> mvcf  
-           Coef. Estimate     SE t-stat d.f. (Satt) p-val (Satt) Sig.
- domain_numeric1    0.224 0.0553   4.06        8.36      0.00333   **
- domain_numeric2    0.358 0.0322  11.12       27.17      < 0.001  ***
- domain_numeric3    0.735 0.1147   6.40        9.18      < 0.001  ***
-> 
-> 
-> ####################################################################################################
-> 
-> NNMA_control_control_nature_numeric <- rma.mv(yi = effect_size, 
-+                                       V = V_list, 
-+                                       random = ~ 1 | record_id/es_id,
-+                                       mods = ~ control_nature_numeric - 1,
-+                                       test =  "t", 
-+                                       data = NMA_Data_Subset_grpID, 
-+                                       method = "REML")
-Warning messages:
-1: 1 row with NAs omitted from model fitting. 
-2: 'V' appears to be not positive definite. 
-> summary(NNMA_control_control_nature_numeric)  
-
-Multivariate Meta-Analysis Model (k = 367; method: REML)
-
-   logLik   Deviance        AIC        BIC       AICc   
--265.3067   530.6134   538.6134   554.2130   538.7245   
-
-Variance Components:
-
-            estim    sqrt  nlvls  fixed           factor 
-sigma^2.1  0.0616  0.2482     51     no        record_id 
-sigma^2.2  0.1602  0.4003    367     no  record_id/es_id 
-
-Test of Moderators (coefficients 1:2):
-F(df1 = 2, df2 = 365) = 84.0323, p-val < .0001
-
-Model Results:
-
-                         estimate      se     tval   df    pval    ci.lb   ci.ub      
-control_nature_numeric1    0.0878  0.0634   1.3849  365  0.1669  -0.0369  0.2124      
-control_nature_numeric2    0.6423  0.0525  12.2404  365  <.0001   0.5391  0.7455  *** 
-
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-> 
-> ##Use RVE for robustness
-> mvcf <- coef_test(NNMA_control_control_nature_numeric,
-+                   cluster = NMA_Data_Subset_grpID$record_id, 
-+                   vcov = "CR2")
-> mvcf 
-                   Coef. Estimate     SE t-stat d.f. (Satt) p-val (Satt) Sig.
- control_nature_numeric1   0.0878 0.0485   1.81        29.3       0.0805    .
- control_nature_numeric2   0.6423 0.0730   8.79        38.9       <0.001  ***
-> 
-> ####################################################################################################
-> 
-> NNMA_control_dosage_overall_hours_avg <- rma.mv(yi = effect_size, 
-+                                                 V = V_list, 
-+                                                 random = ~ 1 | record_id/es_id,
-+                                                 mods = ~ dosage_overall_hours_avg - 1,
-+                                                 test =  "t", 
-+                                                 data = NMA_Data_Subset_grpID, 
-+                                                 method = "REML")
-Warning messages:
-1: 1 row with NAs omitted from model fitting. 
-2: 'V' appears to be not positive definite. 
-> summary(NNMA_control_dosage_overall_hours_avg)  
-
-Multivariate Meta-Analysis Model (k = 367; method: REML)
-
-   logLik   Deviance        AIC        BIC       AICc   
--308.5972   617.1944   623.1944   634.9023   623.2607   
-
-Variance Components:
-
-            estim    sqrt  nlvls  fixed           factor 
-sigma^2.1  0.0791  0.2813     51     no        record_id 
-sigma^2.2  0.1945  0.4411    367     no  record_id/es_id 
-
-Model Results:
-
-                          estimate      se    tval   df    pval   ci.lb   ci.ub      
-dosage_overall_hours_avg    0.0170  0.0021  8.0894  366  <.0001  0.0129  0.0211  *** 
-
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-> 
-> ##Use RVE for robustness
-> mvcf <- coef_test(NNMA_control_dosage_overall_hours_avg,
-+                   cluster = NMA_Data_Subset_grpID$record_id, 
-+                   vcov = "CR2")
-> mvcf
-                    Coef. Estimate      SE t-stat d.f. (Satt) p-val (Satt) Sig.
- dosage_overall_hours_avg    0.017 0.00289   5.89        18.2       <0.001  ***
-> 
-> ####################################################################################################
-> 
-> NNMA_control_group_size_average <- rma.mv(yi = effect_size, 
-+                                            V = V_list, 
-+                                            random = ~ 1 | record_id/es_id,
-+                                            mods = ~ group_size_average - 1,
-+                                            test =  "t", 
-+                                            data = NMA_Data_Subset_grpID, 
-+                                            method = "REML")
-Warning messages:
-1: 2 rows with NAs omitted from model fitting. 
-2: 'V' appears to be not positive definite. 
-> summary(NNMA_control_group_size_average)  
-
-Multivariate Meta-Analysis Model (k = 366; method: REML)
-
-   logLik   Deviance        AIC        BIC       AICc   
--318.4141   636.8283   642.8283   654.5280   642.8948   
-
-Variance Components:
-
-            estim    sqrt  nlvls  fixed           factor 
-sigma^2.1  0.1646  0.4058     50     no        record_id 
-sigma^2.2  0.1961  0.4429    366     no  record_id/es_id 
-
-Model Results:
-
-                    estimate      se    tval   df    pval   ci.lb   ci.ub      
-group_size_average    0.0829  0.0171  4.8555  365  <.0001  0.0493  0.1165  *** 
-
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-> 
-> ##Use RVE for robustness
-> mvcf <- coef_test(NNMA_control_group_size_average,
-+                   cluster = NMA_Data_Subset_grpID$record_id, 
-+                   vcov = "CR2")
-> mvcf
-              Coef. Estimate     SE t-stat d.f. (Satt) p-val (Satt) Sig.
- group_size_average   0.0829 0.0354   2.34        6.44       0.0547    .
-> 
-> ####################################################################################################
-> 
-> NNMA_control_grade_level <- rma.mv(yi = effect_size, 
-+                                    V = V_list, 
-+                                    random = ~ 1 | record_id/es_id,
-+                                    mods = ~ grade_level - 1,
-+                                    test =  "t", 
-+                                    data = NMA_Data_Subset_grpID, 
-+                                    method = "REML")
-Warning messages:
-1: 1 row with NAs omitted from model fitting. 
-2: 'V' appears to be not positive definite. 
-> summary(NNMA_control_grade_level)  
-
-Multivariate Meta-Analysis Model (k = 367; method: REML)
-
-   logLik   Deviance        AIC        BIC       AICc   
--303.6855   607.3711   613.3711   625.0790   613.4374   
-
-Variance Components:
-
-            estim    sqrt  nlvls  fixed           factor 
-sigma^2.1  0.0522  0.2286     51     no        record_id 
-sigma^2.2  0.1971  0.4439    367     no  record_id/es_id 
-
-Model Results:
-
-             estimate      se    tval   df    pval   ci.lb   ci.ub      
-grade_level    0.1515  0.0156  9.7055  366  <.0001  0.1208  0.1822  *** 
-
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-> 
-> ##Use RVE for robustness
-> mvcf <- coef_test(NNMA_control_grade_level,
-+                   cluster = NMA_Data_Subset_grpID$record_id, 
-+                   vcov = "CR2")
-> mvcf
-       Coef. Estimate     SE t-stat d.f. (Satt) p-val (Satt) Sig.
- grade_level    0.152 0.0191   7.95          24       <0.001  ***
-> 
-> ####################################################################################################
-> 
-> NNMA_control_TvsT <- rma.mv(yi = effect_size, 
-+                                    V = V_list, 
-+                                    random = ~ 1 | record_id/es_id,
-+                                    mods = ~ TvsT - 1,
-+                                    test =  "t", 
-+                                    data = NMA_Data_Subset_grpID, 
-+                                    method = "REML")
-Warning messages:
-1: 1 row with NAs omitted from model fitting. 
-2: 'V' appears to be not positive definite. 
-> summary(NNMA_control_TvsT)  
-
-Multivariate Meta-Analysis Model (k = 367; method: REML)
-
-   logLik   Deviance        AIC        BIC       AICc   
--269.0713   538.1425   546.1425   561.7421   546.2536   
-
-Variance Components:
-
-            estim    sqrt  nlvls  fixed           factor 
-sigma^2.1  0.0708  0.2661     51     no        record_id 
-sigma^2.2  0.1617  0.4021    367     no  record_id/es_id 
-
-Test of Moderators (coefficients 1:2):
-F(df1 = 2, df2 = 365) = 76.7242, p-val < .0001
-
-Model Results:
-
-       estimate      se     tval   df    pval    ci.lb   ci.ub      
-TvsT0    0.5873  0.0525  11.1829  365  <.0001   0.4840  0.6906  *** 
-TvsT1    0.0406  0.0702   0.5779  365  0.5637  -0.0975  0.1786      
-
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-> 
-> ##Use RVE for robustness
-> mvcf <- coef_test(NNMA_control_TvsT,
-+                   cluster = NMA_Data_Subset_grpID$record_id, 
-+                   vcov = "CR2")
-> mvcf
- Coef. Estimate     SE t-stat d.f. (Satt) p-val (Satt) Sig.
- TvsT0   0.5873 0.0669  8.774        44.0       <0.001  ***
- TvsT1   0.0406 0.0589  0.689        24.9        0.497     
-> 
-> ####################################################################################################
-> 
-> NNMA_control_measure_developer_numeric <- rma.mv(yi = effect_size, 
-+                                          V = V_list, 
-+                                          random = ~ 1 | record_id/es_id,
-+                                          mods = ~ measure_developer_numeric - 1,
-+                                          test =  "t", 
-+                                          data = NMA_Data_Subset_grpID, 
-+                                          method = "REML")
-Warning messages:
-1: 1 row with NAs omitted from model fitting. 
-2: 'V' appears to be not positive definite. 
-> summary(NNMA_control_measure_developer_numeric)  
-
-Multivariate Meta-Analysis Model (k = 367; method: REML)
-
-   logLik   Deviance        AIC        BIC       AICc   
--298.6228   597.2455   605.2455   620.8451   605.3566   
-
-Variance Components:
-
-            estim    sqrt  nlvls  fixed           factor 
-sigma^2.1  0.0416  0.2040     51     no        record_id 
-sigma^2.2  0.1908  0.4368    367     no  record_id/es_id 
-
-Test of Moderators (coefficients 1:2):
-F(df1 = 2, df2 = 365) = 58.1577, p-val < .0001
-
-Model Results:
-
-                            estimate      se     tval   df    pval   ci.lb   ci.ub      
-measure_developer_numeric1    0.5079  0.0473  10.7325  365  <.0001  0.4148  0.6010  *** 
-measure_developer_numeric2    0.2981  0.0720   4.1423  365  <.0001  0.1566  0.4396  *** 
-
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-> 
-> ##Use RVE for robustness
-> mvcf <- coef_test(NNMA_control_measure_developer_numeric,
-+                   cluster = NMA_Data_Subset_grpID$record_id, 
-+                   vcov = "CR2")
-> mvcf
-                      Coef. Estimate     SE t-stat d.f. (Satt) p-val (Satt) Sig.
- measure_developer_numeric1    0.508 0.0514   9.89        37.5       <0.001  ***
- measure_developer_numeric2    0.298 0.0375   7.95        17.6       <0.001  ***
-> 
-> ####################################################################################################
-> 
-> NNMA_control_interventionist_numeric <- rma.mv(yi = effect_size, 
-+                                        V = V_list, 
-+                                        random = ~ 1 | record_id/es_id,
-+                                        mods = ~ interventionist_numeric - 1,
-+                                        test =  "t", 
-+                                        data = NMA_Data_Subset_grpID, 
-+                                        method = "REML")
-Warning messages:
-1: 1 row with NAs omitted from model fitting. 
-2: 'V' appears to be not positive definite. 
-> summary(NNMA_control_interventionist_numeric)  
-
-Multivariate Meta-Analysis Model (k = 367; method: REML)
-
-   logLik   Deviance        AIC        BIC       AICc   
--300.5125   601.0250   611.0250   630.5107   611.1926   
-
-Variance Components:
-
-            estim    sqrt  nlvls  fixed           factor 
-sigma^2.1  0.0523  0.2286     51     no        record_id 
-sigma^2.2  0.1936  0.4400    367     no  record_id/es_id 
-
-Test of Moderators (coefficients 1:3):
-F(df1 = 3, df2 = 364) = 32.7267, p-val < .0001
-
-Model Results:
-
-                          estimate      se    tval   df    pval    ci.lb   ci.ub      
-interventionist_numeric1    0.4660  0.0513  9.0908  364  <.0001   0.3652  0.5668  *** 
-interventionist_numeric2    0.5954  0.1632  3.6471  364  0.0003   0.2744  0.9164  *** 
-interventionist_numeric3    0.2544  0.1701  1.4952  364  0.1357  -0.0802  0.5889      
-
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-> 
-> ##Use RVE for robustness
-> mvcf <- coef_test(NNMA_control_interventionist_numeric,
-+                   cluster = NMA_Data_Subset_grpID$record_id, 
-+                   vcov = "CR2")
-> mvcf
-                    Coef. Estimate     SE t-stat d.f. (Satt) p-val (Satt) Sig.
- interventionist_numeric1    0.466 0.0504   9.25       34.95       <0.001  ***
- interventionist_numeric2    0.595 0.2386   2.50        3.65       0.0732    .
- interventionist_numeric3    0.254 0.0605   4.20        2.51       0.0346    *
-> 
-> 
-> ####################################################################################################
-> 
-> NNMA_control_ongoing_training <- rma.mv(yi = effect_size, 
+#Run meta-regressions
+>   
+>   ####################################################################################################
+>   
+>   NNMA_control_control_nature <- rma.mv(yi = effect_size, 
 +                                         V = V_list, 
 +                                         random = ~ 1 | record_id/es_id,
-+                                         mods = ~ ongoing_training - 1,
++                                         mods = ~ control_nature - 1,
 +                                         test =  "t", 
 +                                         data = NMA_Data_Subset_grpID, 
 +                                         method = "REML")
 Warning messages:
 1: 1 row with NAs omitted from model fitting. 
 2: 'V' appears to be not positive definite. 
-> summary(NNMA_control_ongoing_training)  
+>   summary(NNMA_control_control_nature)  
 
-Multivariate Meta-Analysis Model (k = 367; method: REML)
+Multivariate Meta-Analysis Model (k = 372; method: REML)
 
    logLik   Deviance        AIC        BIC       AICc   
--300.0721   600.1442   608.1442   623.7438   608.2553   
+-266.2316   532.4631   540.4631   556.1171   540.5727   
 
 Variance Components:
 
             estim    sqrt  nlvls  fixed           factor 
-sigma^2.1  0.0492  0.2219     51     no        record_id 
-sigma^2.2  0.1928  0.4391    367     no  record_id/es_id 
+sigma^2.1  0.0417  0.2042     51     no        record_id 
+sigma^2.2  0.1759  0.4194    372     no  record_id/es_id 
 
 Test of Moderators (coefficients 1:2):
-F(df1 = 2, df2 = 365) = 51.6568, p-val < .0001
+F(df1 = 2, df2 = 370) = 77.4167, p-val < .0001
 
 Model Results:
 
-                   estimate      se    tval   df    pval   ci.lb   ci.ub      
-ongoing_training1    0.2707  0.1041  2.6003  365  0.0097  0.0660  0.4753   ** 
-ongoing_training2    0.5070  0.0516  9.8261  365  <.0001  0.4055  0.6084  *** 
+                                   estimate      se     tval   df    pval    ci.lb   ci.ub      
+control_natureAlternate Treatment    0.0508  0.0687   0.7388  370  0.4605  -0.0844  0.1860      
+control_natureControl                0.5681  0.0476  11.9291  370  <.0001   0.4745  0.6617  *** 
 
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-> 
-> ##Use RVE for robustness
-> mvcf <- coef_test(NNMA_control_ongoing_training,
-+                   cluster = NMA_Data_Subset_grpID$record_id, 
-+                   vcov = "CR2")
-> mvcf
-             Coef. Estimate     SE t-stat d.f. (Satt) p-val (Satt) Sig.
- ongoing_training1    0.271 0.0692   3.91        11.1      0.00239   **
- ongoing_training2    0.507 0.0550   9.22        31.6      < 0.001  ***
-> 
-> ####################################################################################################
-> 
-> NNMA_control_research_lab <- rma.mv(yi = effect_size, 
-+                                     V = V_list, 
-+                                     random = ~ 1 | record_id/es_id,
-+                                     mods = ~ research_lab - 1,
-+                                     test =  "t", 
-+                                     data = NMA_Data_Subset_grpID, 
-+                                     method = "REML")
+>   
+>   ##Use RVE for robustness
+>   mvcf <- coef_test(NNMA_control_control_nature,
++                     cluster = NMA_Data_Subset_grpID$record_id, 
++                     vcov = "CR2")
+>   mvcf 
+                             Coef. Estimate     SE t-stat d.f. (Satt) p-val (Satt) Sig.
+ control_natureAlternate Treatment   0.0508 0.0421   1.21        20.8        0.242     
+             control_natureControl   0.5681 0.0598   9.49        41.8       <0.001  ***
+>   
+>   ####################################################################################################
+>   
+>   NNMA_control_dosage_overall_hours <- rma.mv(yi = effect_size, 
++                                                   V = V_list, 
++                                                   random = ~ 1 | record_id/es_id,
++                                                   mods = ~ dosage_overall_hours - 1,
++                                                   test =  "t", 
++                                                   data = NMA_Data_Subset_grpID, 
++                                                   method = "REML")
+Warning messages:
+1: 3 rows with NAs omitted from model fitting. 
+2: 'V' appears to be not positive definite. 
+>   summary(NNMA_control_dosage_overall_hours)  
+
+Multivariate Meta-Analysis Model (k = 370; method: REML)
+
+   logLik   Deviance        AIC        BIC       AICc   
+-299.6465   599.2930   605.2930   617.0254   605.3588   
+
+Variance Components:
+
+            estim    sqrt  nlvls  fixed           factor 
+sigma^2.1  0.0567  0.2380     51     no        record_id 
+sigma^2.2  0.1965  0.4433    370     no  record_id/es_id 
+
+Model Results:
+
+                      estimate      se    tval   df    pval   ci.lb   ci.ub      
+dosage_overall_hours    0.0165  0.0019  8.4714  369  <.0001  0.0127  0.0204  *** 
+
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+>   
+>   ##Use RVE for robustness
+>   mvcf <- coef_test(NNMA_control_dosage_overall_hours,
++                     cluster = NMA_Data_Subset_grpID$record_id, 
++                     vcov = "CR2")
+>   mvcf
+                Coef. Estimate      SE t-stat d.f. (Satt) p-val (Satt) Sig.
+ dosage_overall_hours   0.0165 0.00272   6.08        18.4       <0.001  ***
+>   
+>   ####################################################################################################
+>   
+>   NNMA_control_group_size_average <- rma.mv(yi = effect_size, 
++                                              V = V_list, 
++                                              random = ~ 1 | record_id/es_id,
++                                              mods = ~ group_size_average - 1,
++                                              test =  "t", 
++                                              data = NMA_Data_Subset_grpID, 
++                                              method = "REML")
+Warning messages:
+1: 7 rows with NAs omitted from model fitting. 
+2: 'V' appears to be not positive definite. 
+>   summary(NNMA_control_group_size_average)  
+
+Multivariate Meta-Analysis Model (k = 366; method: REML)
+
+   logLik   Deviance        AIC        BIC       AICc   
+-308.4338   616.8676   622.8676   634.5673   622.9340   
+
+Variance Components:
+
+            estim    sqrt  nlvls  fixed           factor 
+sigma^2.1  0.1373  0.3705     50     no        record_id 
+sigma^2.2  0.1989  0.4460    366     no  record_id/es_id 
+
+Model Results:
+
+                    estimate      se    tval   df    pval   ci.lb   ci.ub      
+group_size_average    0.0813  0.0164  4.9544  365  <.0001  0.0490  0.1136  *** 
+
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+>   
+>   ##Use RVE for robustness
+>   mvcf <- coef_test(NNMA_control_group_size_average,
++                     cluster = NMA_Data_Subset_grpID$record_id, 
++                     vcov = "CR2")
+>   mvcf
+              Coef. Estimate     SE t-stat d.f. (Satt) p-val (Satt) Sig.
+ group_size_average   0.0813 0.0355   2.29         6.2       0.0605    .
+>   
+>   ####################################################################################################
+>   
+>   NNMA_control_grade_level <- rma.mv(yi = effect_size, 
++                                      V = V_list, 
++                                      random = ~ 1 | record_id/es_id,
++                                      mods = ~ grade_level - 1,
++                                      test =  "t", 
++                                      data = NMA_Data_Subset_grpID, 
++                                      method = "REML")
+Warning messages:
+1: 4 rows with NAs omitted from model fitting. 
+2: 'V' appears to be not positive definite. 
+>   summary(NNMA_control_grade_level)  
+
+Multivariate Meta-Analysis Model (k = 369; method: REML)
+
+   logLik   Deviance        AIC        BIC       AICc   
+-294.3228   588.6456   594.6456   606.3699   594.7116   
+
+Variance Components:
+
+            estim    sqrt  nlvls  fixed           factor 
+sigma^2.1  0.0366  0.1914     51     no        record_id 
+sigma^2.2  0.1990  0.4461    369     no  record_id/es_id 
+
+Model Results:
+
+             estimate      se    tval   df    pval   ci.lb   ci.ub      
+grade_level    0.1454  0.0148  9.8576  368  <.0001  0.1164  0.1744  *** 
+
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+>   
+>   ##Use RVE for robustness
+>   mvcf <- coef_test(NNMA_control_grade_level,
++                     cluster = NMA_Data_Subset_grpID$record_id, 
++                     vcov = "CR2")
+>   mvcf
+       Coef. Estimate     SE t-stat d.f. (Satt) p-val (Satt) Sig.
+ grade_level    0.145 0.0174   8.35        23.5       <0.001  ***
+>   
+>   ####################################################################################################
+>   
+>   NNMA_control_interventionist <- rma.mv(yi = effect_size, 
++                                          V = V_list, 
++                                          random = ~ 1 | record_id/es_id,
++                                          mods = ~ interventionist - 1,
++                                          test =  "t", 
++                                          data = NMA_Data_Subset_grpID, 
++                                          method = "REML")
 Warning messages:
 1: 1 row with NAs omitted from model fitting. 
 2: 'V' appears to be not positive definite. 
-> summary(NNMA_control_research_lab)  
+>   summary(NNMA_control_interventionist)  
 
-Multivariate Meta-Analysis Model (k = 367; method: REML)
+Multivariate Meta-Analysis Model (k = 372; method: REML)
 
    logLik   Deviance        AIC        BIC       AICc   
--292.0848   584.1697   604.1697   643.0029   604.8018   
+-291.6780   583.3561   593.3561   612.9101   593.5214   
 
 Variance Components:
 
             estim    sqrt  nlvls  fixed           factor 
-sigma^2.1  0.0386  0.1964     51     no        record_id 
-sigma^2.2  0.1938  0.4403    367     no  record_id/es_id 
+sigma^2.1  0.0304  0.1742     51     no        record_id 
+sigma^2.2  0.1948  0.4414    372     no  record_id/es_id 
 
-Test of Moderators (coefficients 1:8):
-F(df1 = 8, df2 = 359) = 15.6812, p-val < .0001
+Test of Moderators (coefficients 1:3):
+F(df1 = 3, df2 = 369) = 37.9520, p-val < .0001
 
 Model Results:
 
-               estimate      se    tval   df    pval    ci.lb   ci.ub      
-research_lab1    0.5916  0.0656  9.0198  359  <.0001   0.4626  0.7206  *** 
-research_lab2    0.1171  0.2620  0.4468  359  0.6553  -0.3982  0.6323      
-research_lab3    0.5696  0.2024  2.8143  359  0.0052   0.1716  0.9677   ** 
-research_lab4    0.4815  0.2209  2.1801  359  0.0299   0.0472  0.9159    * 
-research_lab5    0.4105  0.1272  3.2260  359  0.0014   0.1603  0.6607   ** 
-research_lab6    0.2365  0.1011  2.3399  359  0.0198   0.0377  0.4353    * 
-research_lab7    0.1866  0.1881  0.9921  359  0.3218  -0.1833  0.5564      
-research_lab8    0.5422  0.1431  3.7886  359  0.0002   0.2607  0.8236  *** 
+                                                    estimate      se    tval   df    pval    ci.lb   ci.ub      
+interventionistresearch staff                         0.4547  0.0459  9.9098  369  <.0001   0.3645  0.5449  *** 
+interventionistschool personnel                       0.5463  0.1519  3.5957  369  0.0004   0.2475  0.8450  *** 
+interventionistschool personnel and research staff    0.2514  0.1523  1.6503  369  0.0997  -0.0482  0.5510    . 
 
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
+>   
+>   ##Use RVE for robustness
+>   mvcf <- coef_test(NNMA_control_interventionist,
++                     cluster = NMA_Data_Subset_grpID$record_id, 
++                     vcov = "CR2")
+>   mvcf
+                                              Coef. Estimate     SE t-stat d.f. (Satt) p-val (Satt) Sig.
+                      interventionistresearch staff    0.455 0.0457   9.96       32.72       <0.001  ***
+                    interventionistschool personnel    0.546 0.2058   2.66        3.37       0.0677    .
+ interventionistschool personnel and research staff    0.251 0.0548   4.59        2.29       0.0341    *
+>   
+>   ####################################################################################################
 > 
-> ##Use RVE for robustness
-> mvcf <- coef_test(NNMA_control_research_lab,
-+                   cluster = NMA_Data_Subset_grpID$record_id, 
-+                   vcov = "CR2")
-> mvcf 
-         Coef. Estimate     SE t-stat d.f. (Satt) p-val (Satt) Sig.
- research_lab1    0.592 0.0776   7.62       15.38      < 0.001  ***
- research_lab2    0.117 0.2387   0.49        1.00      0.70975     
- research_lab3    0.570 0.1078   5.28        1.69      0.04802    *
- research_lab4    0.482 0.2856   1.69        1.00      0.34074     
- research_lab5    0.410 0.0731   5.62        4.36      0.00379   **
- research_lab6    0.237 0.0222  10.64        5.86      < 0.001  ***
- research_lab7    0.187 0.1054   1.77        3.36      0.16469     
- research_lab8    0.542 0.2107   2.57        4.50      0.05509    .
-> 
-> 
-> 
-> 
-> ####################################################################################################
-> 
-> NNMA_control_intervention_content_numeric <- rma.mv(yi = effect_size, 
-+                                             V = V_list, 
-+                                             random = ~ 1 | record_id/es_id,
-+                                             mods = ~ intervention_content_numeric - 1,
-+                                             test =  "t", 
-+                                             data = NMA_Data_Subset_grpID, 
-+                                             method = "REML")
+>   NNMA_control_ongoing_training <- rma.mv(yi = effect_size, 
++                                           V = V_list, 
++                                           random = ~ 1 | record_id/es_id,
++                                           mods = ~ ongoing_training - 1,
++                                           test =  "t", 
++                                           data = NMA_Data_Subset_grpID, 
++                                           method = "REML")
 Warning messages:
 1: 1 row with NAs omitted from model fitting. 
 2: 'V' appears to be not positive definite. 
-> summary(NNMA_control_intervention_content_numeric)  
+>   summary(NNMA_control_ongoing_training)  
 
-Multivariate Meta-Analysis Model (k = 367; method: REML)
+Multivariate Meta-Analysis Model (k = 372; method: REML)
 
    logLik   Deviance        AIC        BIC       AICc   
--294.0748   588.1497   596.1497   611.7493   596.2608   
+-296.0749   592.1497   598.1497   609.8983   598.2151   
 
 Variance Components:
 
             estim    sqrt  nlvls  fixed           factor 
-sigma^2.1  0.0258  0.1608     51     no        record_id 
-sigma^2.2  0.1947  0.4412    367     no  record_id/es_id 
-
-Test of Moderators (coefficients 1:2):
-F(df1 = 2, df2 = 365) = 75.6566, p-val < .0001
+sigma^2.1  0.0425  0.2061     51     no        record_id 
+sigma^2.2  0.1950  0.4416    372     no  record_id/es_id 
 
 Model Results:
 
-                               estimate      se    tval   df    pval   ci.lb   ci.ub      
-intervention_content_numeric1    0.3469  0.0477  7.2721  365  <.0001  0.2531  0.4407  *** 
-intervention_content_numeric2    0.7173  0.0723  9.9212  365  <.0001  0.5751  0.8595  *** 
+                  estimate      se    tval   df    pval   ci.lb   ci.ub      
+ongoing_training    0.4865  0.0506  9.6158  371  <.0001  0.3870  0.5859  *** 
 
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
+>   
+>   ##Use RVE for robustness
+>   mvcf <- coef_test(NNMA_control_ongoing_training,
++                     cluster = NMA_Data_Subset_grpID$record_id, 
++                     vcov = "CR2")
+>   mvcf
+            Coef. Estimate     SE t-stat d.f. (Satt) p-val (Satt) Sig.
+ ongoing_training    0.486 0.0502   9.68        31.1       <0.001  ***
+>   
+>   ####################################################################################################
+>   
+>   NNMA_control_intervention_content <- rma.mv(yi = effect_size, 
++                                               V = V_list, 
++                                               random = ~ 1 | record_id/es_id,
++                                               mods = ~ intervention_content - 1,
++                                               test =  "t", 
++                                               data = NMA_Data_Subset_grpID, 
++                                               method = "REML")
+Warning messages:
+1: 1 row with NAs omitted from model fitting. 
+2: 'V' appears to be not positive definite. 
+>   summary(NNMA_control_intervention_content)  
+
+Multivariate Meta-Analysis Model (k = 372; method: REML)
+
+   logLik   Deviance        AIC        BIC       AICc   
+-286.1681   572.3362   580.3362   595.9902   580.4458   
+
+Variance Components:
+
+            estim    sqrt  nlvls  fixed           factor 
+sigma^2.1  0.0131  0.1144     51     no        record_id 
+sigma^2.2  0.1965  0.4433    372     no  record_id/es_id 
+
+Test of Moderators (coefficients 1:2):
+F(df1 = 2, df2 = 370) = 80.5947, p-val < .0001
+
+Model Results:
+
+                       estimate      se    tval   df    pval   ci.lb   ci.ub      
+intervention_contentR    0.6599  0.0664  9.9317  370  <.0001  0.5292  0.7905  *** 
+intervention_contentW    0.3483  0.0438  7.9446  370  <.0001  0.2621  0.4345  *** 
+
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+>   
+>   ##Use RVE for robustness
+>   mvcf <- coef_test(NNMA_control_intervention_content,
++                     cluster = NMA_Data_Subset_grpID$record_id, 
++                     vcov = "CR2")
+>   mvcf    
+                 Coef. Estimate     SE t-stat d.f. (Satt) p-val (Satt) Sig.
+ intervention_contentR    0.660 0.0992   6.65          10       <0.001  ***
+ intervention_contentW    0.348 0.0308  11.31          25       <0.001  ***
+>   
+>   ####################################################################################################
+>   
+>   NNMA_control_measure_developer <- rma.mv(yi = effect_size, 
++                                            V = V_list, 
++                                            random = ~ 1 | record_id/es_id,
++                                            mods = ~ measure_developer - 1,
++                                            test =  "t", 
++                                            data = NMA_Data_Subset_grpID, 
++                                            method = "REML")
+Warning messages:
+1: 1 row with NAs omitted from model fitting. 
+2: 'V' appears to be not positive definite. 
+>   summary(NNMA_control_measure_developer)  
+
+Multivariate Meta-Analysis Model (k = 372; method: REML)
+
+   logLik   Deviance        AIC        BIC       AICc   
+-288.2162   576.4325   584.4325   600.0865   584.5420   
+
+Variance Components:
+
+            estim    sqrt  nlvls  fixed           factor 
+sigma^2.1  0.0177  0.1331     51     no        record_id 
+sigma^2.2  0.1922  0.4384    372     no  record_id/es_id 
+
+Test of Moderators (coefficients 1:2):
+F(df1 = 2, df2 = 370) = 73.1780, p-val < .0001
+
+Model Results:
+
+                                       estimate      se     tval   df    pval   ci.lb   ci.ub      
+measure_developerindependent             0.2705  0.0641   4.2226  370  <.0001  0.1445  0.3965  *** 
+measure_developerresearcher developed    0.5003  0.0418  11.9802  370  <.0001  0.4182  0.5824  *** 
+
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+>   
+>   ##Use RVE for robustness
+>   mvcf <- coef_test(NNMA_control_measure_developer,
++                     cluster = NMA_Data_Subset_grpID$record_id, 
++                     vcov = "CR2")
+>   mvcf
+                                 Coef. Estimate     SE t-stat d.f. (Satt) p-val (Satt) Sig.
+          measure_developerindependent    0.271 0.0321   8.43        17.4       <0.001  ***
+ measure_developerresearcher developed    0.500 0.0465  10.75        32.5       <0.001  ***
 > 
-> ##Use RVE for robustness
-> mvcf <- coef_test(NNMA_control_intervention_content_numeric,
-+                   cluster = NMA_Data_Subset_grpID$record_id, 
-+                   vcov = "CR2")
-> mvcf 
-                         Coef. Estimate     SE t-stat d.f. (Satt) p-val (Satt) Sig.
- intervention_content_numeric1    0.347 0.0315  11.00        28.1       <0.001  ***
- intervention_content_numeric2    0.717 0.1118   6.41        10.1       <0.001  ***
+> ####################################################################################################
  
  
  
 =================================================================================================================
  
- > mod_analysis_BHcorrection <- mod_analysis %>% 
-+   # this numbers each row, thus allowing you to determine how many tests you ran, for categorical
-+   # model this should reflect one test for each level of the categorical model
-+   rowid_to_column(var = "order_id") %>% 
-+   ## filter if needed
-+   ## group_by(domain) %>% ## only use if you have multiple outcome domains, otherwise remove
-+   ## arrange(domain, p) %>% ## only arrange by p (p-value) if no multiple outcome domains
-+   arrange(p.value) %>% ## only arrange by p (p-value) if no multiple outcome domains
-+   mutate(rank = seq_along(p.value),
-+          BH_val = (rank/length(rank)*.10), # specifies BH corrected level
-+          p_less_BH = case_when(p.value < BH_val ~ "Yes",
-+                                p.value >= BH_val ~ "No"),
-+          BH_sig = if_else(cumall(p_less_BH == "No"), "", if_else(p.value <= max(p.value[p_less_BH == "Yes"]), "*", ""))) %>% 
-+   ungroup() %>% 
-+   arrange(order_id)
-> # here you can select your final dataframe
-> # select(domain:moderator, df_4, coef, p, BH_sig, ES, CI_LB:CI_UB, k, nES, Comments) 
-> 
-> print(mod_analysis_BHcorrection, n=Inf)
-# A tibble: 14 × 13
-   order_id term                          type    estimate std.error statistic p.value conf.low conf.high  rank  BH_val p_less_BH BH_sig
-      <int> <chr>                         <chr>      <dbl>     <dbl>     <dbl>   <dbl>    <dbl>     <dbl> <int>   <dbl> <chr>     <chr> 
- 1        1 dosage_overall_hours_avg      summary   0.0170   0.00210     8.09  0         0.0129    0.0211     1 0.00714 Yes       "*"   
- 2        2 group_size_average            summary   0.0829   0.0171      4.86  0         0.0493    0.117      2 0.0143  Yes       "*"   
- 3        3 grade_level                   summary   0.152    0.0156      9.71  0         0.121     0.182      3 0.0214  Yes       "*"   
- 4        4 TvsT0                         summary   0.587    0.0525     11.2   0         0.484     0.691      4 0.0286  Yes       "*"   
- 5        5 TvsT1                         summary   0.0406   0.0702      0.578 0.564    -0.0975    0.179     14 0.1     No        ""    
- 6        6 measure_developer_numeric1    summary   0.508    0.0473     10.7   0         0.415     0.601      5 0.0357  Yes       "*"   
- 7        7 measure_developer_numeric2    summary   0.298    0.0720      4.14  0.00004   0.157     0.440     10 0.0714  Yes       "*"   
- 8        8 interventionist_numeric1      summary   0.466    0.0513      9.09  0         0.365     0.567      6 0.0429  Yes       "*"   
- 9        9 interventionist_numeric2      summary   0.595    0.163       3.65  0.0003    0.274     0.916     11 0.0786  Yes       "*"   
-10       10 interventionist_numeric3      summary   0.254    0.170       1.50  0.136    -0.0802    0.589     13 0.0929  No        ""    
-11       11 ongoing_training1             summary   0.271    0.104       2.60  0.00969   0.0660    0.475     12 0.0857  Yes       "*"   
-12       12 ongoing_training2             summary   0.507    0.0516      9.83  0         0.406     0.608      7 0.05    Yes       "*"   
-13       13 intervention_content_numeric1 summary   0.347    0.0477      7.27  0         0.253     0.441      8 0.0571  Yes       "*"   
-14       14 intervention_content_numeric2 summary   0.717    0.0723      9.92  0         0.575     0.859      9 0.0643  Yes       "*"   
- 
- 
+>   mod_analysis_BHcorrection <- mod_analysis %>% 
++     # this numbers each row, thus allowing you to determine how many tests you ran;
++     # for categorical model this should reflect one test for each level of the categorical model
++     rowid_to_column(var = "order_id") %>% 
++     ## filter if needed
++     ## group_by(domain) %>% ## only use if you have multiple outcome domains, otherwise remove
++     ## arrange(domain, p) %>% ## only arrange by p (p-value) if no multiple outcome domains
++     arrange(p.value) %>% ## only arrange by p (p-value) if no multiple outcome domains
++     mutate(rank = seq_along(p.value),
++            BH_val = (rank/length(rank)*.10), # specifies BH corrected level
++            p_less_BH = case_when(p.value < BH_val ~ "Yes",
++                                  p.value >= BH_val ~ "No"),
++            BH_sig = if_else(cumall(p_less_BH == "No"), "", if_else(p.value <= max(p.value[p_less_BH == "Yes"]), "*", ""))) %>% 
++     ungroup() %>% 
++     arrange(order_id)
+>   # here you can select your final dataframe
+>   # select(domain:moderator, df_4, coef, p, BH_sig, ES, CI_LB:CI_UB, k, nES, Comments) 
+>   
+>   print(mod_analysis_BHcorrection, n=Inf)
+# A tibble: 13 × 13
+   order_id term                                               type    estimate std.error statistic p.value conf.low conf.high  rank  BH_val p_less_BH BH_sig
+      <int> <chr>                                              <chr>      <dbl>     <dbl>     <dbl>   <dbl>    <dbl>     <dbl> <int>   <dbl> <chr>     <chr> 
+ 1        1 control_natureAlternate Treatment                  summary   0.0508   0.0687      0.739 0.460    -0.0844    0.186     13 0.1     No        ""    
+ 2        2 control_natureControl                              summary   0.568    0.0476     11.9   0         0.474     0.662      1 0.00769 Yes       "*"   
+ 3        3 dosage_overall_hours                               summary   0.0165   0.00195     8.47  0         0.0127    0.0204     2 0.0154  Yes       "*"   
+ 4        4 group_size_average                                 summary   0.0813   0.0164      4.95  0         0.0490    0.114      3 0.0231  Yes       "*"   
+ 5        5 grade_level                                        summary   0.145    0.0148      9.86  0         0.116     0.174      4 0.0308  Yes       "*"   
+ 6        6 interventionistresearch staff                      summary   0.455    0.0459      9.91  0         0.364     0.545      5 0.0385  Yes       "*"   
+ 7        7 interventionistschool personnel                    summary   0.546    0.152       3.60  0.00037   0.248     0.845     11 0.0846  Yes       "*"   
+ 8        8 interventionistschool personnel and research staff summary   0.251    0.152       1.65  0.0997   -0.0482    0.551     12 0.0923  No        ""    
+ 9        9 ongoing_training                                   summary   0.486    0.0506      9.62  0         0.387     0.586      6 0.0462  Yes       "*"   
+10       10 intervention_contentR                              summary   0.660    0.0664      9.93  0         0.529     0.791      7 0.0538  Yes       "*"   
+11       11 intervention_contentW                              summary   0.348    0.0438      7.94  0         0.262     0.434      8 0.0615  Yes       "*"   
+12       12 measure_developerindependent                       summary   0.271    0.0641      4.22  0.00003   0.145     0.396     10 0.0769  Yes       "*"   
+13       13 measure_developerresearcher developed              summary   0.500    0.0418     12.0   0         0.418     0.582      9 0.0692  Yes       "*"  
