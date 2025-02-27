@@ -32,7 +32,7 @@ NNMA_Data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_
   var_class <- function(x) {
     class(x)
   }
-  lapply(NMA_Data_Subset[c("FWOF_TX", "control_nature", "dosage_overall_hours_avg", "group_size_average", "grade_level", "interventionist", "ongoing_training", "intervention_content", "measure_developer")], var_class)
+  lapply(NMA_Data_Subset[c("FWOF_TX", "control_nature", "dosage_overall_hours", "group_size_average", "grade_level", "interventionist", "ongoing_training", "intervention_content", "measure_developer")], var_class)
   
   class(NMA_Data_Subset$FWOF_TX)
   NMA_Data_Subset<- NMA_Data_Subset %>% mutate(FWOF_TX = as.character(FWOF_TX))
@@ -169,7 +169,7 @@ NNMA_Data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_
   tabyl(NMA_Data_Subset_grpID$grade_level_numeric)
   
   cor(NMA_Data_Subset_grpID[c("NL_TX", "TES_TX", "VF_TX", "RS_TX", "FF_TX", "N_TX", "SEO_TX", "TV_TX", "RV_TX", "FWOF_TX",
-                              "control_nature_numeric", "dosage_overall_hours_avg", "group_size_average", "grade_level_numeric", "interventionist_numeric", "ongoing_training", "intervention_content_numeric", "measure_developer_numeric")])
+                              "control_nature_numeric", "dosage_overall_hours", "group_size_average", "grade_level_numeric", "interventionist_numeric", "ongoing_training", "intervention_content_numeric", "measure_developer_numeric")])
 
 #Run meta-regressions
   
@@ -192,17 +192,17 @@ NNMA_Data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_
   
   ####################################################################################################
   
-  NNMA_control_dosage_overall_hours_avg <- rma.mv(yi = effect_size, 
+  NNMA_control_dosage_overall_hours <- rma.mv(yi = effect_size, 
                                                   V = V_list, 
                                                   random = ~ 1 | record_id/es_id,
-                                                  mods = ~ dosage_overall_hours_avg - 1,
+                                                  mods = ~ dosage_overall_hours - 1,
                                                   test =  "t", 
                                                   data = NMA_Data_Subset_grpID, 
                                                   method = "REML")
-  summary(NNMA_control_dosage_overall_hours_avg)  
+  summary(NNMA_control_dosage_overall_hours)  
   
   ##Use RVE for robustness
-  mvcf <- coef_test(NNMA_control_dosage_overall_hours_avg,
+  mvcf <- coef_test(NNMA_control_dosage_overall_hours,
                     cluster = NMA_Data_Subset_grpID$record_id, 
                     vcov = "CR2")
   mvcf
@@ -320,10 +320,10 @@ NNMA_Data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_
   NNMA_control_control_nature_df$term <- gsub("overall", "control_nature", NNMA_control_control_nature_df$term)
   NNMA_control_control_nature_df
   
-  NNMA_control_dosage_overall_hours_avg_df <- tidy(NNMA_control_dosage_overall_hours_avg, conf.int = TRUE)
-  NNMA_control_dosage_overall_hours_avg_df
-  NNMA_control_dosage_overall_hours_avg_df$term <- gsub("overall", "dosage_overall_hours_avg", NNMA_control_dosage_overall_hours_avg_df$term)
-  NNMA_control_dosage_overall_hours_avg_df
+  NNMA_control_dosage_overall_hours_df <- tidy(NNMA_control_dosage_overall_hours, conf.int = TRUE)
+  NNMA_control_dosage_overall_hours_df
+  NNMA_control_dosage_overall_hours_df$term <- gsub("overall", "dosage_overall_hours", NNMA_control_dosage_overall_hours_df$term)
+  NNMA_control_dosage_overall_hours_df
   
   NNMA_control_group_size_average_df <- tidy(NNMA_control_group_size_average, conf.int = TRUE)
   NNMA_control_group_size_average_df
@@ -355,7 +355,7 @@ NNMA_Data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_
   NNMA_control_measure_developer_df$term <- gsub("overall", "measure_developer", NNMA_control_measure_developer_df$term)
   NNMA_control_measure_developer_df
   
-  mod_analysis <- rbind(NNMA_control_control_nature_df, NNMA_control_dosage_overall_hours_avg_df, NNMA_control_group_size_average_df, NNMA_control_grade_level_df, NNMA_control_interventionist_df, NNMA_control_ongoing_training_df, NNMA_control_intervention_content_df, NNMA_control_measure_developer_df)
+  mod_analysis <- rbind(NNMA_control_control_nature_df, NNMA_control_dosage_overall_hours_df, NNMA_control_group_size_average_df, NNMA_control_grade_level_df, NNMA_control_interventionist_df, NNMA_control_ongoing_training_df, NNMA_control_intervention_content_df, NNMA_control_measure_developer_df)
   mod_analysis$p.value <- round(mod_analysis$p.value, digits = 5)
   print(mod_analysis, n=Inf) 
   

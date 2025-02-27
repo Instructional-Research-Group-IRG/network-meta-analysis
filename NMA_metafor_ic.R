@@ -302,19 +302,62 @@
     ### Fit model assuming consistency (tau^2_omega=0)
     res_mod_icW <- rma.mv(effect_size, V_list, 
                             mods = ~ FF + FF.RS + RS + VF.FF.RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
-                            random = ~ 1 | record_id/es_id, 
+                            random = ~ 1 | record_id/es_id,
                             rho=0.60, 
                             data=NMA_data_analysis_subset_grpID_icW)
     summary(res_mod_icW) 
-
+    
     ### Fit Jackson's model to test for inconsistency 
+    
+      #### Note: First create both a contrast variable and design variable to enter into the random argument as the inconsistency variance component for testing for inconsistency.
+      ####       The contrast variable is a character string that combines the intervention and comparison conditions of each specific contrast into a single variable.
+      ####       The design variable is a character string that combines all the intervention and comparison conditions of all the contrasts of a specific study into a single variable.
+      NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% mutate(intervention_prelim= as.character(intervention_prelim), comparison_prelim= as.character(comparison_prelim))
+      NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% mutate(contrast = paste(intervention_prelim, comparison_prelim, sep = "_"))
+      tabyl(NMA_data_analysis_subset_grpID_icW$contrast)
+      contrast_design <- NMA_data_analysis_subset_grpID_icW %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, contrast)
+      print(contrast_design, n=Inf, na.print="") 
+      NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% mutate(design = contrast)
+      NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% mutate(design = ifelse(record_id == "MI10012", "FF+RS_FF_BAU", design))
+      NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% mutate(design = ifelse(record_id == "MI20625", "FF+RS_RS_BAU", design))
+      NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% mutate(design = ifelse(record_id == "MI20759", "FF+RS_RS_BAU", design))
+      NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% mutate(design = ifelse(record_id == "MI20760", "FF+RS_FF_BAU", design))
+      NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% mutate(design = ifelse(record_id == "MI21119", "RS_FF_BAU", design))
+      NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% mutate(design = ifelse(record_id == "MI21843", "VF+FF+RS_FF+RS_BAU", design))
+      NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% mutate(design = ifelse(record_id == "MI21847", "VF+FF+RS_FF+RS_BAU", design))
+      NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% mutate(design = ifelse(record_id == "MI30044", "FF+RS_RS_BAU", design))
+      NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% mutate(design = ifelse(record_id == "MI30059", "VF+FF+RS_FF+RS_BAU", design))
+      contrast_design <- NMA_data_analysis_subset_grpID_icW %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, contrast, design)
+      print(contrast_design, n=Inf, na.print="") 
+      
     res_mod_icW_J <- rma.mv(effect_size, V_list,
+                             mods = ~ FF + FF.RS + RS + VF.FF.RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons 
+                             random = list(~ 1 | record_id/es_id, ~ contrast | record_id, ~ contrast | design),
+                             rho=0.60, phi=1/2,
+                             data=NMA_data_analysis_subset_grpID_icW)
+    summary(res_mod_icW_J)      
+    
+      #### profile likelihood plots for tau^2_beta and tau^2_omega
+      par(mfrow=c(2,1))
+      profile(res_mod_icW_J, tau2=1, xlim=c(0,.1))
+      abline(h=logLik(res_mod_icW_J) - qchisq(.95, df=1)/2, lty="dotted")
+      profile(res_mod_icW_J, gamma2=1, xlim=c(0,.8))
+      abline(h=logLik(res_mod_icW_J) - qchisq(.95, df=1)/2, lty="dotted")
+      
+      #### profile likelihood CIs for tau^2_beta and tau^2_omega
+      confint(res_mod_icW_J, tau2=1, digits=2)
+      confint(res_mod_icW_J, gamma2=1, digits=2)
+      
+      #### LRT comparing modI and modC
+      anova(res_mod_icW_J, res_mod_icW)
+
+      res_mod_icW_J2 <- rma.mv(effect_size, V_list,
                               mods = ~ FF + FF.RS + RS + VF.FF.RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons 
-                              random = list(~ 1 | record_id/es_id, ~ domain | record_id, ~ contrast_id | record_id),
+                              random = list(~ 1 | record_id/es_id, ~ contrast | design),
                               rho=0.60, phi=1/2,
                               data=NMA_data_analysis_subset_grpID_icW)
-    summary(res_mod_icW_J)
-
+      summary(res_mod_icW_J2)         
+    
     ### Estimate all pairwise differences between treatments
     contr <- data.frame(t(combn(names(coef(res_mod_icW)), 2)))
     contr <- contrmat(contr, "X1", "X2")
