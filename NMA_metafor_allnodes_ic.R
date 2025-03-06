@@ -303,13 +303,78 @@
     summary(res_mod_icW) 
 
     ### Fit Jackson's model to test for inconsistency 
+    
+      #### Note: First create both a contrast variable and design variable to enter into the random argument as the inconsistency variance component for testing for inconsistency.
+      ####       The contrast variable is a character string that combines the intervention and comparison conditions of each specific contrast into a single variable.
+      ####       The design variable is a character string that combines all the intervention and comparison conditions of all the contrasts of a specific study into a single variable.
+      ####       These variables must be created after reducing the dataset to the domain level because studies with contrasts that only have outcome measures in one of the two domains
+      ####       should only contribute to the concatenated bundles of the design variable for the domain to which all its outcome measures belong.
+      
+      #### Create contrast variable
+      NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% mutate(intervention_prelim= as.character(intervention_prelim), comparison_prelim= as.character(comparison_prelim))
+      NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% mutate(contrast = paste(intervention_prelim, comparison_prelim, sep = "_"))
+      tabyl(NMA_data_analysis_subset_grpID_icW$contrast)
+      NMA_data_analysis_subset_grpID_icW_select1 <- dplyr::select(NMA_data_analysis_subset_grpID_icW, record_id, contrast_id, intervention_prelim, comparison_prelim, contrast)
+      print(NMA_data_analysis_subset_grpID_icW_select1)
+      
+      #### Create design variable
+      
+        ##### Reduce dataset from measure level to contrast level
+        Jackson_icW <- NMA_data_analysis_subset_grpID_icW %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
+        print(Jackson_icW)
+        Jackson_icW_unique <- Jackson_icW %>% distinct(record_id, contrast_id, .keep_all = TRUE)
+        print(Jackson_icW_unique)
+      
+        ##### Reshape data long so that each intervention/comparison group bundle of each unique contrast of each study is a row
+        Jackson_icW_unique_long <- Jackson_icW_unique %>% pivot_longer(c(intervention_prelim, comparison_prelim), names_to="group_assignment", values_to="bundle")
+        print(Jackson_icW_unique_long, n=Inf)
+        
+        ##### Keep only the unique intervention/comparison group bundles across all contrasts of each study, numbering each within study  
+        Jackson_icW_unique_long_unique <- Jackson_icW_unique_long %>% distinct(record_id, bundle, .keep_all = TRUE)
+        print(Jackson_icW_unique_long_unique, n=Inf)
+        Jackson_icW_unique_long_unique <- Jackson_icW_unique_long_unique %>% dplyr::select(record_id, bundle)
+        Jackson_icW_unique_long_unique <- Jackson_icW_unique_long_unique %>% group_by(record_id) %>% mutate(running_count = row_number()) %>% ungroup()
+        print(Jackson_icW_unique_long_unique, n=Inf)
+        
+        ##### Reshape data wide format so that each unique intervention/comparison group bundle within each study is a column
+        Jackson_icW_unique_long_unique_wide <- Jackson_icW_unique_long_unique %>% pivot_wider(record_id, names_from="running_count", values_from="bundle")
+        print(Jackson_icW_unique_long_unique_wide, n=Inf)
+      
+        ##### Create design variable
+        Jackson_icW_unique_long_unique_wide <- Jackson_icW_unique_long_unique_wide %>% mutate(design = paste(`1`, `2`, `3`, `4`, sep = "_"))
+        print(Jackson_icW_unique_long_unique_wide, n=Inf)
+
+        Jackson_icW_contrast_design <- Jackson_icW_unique_long_unique_wide %>% dplyr::select(record_id, design)
+        print(Jackson_icW_contrast_design, n=Inf)
+        Jackson_icW_contrast_design$design <- gsub("_NA","", Jackson_icW_contrast_design$design)
+        tabyl(Jackson_icW_contrast_design$design)
+      
+        Jackson_icW_contrast_design <- Jackson_icW_contrast_design %>% mutate(design = ifelse(design == "FF_BAU_FF+RS", "FF+RS_FF_BAU", design))
+        Jackson_icW_contrast_design <- Jackson_icW_contrast_design %>% mutate(design = ifelse(design == "RS_BAU_FF", "FF+RS_BAU", design))
+        Jackson_icW_contrast_design <- Jackson_icW_contrast_design %>% mutate(design = ifelse(design == "VF+FF+RS_BAU_FF+RS", "VF+FF+RS_FF+RS_BAU", design))
+        tabyl(Jackson_icW_contrast_design$design)
+      
+        ##### Merge design variable onto main dataset
+        NMA_data_analysis_subset_grpID_icW <- left_join(NMA_data_analysis_subset_grpID_icW, Jackson_icW_contrast_design, by = c("record_id"))
+        tabyl(NMA_data_analysis_subset_grpID_icW$contrast)
+        tabyl(NMA_data_analysis_subset_grpID_icW$design)
+        NMA_data_analysis_subset_grpID_icW_select2 <- dplyr::select(NMA_data_analysis_subset_grpID_icW, record_id, contrast_id, intervention_prelim, comparison_prelim, contrast, design)
+        print(NMA_data_analysis_subset_grpID_icW_select2)
+      
     res_mod_icW_J <- rma.mv(effect_size, V_list,
                               mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons 
-                              random = list(~ 1 | record_id/es_id, ~ domain | record_id, ~ contrast_id | record_id),
+                              random = list(~ 1 | record_id/es_id, ~ contrast | record_id, ~ contrast | design),
                               rho=0.60, phi=1/2,
                               data=NMA_data_analysis_subset_grpID_icW)
     summary(res_mod_icW_J)
-
+      
+      #### profile likelihood CIs for tau^2_beta and tau^2_omega
+      confint(res_mod_icW_J, tau2=1, digits=2)
+      confint(res_mod_icW_J, gamma2=1, digits=2)
+      
+      #### LRT comparing modI and modC
+      anova(res_mod_icW_J, res_mod_icW)      
+  
     ### Estimate all pairwise differences between treatments
     contr <- data.frame(t(combn(names(coef(res_mod_icW)), 2)))
     contr <- contrmat(contr, "X1", "X2")
@@ -596,12 +661,75 @@
     summary(res_mod_icR)
     
     ### Fit Jackson's model to test for inconsistency 
+    
+      #### Note: First create both a contrast variable and design variable to enter into the random argument as the inconsistency variance component for testing for inconsistency.
+      ####       The contrast variable is a character string that combines the intervention and comparison conditions of each specific contrast into a single variable.
+      ####       The design variable is a character string that combines all the intervention and comparison conditions of all the contrasts of a specific study into a single variable.
+      ####       These variables must be created after reducing the dataset to the domain level because studies with contrasts that only have outcome measures in one of the two domains
+      ####       should only contribute to the concatenated bundles of the design variable for the domain to which all its outcome measures belong.
+      
+      #### Create contrast variable
+      NMA_data_analysis_subset_grpID_icR <- NMA_data_analysis_subset_grpID_icR %>% mutate(intervention_prelim= as.character(intervention_prelim), comparison_prelim= as.character(comparison_prelim))
+      NMA_data_analysis_subset_grpID_icR <- NMA_data_analysis_subset_grpID_icR %>% mutate(contrast = paste(intervention_prelim, comparison_prelim, sep = "_"))
+      tabyl(NMA_data_analysis_subset_grpID_icR$contrast)
+      NMA_data_analysis_subset_grpID_icR_select1 <- dplyr::select(NMA_data_analysis_subset_grpID_icR, record_id, contrast_id, intervention_prelim, comparison_prelim, contrast)
+      print(NMA_data_analysis_subset_grpID_icR_select1)
+      
+      #### Create design variable
+    
+        ##### Reduce dataset from measure level to contrast level
+        Jackson_icR <- NMA_data_analysis_subset_grpID_icR %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
+        print(Jackson_icR)
+        Jackson_icR_unique <- Jackson_icR %>% distinct(record_id, contrast_id, .keep_all = TRUE)
+        print(Jackson_icR_unique)
+        
+        ##### Reshape data long so that each intervention/comparison group bundle of each unique contrast of each study is a row
+        Jackson_icR_unique_long <- Jackson_icR_unique %>% pivot_longer(c(intervention_prelim, comparison_prelim), names_to="group_assignment", values_to="bundle")
+        print(Jackson_icR_unique_long, n=Inf)
+        
+        ##### Keep only the unique intervention/comparison group bundles across all contrasts of each study, numbering each within study  
+        Jackson_icR_unique_long_unique <- Jackson_icR_unique_long %>% distinct(record_id, bundle, .keep_all = TRUE)
+        print(Jackson_icR_unique_long_unique, n=Inf)
+        Jackson_icR_unique_long_unique <- Jackson_icR_unique_long_unique %>% dplyr::select(record_id, bundle)
+        Jackson_icR_unique_long_unique <- Jackson_icR_unique_long_unique %>% group_by(record_id) %>% mutate(running_count = row_number()) %>% ungroup()
+        print(Jackson_icR_unique_long_unique, n=Inf)
+        
+        ##### Reshape data wide format so that each unique intervention/comparison group bundle within each study is a column
+        Jackson_icR_unique_long_unique_wide <- Jackson_icR_unique_long_unique %>% pivot_wider(record_id, names_from="running_count", values_from="bundle")
+        print(Jackson_icR_unique_long_unique_wide, n=Inf)
+        
+        ##### Create design variable
+        Jackson_icR_unique_long_unique_wide <- Jackson_icR_unique_long_unique_wide %>% mutate(design = paste(`1`, `2`, `3`, sep = "_"))
+        print(Jackson_icR_unique_long_unique_wide, n=Inf)
+        
+        Jackson_icR_contrast_design <- Jackson_icR_unique_long_unique_wide %>% dplyr::select(record_id, design)
+        print(Jackson_icR_contrast_design, n=Inf)
+        Jackson_icR_contrast_design$design <- gsub("_NA","", Jackson_icR_contrast_design$design)
+        tabyl(Jackson_icR_contrast_design$design)
+        
+        Jackson_icR_contrast_design <- Jackson_icR_contrast_design %>% mutate(design = ifelse(design == "NL+SE+FF+RS_BAU_NL+FF+RS", "NL+SE+FF+RS_NL+FF+RS_BAU", design))
+        tabyl(Jackson_icR_contrast_design$design)
+        
+        ##### Merge design variable onto main dataset
+        NMA_data_analysis_subset_grpID_icR <- left_join(NMA_data_analysis_subset_grpID_icR, Jackson_icR_contrast_design, by = c("record_id"))
+        tabyl(NMA_data_analysis_subset_grpID_icR$contrast)
+        tabyl(NMA_data_analysis_subset_grpID_icR$design)
+        NMA_data_analysis_subset_grpID_icR_select2 <- dplyr::select(NMA_data_analysis_subset_grpID_icR, record_id, contrast_id, intervention_prelim, comparison_prelim, contrast, design)
+        print(NMA_data_analysis_subset_grpID_icR_select2)
+    
     res_mod_icR_J <- rma.mv(effect_size, V_list, 
                            mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS + NL.SE.VF.RS + RS + SE.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
-                           random = list(~ 1 | record_id/es_id, ~ domain | record_id, ~ contrast_id | record_id),
+                           random = list(~ 1 | record_id/es_id, ~ contrast | record_id, ~ contrast | design),
                            rho=0.60, phi=1/2,
                            data=NMA_data_analysis_subset_grpID_icR)
     summary(res_mod_icR_J)
+    
+      #### profile likelihood CIs for tau^2_beta and tau^2_omega
+      confint(res_mod_icR_J, tau2=1, digits=2)
+      confint(res_mod_icR_J, gamma2=1, digits=2)
+      
+      #### LRT comparing modI and modC
+      anova(res_mod_icR_J, res_mod_icR)   
       
     ### Estimate all pairwise differences between treatments
     contr <- data.frame(t(combn(names(coef(res_mod_icR)), 2)))
