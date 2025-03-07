@@ -405,7 +405,7 @@
     lt_info_df2$ci.ub <- paste(lt_info_df2$ci.ub, ")", sep= "")
     lt_info_df2 <- lt_info_df2 %>% unite(pred_cis, pred, ci.lb, ci.ub, sep= " ", remove = FALSE )
     print(lt_info_df2)
-    lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis")
+    lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #This creates the league table formatted as "left vs top".
     lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
     print(lt_info_df3)
     write_csv(lt_info_df3, 'nma_league_table_icW.csv')
@@ -761,7 +761,7 @@
     lt_info_df2$ci.ub <- paste(lt_info_df2$ci.ub, ")", sep= "")
     lt_info_df2 <- lt_info_df2 %>% unite(pred_cis, pred, ci.lb, ci.ub, sep= " ", remove = FALSE )
     print(lt_info_df2)
-    lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #To-do: possible to format ci below? + color code by sig
+    lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #This creates the league table formatted as "left vs top".
     lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
     print(lt_info_df3)
     write_csv(lt_info_df3, 'nma_league_table_icR.csv')
