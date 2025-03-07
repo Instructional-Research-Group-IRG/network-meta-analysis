@@ -332,7 +332,7 @@
         ##### Keep only the unique intervention/comparison group bundles across all contrasts of each study, numbering each within study  
         Jackson_icW_unique_long_unique <- Jackson_icW_unique_long %>% distinct(record_id, bundle, .keep_all = TRUE)
         print(Jackson_icW_unique_long_unique, n=Inf)
-        Jackson_icW_unique_long_unique <- Jackson_icW_unique_long_unique %>% dplyr::select(record_id, bundle)
+        Jackson_icW_unique_long_unique <- Jackson_icW_unique_long_unique %>% dplyr::select(record_id, bundle) #Now that we've reduced the dataset to the unique intervention/comparison group bundles across all contrasts within the same study, we can drop the contrast_id column.
         Jackson_icW_unique_long_unique <- Jackson_icW_unique_long_unique %>% group_by(record_id) %>% mutate(running_count = row_number()) %>% ungroup()
         print(Jackson_icW_unique_long_unique, n=Inf)
         
@@ -372,7 +372,7 @@
       confint(res_mod_icW_J, tau2=1, digits=2)
       confint(res_mod_icW_J, gamma2=1, digits=2)
       
-      #### LRT comparing modI and modC
+      #### LRT comparing res_mod_icW_J and res_mod_icW
       anova(res_mod_icW_J, res_mod_icW)      
   
     ### Estimate all pairwise differences between treatments
@@ -690,7 +690,7 @@
         ##### Keep only the unique intervention/comparison group bundles across all contrasts of each study, numbering each within study  
         Jackson_icR_unique_long_unique <- Jackson_icR_unique_long %>% distinct(record_id, bundle, .keep_all = TRUE)
         print(Jackson_icR_unique_long_unique, n=Inf)
-        Jackson_icR_unique_long_unique <- Jackson_icR_unique_long_unique %>% dplyr::select(record_id, bundle)
+        Jackson_icR_unique_long_unique <- Jackson_icR_unique_long_unique %>% dplyr::select(record_id, bundle) #Now that we've reduced the dataset to the unique intervention/comparison group bundles across all contrasts within the same study, we can drop the contrast_id column.
         Jackson_icR_unique_long_unique <- Jackson_icR_unique_long_unique %>% group_by(record_id) %>% mutate(running_count = row_number()) %>% ungroup()
         print(Jackson_icR_unique_long_unique, n=Inf)
         
@@ -728,7 +728,7 @@
       confint(res_mod_icR_J, tau2=1, digits=2)
       confint(res_mod_icR_J, gamma2=1, digits=2)
       
-      #### LRT comparing modI and modC
+      #### LRT comparing res_mod_icR_J and res_mod_icR
       anova(res_mod_icR_J, res_mod_icR)   
       
     ### Estimate all pairwise differences between treatments
