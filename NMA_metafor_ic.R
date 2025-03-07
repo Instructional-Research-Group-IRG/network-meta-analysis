@@ -733,7 +733,7 @@
       confint(res_mod_icR_J, tau2=1, digits=2)
       confint(res_mod_icR_J, gamma2=1, digits=2)
       
-      #### LRT comparing modI and modC
+      #### LRT comparing res_mod_icR_J and res_mod_icR
       anova(res_mod_icR_J, res_mod_icR)      
       
     ### Estimate all pairwise differences between treatments
