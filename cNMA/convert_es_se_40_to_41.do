@@ -17,7 +17,7 @@ log using "C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network met
 ***																							  ***
 *** Authors: Seth B. Morgan																      ***
 *** Start date: February 19, 2025															  ***
-*** Last date modified: February 19, 2025												      ***
+*** Last date modified: March 11, 2025												          ***
 ***																							  ***
 *** Notes:																					  ***
 ***																							  ***
@@ -50,7 +50,7 @@ pause off
 *=========================================================================================
 
 	/* Load in cNMA database */
-	import excel "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 v5_Data inventory for 4.0 to 4.xlsx", sheet("DATABASE Converting ESs and SEs") firstrow clear
+	import excel "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 v5_CLEAN.xlsx", sheet("Data inventory for 4.0 to 4.1") firstrow clear
 
 	/* Clean up variable names */
 	include "$root\convert_es_se_40_to_41_revise_variable_names.do"
@@ -80,7 +80,7 @@ pause off
 	}
 	
 	/* Clean up numeric variables */
-	foreach var of varlist mean_?_adj {
+	foreach var of varlist mean_?_adj mean_c_sd {
 		display as input _n "Numeric variable: `var'"
 		destring `var', replace
 	}
@@ -90,19 +90,22 @@ pause off
 			
 		*-> Total sample of individuals
 			assert !missing(n_t_indiv) 
+			tablist study_id contrast_id n_i_indiv n_c_indiv n_t_indiv if n_i_indiv + n_c_indiv != n_t_indiv, sort(v) ab(32)
+			replace n_t_indiv= 934 if study_id=="MI20802" & contrast_id=="86426"
 			assert n_i_indiv + n_c_indiv == n_t_indiv
 			tablist n_i_indiv n_c_indiv n_t_indiv, sort(v)
 
 		*-> Total sample of clusters
 			assert missing(n_t_cluster) if level_of_assignment!="cluster"
-			tablist n_i_cluster n_c_cluster n_t_cluster if level_of_assignment=="cluster", sort(v)
+			tablist level_of_assignment n_i_cluster n_c_cluster n_t_cluster if level_of_assignment=="cluster", sort(v)
 			replace n_t_cluster= n_i_cluster + n_c_cluster
-			tablist n_i_cluster n_c_cluster n_t_cluster if level_of_assignment=="cluster", sort(v)
-			tablist contrast_id n_i_cluster n_c_cluster n_t_cluster if level_of_assignment=="cluster" & missing(n_t_cluster), sort(v) // (Send to team for correction in database- contrast IDs: 87196, 90508)
+			tablist level_of_assignment n_i_cluster n_c_cluster n_t_cluster if level_of_assignment=="cluster", sort(v)
+			tablist level_of_assignment contrast_id n_i_cluster n_c_cluster n_t_cluster if level_of_assignment=="cluster" & missing(n_t_cluster), sort(v) ab(32) // (!) Send to team for correction in database- contrast IDs: 87196, 90508.
 			
 		*-> Average number of individuals per cluster
+			tablist level_of_assignment level_of_assignment n_i_indiv n_c_indiv n_t_indiv n_i_cluster n_c_cluster n_t_cluster n_avg_cluster if level_of_assignment=="cluster", sort(v) ab(32)
 			replace n_avg_cluster= n_t_indiv/n_t_cluster
-			tablist level_of_assignment n_i_indiv n_c_indiv n_t_indiv n_i_cluster n_c_cluster n_t_cluster n_avg_cluster n_avg_cluster, sort(v) ab(32)
+			tablist level_of_assignment n_i_indiv n_c_indiv n_t_indiv n_i_cluster n_c_cluster n_t_cluster n_avg_cluster if level_of_assignment=="cluster", sort(v) ab(32)
 			assert n_avg_cluster==. if level_of_assignment!="cluster"
 			
 		*-> Small-sample bias adjustment (ω)
@@ -111,15 +114,15 @@ pause off
 			replace omega= (1-(3/((4*(n_i_indiv + n_c_indiv))-9)))
 			summarize omega
 			assert !missing(omega)
-			assert missing(Smallsamplebiascorrection)
-			drop Smallsamplebiascorrection
+			assert missing(Smallsamplebiascorrectionω)
+			drop Smallsamplebiascorrectionω
 			
 		*-> Pooled standard deviation (S)
 			replace mean_i_sd="10.4" if  mean_i_sd=="`10.4"
 			destring mean_i_sd, replace
 			generate S_pooled_sd = sqrt( ( ((n_i_indiv-1)*mean_i_sd^2) + ((n_c_indiv-1)*mean_c_sd^2) ) / (n_i_indiv + n_c_indiv - 2) )
 			label variable S_pooled_sd "pooled standard deviation"
-			tablist S_pooled_sd n_i_indiv n_c_indiv mean_i_sd mean_c_sd, sort(v) ab(32)
+			tablist level_of_assignment S_pooled_sd n_i_indiv n_c_indiv mean_i_sd mean_c_sd, sort(v) ab(32)
 		
   
 *=========================================================================================
