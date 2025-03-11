@@ -51,17 +51,18 @@ pause off
 
 	/* Load in cNMA database */
 	import excel "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 v5_CLEAN.xlsx", sheet("Data inventory for 4.0 to 4.1") firstrow clear
+	save "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 v5_CLEAN.dta", replace
 
 	/* Clean up variable names */
 	include "$root\convert_es_se_40_to_41_revise_variable_names.do"
+	
+	/* Drop uneccesary columns */
+	drop mrg_link StudyCitationfull_citation
 	
 	/*Keep only valid rows */
 	count
 	drop if missing(contrast_simple_number)
 	count
-	
-	/* Drop uneccesary columns */
-	drop mrg_link
 	
 	/* Save cNMA database as .dta */
 	save "$root\Data inventory for 4.0 to 4.dta", replace
@@ -80,7 +81,7 @@ pause off
 	}
 	
 	/* Clean up numeric variables */
-	foreach var of varlist mean_?_adj mean_c_sd {
+	foreach var of varlist mean_?_*adj mean_?_sd {
 		display as input _n "Numeric variable: `var'"
 		destring `var', replace
 	}
@@ -123,7 +124,16 @@ pause off
 			generate S_pooled_sd = sqrt( ( ((n_i_indiv-1)*mean_i_sd^2) + ((n_c_indiv-1)*mean_c_sd^2) ) / (n_i_indiv + n_c_indiv - 2) )
 			label variable S_pooled_sd "pooled standard deviation"
 			tablist level_of_assignment S_pooled_sd n_i_indiv n_c_indiv mean_i_sd mean_c_sd, sort(v) ab(32)
-		
+			
+		*-> Log odds ratio
+			tablist level_of_assignment analytic_method outcome_type mean_?_unadj mean_?_adj log_odds_post if outcome_type=="dichotomous", sort(v) ab(32)
+			foreach var of varlist mean_?_*adj {
+				replace `var'= `var' / 100 if outcome_type=="dichotomous"
+			}
+			generate OR= (mean_i_adj* (1-mean_c_adj))  /  (mean_c_adj* (1-mean_i_adj)) if outcome_type=="dichotomous"
+			replace log_odds_post= ln(OR) if outcome_type=="dichotomous"  
+			tablist level_of_assignment analytic_method outcome_type mean_?_unadj mean_?_adj OR log_odds_post if outcome_type=="dichotomous", sort(v) ab(32)
+			
   
 *=========================================================================================
 * II) CONVERT EFFECT SIZES FROM 4.0 to 4.1
@@ -132,6 +142,7 @@ pause off
 	/* Prepare data and variables for ES conversions */
 	summarize es_official_40, detail
 	generate es_converted_41=.
+	generate es_converted_41_check=.
 	label variable es_converted_41 "effect size converted from 4.0 to 4.1"
 
 	/* Effect sizes that are calculated the same under 4.0 and 4.1 */
@@ -140,20 +151,44 @@ pause off
 		*-> Individual-level assignment, analytic method other than difference-in-differences, continuous outcomes
 			// Note: The effect size formula for continuous outcome measures from studies using individual-level assignment and an analytic method other than difference-in-differences remains unchanged from 4.0 to 4.1.
 			//       Row 3 of <<Guide to 4.0 to 4.1 ES SE conversions.xldx>>
-			replace es_nochange=1 if level_of_assignment=="individual" & analytic_method!="difference-in-differences" & outcome_type=="continuous"
-			tablist level_of_assignment analytic_method outcome_type es_nochange, sort(v)
+			replace es_nochange=1 if level_of_assignment=="individual" & analytic_method!="difference-in-differences" & !missing(analytic_method) & outcome_type=="continuous"
+			tablist es_nochange level_of_assignment analytic_method outcome_type, sort(v) ab(32)
 			replace es_converted_41=es_official_40 if es_nochange==1
 			bysort es_nochange: summarize es_converted_41
+			tablist es_nochange level_of_assignment analytic_method outcome_type es_official_40 es_converted_41 if es_nochange==1, sort(v) ab(32)
+			
+			**-->> Recalculate effect sizes based on no adjustment as a check
+			tablist es_nochange level_of_assignment analytic_method outcome_type mean_i_unadj mean_c_unadj S_pooled_sd es_official_40 es_converted_41 if es_nochange==1 & analytic_method=="no adjustment", sort(v) ab(32)
+			replace es_converted_41_check= (omega * (mean_i_unadj - mean_c_unadj)) / S_pooled_sd if es_nochange==1 & analytic_method=="no adjustment"
+			tablist es_nochange level_of_assignment analytic_method outcome_type mean_i_unadj mean_c_unadj S_pooled_sd es_official_40 es_converted_41 es_converted_41_check if es_nochange==1 & analytic_method=="no adjustment" & !missing(es_converted_41_check), sort(v) ab(32)
+			summarize es_converted_41 es_converted_41_check if es_nochange==1 & analytic_method=="no adjustment" & !missing(es_converted_41_check)
+			summarize es_converted_41 es_converted_41_check if es_nochange==1 & analytic_method=="no adjustment" & !missing(es_converted_41_check) // (!) Negative ESs?
 			
 		*-> Additional adjustment if officially reported effect size calculated with unadjusted means but adjusted means are available
-			// Note: TBD
-		
+			// Note: (!) Ask team about this. (!) Also about negative effect sizes if positive result is decrease in outcome.
+			tablist es_nochange level_of_assignment analytic_method outcome_type mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj mean_i_sd mean_c_sd es_official_40 es_converted_41 if level_of_assignment=="individual" & analytic_method=="no adjustment" & outcome_type=="continuous" & !missing(mean_i_sd) & !missing(mean_c_sd), sort(v) ab(32)
+			replace es_nochange=2 if level_of_assignment=="individual" & analytic_method=="no adjustment" & outcome_type=="continuous" & !missing(mean_i_sd) & !missing(mean_c_sd)
+			replace es_converted_41= (omega * (mean_i_adj - mean_c_adj)) / S_pooled_sd if es_nochange==2
+			tablist es_nochange level_of_assignment analytic_method outcome_type mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj mean_i_sd mean_c_sd es_official_40 es_converted_41 if es_nochange==2, sort(v) ab(32)
+			
 	/* Effect sizes that are calculated differently under 4.0 and 4.1 */
 	
-		*-> Individual-level assignment, analytic method other than difference-in-differences, dichotomous outcomes
-		
 		*-> Individual-level assignment, analytic method difference-in-differences, continuous outcomes
-		
+			count if level_of_assignment=="individual" & analytic_method=="difference-in-differences" & !missing(analytic_method) & outcome_type=="continuous"
+			assert r(N)==0
+			*tablist level_of_assignment analytic_method outcome_type pre_post_same_measure pre_post_correlation es_official_40 es_converted_41 if level_of_assignment=="individual" & analytic_method=="difference-in-differences" & !missing(analytic_method) & outcome_type=="continuous", sort(v) ab(32)
+	
+		*-> Individual-level assignment, analytic method other than difference-in-differences, dichotomous outcomes
+			tablist level_of_assignment analytic_method outcome_type mean_?_unadj mean_?_adj log_odds_post es_official_40 es_converted_41 if level_of_assignment=="individual" & analytic_method!="difference-in-differences" & !missing(analytic_method) & outcome_type=="dichotomous", sort(v) ab(32)
+			replace es_converted_41= log_odds_post/1.65
+			tablist level_of_assignment analytic_method outcome_type mean_?_unadj mean_?_adj log_odds_post OR es_official_40 es_converted_41 if level_of_assignment=="individual" & analytic_method!="difference-in-differences" & !missing(analytic_method) & outcome_type=="dichotomous", sort(v) ab(32)
+			
+		*-> Individual-level assignment, analytic method difference-in-differences, dichotomous outcomes
+			count if level_of_assignment=="individual" & analytic_method=="difference-in-differences" & !missing(analytic_method) & outcome_type=="dichotomous"
+			assert r(N)==0
+			*tablist level_of_assignment analytic_method outcome_type pre_post_same_measure pre_post_correlation es_official_40 es_converted_41 if level_of_assignment=="individual" & analytic_method=="difference-in-differences" & !missing(analytic_method) & outcome_type=="dichotomous", sort(v) ab(32)
+
+/*		
 		*-> Cluster-level assignment
 			// Note: Revise the student-level ES from studies using cluster-level assignment using the unbiased formula in Table 1 of the Supplement, 
 			//	     which imposes a bias correction, in place of [E.5.1] on page E-9 of v4.1 Procedures/biased formula in Table 1 of the Supplement.
@@ -182,7 +217,7 @@ pause off
 			*Calculate 4.1 effect size for outcome measures of cluster-level assignment studies: unbiased [E.5.1] formula of Table 1 of the Supplement
 			replace es_converted_41 = ((omega*b_cluster)/S_pooled_sd) * sqrt( 1 - ( (2*(n_avg_cluster-1)*icc) / n_t_indiv-2) ) if level_of_assignment=="cluster"
 			tablist analytic_method es_official_40 es_converted_41 omega b_cluster icc S_pooled_sd n_avg_cluster n_t_indiv if level_of_assignment=="cluster", sort(v) ab(32)
-    
+*/			
 	
 *=========================================================================================
 * III) CONVERT STANDARD ERRORS OF EFFECT SIZES FROM 4.0 to 4.1
@@ -206,11 +241,19 @@ pause off
 	
 	/* Standard errors that are calculated the differently under 4.0 and 4.1 */
  		
-	 
+	/* Save final ES/SE conversion database */
+**# Bookmark #2
+	drop *_check OR
+	quietly compress
+	sort contrast_simple_number
+	save "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 v5_COMPLETED.dta", replace 
+	
+	
 *=========================================================================================
 * IV) DESCRIPTIVE STATISTICS
 *=========================================================================================     
 	
+	/* */
 
 
 log close convert_es_se
