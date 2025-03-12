@@ -2,7 +2,7 @@
       name:  convert_es_se
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41.log
   log type:  text
- opened on:  11 Mar 2025, 14:49:33
+ opened on:  11 Mar 2025, 15:39:53
 
 . 
 . 
@@ -3114,7 +3114,6 @@ es_conver~41 |          0
 .         sort contrast_simple_number
 
 .         save "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 v5_COMPLETED.dta", replace 
-(file C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\DATABASE Converting ESs and SEs from 4.0 to 4.1 v5_COMPLETED.dta not found)
 file C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\DATABASE Converting ESs and SEs from 4.0 to 4.1 v5_COMPLETED.dta saved
 
 .         
@@ -3130,5 +3129,5 @@ file C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-anal
       name:  convert_es_se
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41.log
   log type:  text
- closed on:  11 Mar 2025, 14:49:34
+ closed on:  11 Mar 2025, 15:39:53
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
