@@ -294,9 +294,9 @@
   check_icW <- NMA_data_analysis_subset_grpID_icW %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
   print(check_icW)
 
-    ### Fit model assuming consistency (tau^2_omega=0)
+    ### Fit NMA model assuming consistency (tau^2_omega=0)
     res_mod_icW <- rma.mv(effect_size, V_list, 
-                            mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                            mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS - 1, # BAU is excluded to serve as the reference level for the comparisons.
                             random = ~ 1 | record_id/es_id, 
                             rho=0.60, 
                             data=NMA_data_analysis_subset_grpID_icW)
@@ -436,7 +436,7 @@
         
       dat_cNMS_icW  %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, FF, RS, NL, VF, BAU) %>% print(na.print="NA", n=Inf)
     
-      #### Fit cNMA model
+      #### Fit additive cNMA model
       res_mod_icW_cNMA <- rma.mv(effect_size, V_list, 
                                   mods = ~ FF + RS + NL + VF - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
                                   random = ~ 1 | record_id/es_id, 

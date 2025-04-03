@@ -70,7 +70,8 @@ pause off
 	/* Explore key variables */
 	tab1 level_of_assignment analytic_method outcome_type, missing
 	tablist level_of_assignment analytic_method outcome_type, sort(v) ab(32)
-	tablist contrast_id study_id if , sort(v) ab(32)
+	tablist contrast_id study_id if missing(outcome_type) & !missing(level_of_assignment), sort(v) ab(32)
+	tablist contrast_id study_id if missing(outcome_type) & missing(level_of_assignment), sort(v) ab(32)
 	
 	/* Clean up string variables */
 	foreach var of varlist _all {
