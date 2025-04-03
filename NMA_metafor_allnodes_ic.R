@@ -377,76 +377,72 @@
       
     ### Fit cNMA model 
       
-      #### Notes: These are the bundles from the whole numbers NMA (entered as mods): FF + FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS. 
-      ####        Each component of the bundles entered as mods in the NMA needs its own binary variable in the mods argument of the cNMA model.
-      ####        Binaries for components FF & RS have already been created as part of the NMA. Need to create binaries for the other components.
+      #### Notes: The following are the bundles from the Whole Numbers domain entered as mods in the domain's NMA: FF + FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS. 
+      ####        Each component of the bundles entered as mods in the NMA above needs its own binary variable in the mods argument of the cNMA model.
+      ####        Binaries for components FF, RS, and BAU were already created as part of the NMA above because some bundles consisted of just one of these component. 
+      ####        As such, we need to create binaries for the other components included within the bundles of the Whole Numbers domain: NL and RS.
       ####        Each component binary is (+) 1 if that component is part of the intervention bundle.
       ####        Each component binary is (-) 1 if that component is part of the comparison bundle.
       
-    dat_cNMS_icW <- NMA_data_analysis_subset_grpID_icW
-    
-    dat_cNMS_icW$NL <- 0
-    dat_cNMS_icW$VF <- 0
-    # dat_cNMS_icW$BAU <- 0
-    
-    tabyl(dat_cNMS_icW$FF)
-    tabyl(dat_cNMS_icW$RS)
-    tabyl(dat_cNMS_icW$NL)
-    tabyl(dat_cNMS_icW$VF)
-    tabyl(dat_cNMS_icW$BAU)
-    
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(BAU = ifelse(comparison_prelim=="BAU",-1, BAU))
-    
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(intervention_prelim=="FF+RS",1, FF))
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(intervention_prelim=="FF+RS",1, RS))
-    
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(comparison_prelim=="FF+RS",-1, FF))
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(comparison_prelim=="FF+RS",-1, RS))
-    
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(NL = ifelse(intervention_prelim=="NL+FF+RS",1, NL))
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(intervention_prelim=="NL+FF+RS",1, FF))
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(intervention_prelim=="NL+FF+RS",1, RS))
-
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(NL = ifelse(comparison_prelim=="NL+FF+RS",-1, NL))
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(comparison_prelim=="NL+FF+RS",-1, FF))
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(comparison_prelim=="NL+FF+RS",-1, RS))        
-    
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(NL = ifelse(intervention_prelim=="NL+RS",1, NL))
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(intervention_prelim=="NL+RS",1, RS))
-    
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(NL = ifelse(comparison_prelim=="NL+RS",-1, NL))
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(comparison_prelim=="NL+RS",-1, RS))
-    
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(VF = ifelse(intervention_prelim=="VF+FF+RS",1, VF))
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(intervention_prelim=="VF+FF+RS",1, FF))
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(intervention_prelim=="VF+FF+RS",1, RS))     
-    
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(VF = ifelse(comparison_prelim=="VF+FF+RS",-1, VF))
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(comparison_prelim=="VF+FF+RS",-1, FF))
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(comparison_prelim=="VF+FF+RS",-1, RS))      
-
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(VF = ifelse(intervention_prelim=="VF+RS",1, VF))
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(intervention_prelim=="VF+RS",1, RS))         
-    
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(VF = ifelse(comparison_prelim=="VF+RS",-1, VF))
-    dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(comparison_prelim=="VF+RS",-1, RS))    
-    
-    tabyl(dat_cNMS_icW$FF)
-    tabyl(dat_cNMS_icW$RS)
-    tabyl(dat_cNMS_icW$NL)
-    tabyl(dat_cNMS_icW$VF)
-    tabyl(dat_cNMS_icW$BAU)
+      dat_cNMS_icW <- NMA_data_analysis_subset_grpID_icW
+      dat_cNMS_icW %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, FF, FF.RS, NL.FF.RS, NL.RS, RS, VF.FF.RS, VF.RS, BAU) %>% print(na.print="NA", n=Inf) 
+      
+      #### Prepare component binaries for cNMA
+      dat_cNMS_icW$NL <- 0
+      dat_cNMS_icW$VF <- 0
+      
+      tabyl(dat_cNMS_icW$FF)
+      tabyl(dat_cNMS_icW$RS)
+      tabyl(dat_cNMS_icW$NL)
+      tabyl(dat_cNMS_icW$VF)
+      tabyl(dat_cNMS_icW$BAU)
+      
+      dat_cNMS_icW  %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, FF, RS, NL, VF, BAU) %>% print(na.print="NA", n=Inf)
+      
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(intervention_prelim=="FF+RS",1, FF))
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(intervention_prelim=="FF+RS",1, RS))
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(comparison_prelim=="FF+RS",-1, FF))
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(comparison_prelim=="FF+RS",-1, RS))
+      
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(NL = ifelse(intervention_prelim=="NL+FF+RS",1, NL))
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(intervention_prelim=="NL+FF+RS",1, FF))
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(intervention_prelim=="NL+FF+RS",1, RS))
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(NL = ifelse(comparison_prelim=="NL+FF+RS",-1, NL))
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(comparison_prelim=="NL+FF+RS",-1, FF))
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(comparison_prelim=="NL+FF+RS",-1, RS))        
+      
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(NL = ifelse(intervention_prelim=="NL+RS",1, NL))
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(intervention_prelim=="NL+RS",1, RS))
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(NL = ifelse(comparison_prelim=="NL+RS",-1, NL))
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(comparison_prelim=="NL+RS",-1, RS))
+      
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(VF = ifelse(intervention_prelim=="VF+FF+RS",1, VF))
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(intervention_prelim=="VF+FF+RS",1, FF))
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(intervention_prelim=="VF+FF+RS",1, RS))     
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(VF = ifelse(comparison_prelim=="VF+FF+RS",-1, VF))
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(comparison_prelim=="VF+FF+RS",-1, FF))
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(comparison_prelim=="VF+FF+RS",-1, RS))      
+  
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(VF = ifelse(intervention_prelim=="VF+RS",1, VF))
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(intervention_prelim=="VF+RS",1, RS))         
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(VF = ifelse(comparison_prelim=="VF+RS",-1, VF))
+      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(comparison_prelim=="VF+RS",-1, RS))    
+      
+      tabyl(dat_cNMS_icW$FF)
+      tabyl(dat_cNMS_icW$RS)
+      tabyl(dat_cNMS_icW$NL)
+      tabyl(dat_cNMS_icW$VF)
+      tabyl(dat_cNMS_icW$BAU)
         
-    dat_cNMS_icW_check <- dat_cNMS_icW  %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, FF, RS, NL, VF, BAU) 
-    print(dat_cNMS_icW_check, n=Inf, na.print="NA")
+      dat_cNMS_icW  %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, FF, RS, NL, VF, BAU) %>% print(na.print="NA", n=Inf)
     
-    res_mod_icW_cNMA <- rma.mv(effect_size, V_list, 
-                                #mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
-                                mods = ~ FF + RS + NL + VF - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
-                                random = ~ 1 | record_id/es_id, 
-                                rho=0.60, 
-                                data=dat_cNMS_icW)
-    summary(res_mod_icW_cNMA) 
+      #### Fit cNMA model
+      res_mod_icW_cNMA <- rma.mv(effect_size, V_list, 
+                                  mods = ~ FF + RS + NL + VF - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                                  random = ~ 1 | record_id/es_id, 
+                                  rho=0.60, 
+                                  data=dat_cNMS_icW)
+      summary(res_mod_icW_cNMA) 
   
     ### Estimate all pairwise differences between treatments
     contr <- data.frame(t(combn(names(coef(res_mod_icW)), 2)))
@@ -806,97 +802,89 @@
       
     ### Fit cNMA model 
       
-      #### Notes: These are the bundles from the whole numbers NMA (entered as mods): FF + FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS. 
-      ####        Each component of the bundles entered as mods in the NMA needs its own binary variable in the mods argument of the cNMA model.
-      ####        Binaries for components FF & RS have already been created as part of the NMA. Need to create binaries for the other components.
+      #### Notes: The following are the bundles from the Rational Numbers domain entered as mods in the domain's NMA: NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS + NL.SE.VF.RS + RS + SE.RS. 
+      ####        Each component of the bundles entered as mods in the NMA above needs its own binary variable in the mods argument of the cNMA model.
+      ####        Binaries for components RS and BAU were already created as part of the NMA above because some bundles consisted of just one of these component. 
+      ####        As such, we need to create binaries for the other components included within the bundles of the Rational Numbers domain: NL, FF, SE and VF.
       ####        Each component binary is (+) 1 if that component is part of the intervention bundle.
       ####        Each component binary is (-) 1 if that component is part of the comparison bundle.
       
-    dat_cNMS_icR <- NMA_data_analysis_subset_grpID_icR
+      dat_cNMS_icR <- NMA_data_analysis_subset_grpID_icR
+      dat_cNMS_icR %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, NL.FF.RS, NL.RS, NL.SE.FF.RS, NL.SE.RS, NL.SE.VF.RS, RS, SE.RS, BAU) %>% print(na.print="NA", n=Inf) 
       
-    tabyl(dat_cNMS_icR$intervention_prelim)
-    tabyl(dat_cNMS_icR$comparison_prelim)
-      
-    dat_cNMS_icR$NL <- 0
-    dat_cNMS_icR$SE <- 0
-    dat_cNMS_icR$FF <- 0
-    dat_cNMS_icR$VF <- 0
-    # dat_cNMS_icR$BAU <- 0
+      #### Prepare component binaries for cNMA
+      dat_cNMS_icR$NL <- 0
+      dat_cNMS_icR$FF <- 0
+      dat_cNMS_icR$SE <- 0
+      dat_cNMS_icR$VF <- 0
 
-    tabyl(dat_cNMS_icR$NL)  
-    tabyl(dat_cNMS_icR$RS)
-    tabyl(dat_cNMS_icR$SE)
-    tabyl(dat_cNMS_icR$FF)
-    tabyl(dat_cNMS_icR$VF)
-    tabyl(dat_cNMS_icR$BAU)
+      tabyl(dat_cNMS_icR$NL)
+      tabyl(dat_cNMS_icR$FF)
+      tabyl(dat_cNMS_icR$RS)
+      tabyl(dat_cNMS_icR$SE)
+      tabyl(dat_cNMS_icR$VF)
+      tabyl(dat_cNMS_icR$BAU)
       
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(BAU = ifelse(comparison_prelim=="BAU",-1, BAU))
+      dat_cNMS_icR  %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, NL, FF, RS, SE, VF, BAU) %>% print(na.print="NA", n=Inf)
+      
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+FF+RS",1, NL))  
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(FF = ifelse(intervention_prelim=="NL+FF+RS",1, FF))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+FF+RS",1, RS))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+FF+RS",-1, NL))   
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(FF = ifelse(comparison_prelim=="NL+FF+RS",-1, FF))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+FF+RS",-1, RS))
     
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+FF+RS",1, NL))  
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(FF = ifelse(intervention_prelim=="NL+FF+RS",1, FF))
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+FF+RS",1, RS))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+RS",1, NL))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+RS",1, RS))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+RS",-1, NL))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+RS",-1, RS))
     
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+FF+RS",1, NL))   
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(FF = ifelse(comparison_prelim=="NL+FF+RS",-1, FF))
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+FF+RS",-1, RS))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+SE+FF+RS",1, NL))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(intervention_prelim=="NL+SE+FF+RS",1, SE))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(FF = ifelse(intervention_prelim=="NL+SE+FF+RS",1, FF))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+SE+FF+RS",1, RS))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+SE+FF+RS",-1, NL))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(comparison_prelim=="NL+SE+FF+RS",-1, SE))    
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(FF = ifelse(comparison_prelim=="NL+SE+FF+RS",-1, FF))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+SE+FF+RS",-1, RS))   
     
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+RS",1, NL))
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+RS",1, RS))
-    
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+RS",-1, NL))
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+RS",-1, RS))
-    
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+SE+FF+RS",1, NL))
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(intervention_prelim=="NL+SE+FF+RS",1, SE))
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(FF = ifelse(intervention_prelim=="NL+SE+FF+RS",1, FF))
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+SE+FF+RS",1, RS))
-    
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+SE+FF+RS",-1, NL))
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(comparison_prelim=="NL+SE+FF+RS",-1, SE))    
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(FF = ifelse(comparison_prelim=="NL+SE+FF+RS",-1, FF))
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+SE+FF+RS",-1, RS))   
-    
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+SE+RS",1, NL))
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(intervention_prelim=="NL+SE+RS",1, SE))
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+SE+RS",1, RS))
-    
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+SE+RS",-1, NL))
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(comparison_prelim=="NL+SE+RS",-1, SE))    
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+SE+RS",-1, RS))       
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+SE+RS",1, NL))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(intervention_prelim=="NL+SE+RS",1, SE))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+SE+RS",1, RS))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+SE+RS",-1, NL))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(comparison_prelim=="NL+SE+RS",-1, SE))    
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+SE+RS",-1, RS))       
 
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+SE+VF+RS",1, NL))
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(intervention_prelim=="NL+SE+VF+RS",1, SE))
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(VF = ifelse(intervention_prelim=="NL+SE+VF+RS",1, VF))
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+SE+VF+RS",1, RS))
-    
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+SE+VF+RS",-1, NL))
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(comparison_prelim=="NL+SE+VF+RS",-1, SE))    
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(VF = ifelse(comparison_prelim=="NL+SE+VF+RS",-1, VF))
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+SE+VF+RS",-1, RS))      
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+SE+VF+RS",1, NL))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(intervention_prelim=="NL+SE+VF+RS",1, SE))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(VF = ifelse(intervention_prelim=="NL+SE+VF+RS",1, VF))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+SE+VF+RS",1, RS))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+SE+VF+RS",-1, NL))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(comparison_prelim=="NL+SE+VF+RS",-1, SE))    
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(VF = ifelse(comparison_prelim=="NL+SE+VF+RS",-1, VF))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+SE+VF+RS",-1, RS))      
 
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(intervention_prelim=="SE+RS",1, SE))
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="SE+RS",1, RS))         
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(intervention_prelim=="SE+RS",1, SE))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="SE+RS",1, RS))         
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(comparison_prelim=="SE+RS",-1, SE))
+      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="SE+RS",-1, RS))    
+       
+      tabyl(dat_cNMS_icR$NL)
+      tabyl(dat_cNMS_icR$FF)      
+      tabyl(dat_cNMS_icR$RS)
+      tabyl(dat_cNMS_icR$SE)
+      tabyl(dat_cNMS_icR$VF)
+      tabyl(dat_cNMS_icR$BAU)
       
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(comparison_prelim=="SE+RS",-1, SE))
-    dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="SE+RS",-1, RS))    
+      dat_cNMS_icR  %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, NL, FF, RS, SE, VF, BAU) %>% print(na.print="NA", n=Inf)
       
-    tabyl(dat_cNMS_icR$NL)  
-    tabyl(dat_cNMS_icR$RS)
-    tabyl(dat_cNMS_icR$SE)
-    tabyl(dat_cNMS_icR$FF)
-    tabyl(dat_cNMS_icR$VF)
-    tabyl(dat_cNMS_icR$BAU)
-      
-    dat_cNMS_icR_check <- dat_cNMS_icR  %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, FF, RS, NL, VF, BAU) 
-    print(dat_cNMS_icR_check, n=Inf, na.print="NA")
-      
-    res_mod_icR_cNMA <- rma.mv(effect_size, V_list, 
-                                #mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS + NL.SE.VF.RS + RS + SE.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
-                                mods = ~ NL + RS + SE + FF + VF - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
-                                random = ~ 1 | record_id/es_id, 
-                                rho=0.60, 
-                                data=dat_cNMS_icR)
-    summary(res_mod_icR_cNMA)     
+      #### Fit cNMA model
+      res_mod_icR_cNMA <- rma.mv(effect_size, V_list, 
+                                  mods = ~ NL + FF + RS + SE + VF - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+                                  random = ~ 1 | record_id/es_id, 
+                                  rho=0.60, 
+                                  data=dat_cNMS_icR)
+      summary(res_mod_icR_cNMA)     
       
     ### Estimate all pairwise differences between treatments
     contr <- data.frame(t(combn(names(coef(res_mod_icR)), 2)))

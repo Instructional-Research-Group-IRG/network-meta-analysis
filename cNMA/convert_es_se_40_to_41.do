@@ -17,7 +17,7 @@ log using "C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network met
 ***																							  ***
 *** Authors: Seth B. Morgan																      ***
 *** Start date: February 19, 2025															  ***
-*** Last date modified: March 11, 2025												          ***
+*** Last date modified: April 2, 2025												          ***
 ***																							  ***
 *** Notes:																					  ***
 ***																							  ***
@@ -50,8 +50,8 @@ pause off
 *=========================================================================================
 
 	/* Load in cNMA database */
-	import excel "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 v5_CLEAN.xlsx", sheet("Data inventory for 4.0 to 4.1") firstrow clear
-	save "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 v5_CLEAN.dta", replace
+	import excel "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 v5.1_CLEAN.xlsx", sheet("Data inventory for 4.0 to 4.1") firstrow clear
+	save "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 v5.1_CLEAN.dta", replace
 
 	/* Clean up variable names */
 	include "$root\convert_es_se_40_to_41_revise_variable_names.do"
@@ -69,7 +69,8 @@ pause off
 	
 	/* Explore key variables */
 	tab1 level_of_assignment analytic_method outcome_type, missing
-	tablist level_of_assignment analytic_method outcome_type, sort(v)
+	tablist level_of_assignment analytic_method outcome_type, sort(v) ab(32)
+	tablist contrast_id study_id if , sort(v) ab(32)
 	
 	/* Clean up string variables */
 	foreach var of varlist _all {
@@ -240,13 +241,29 @@ pause off
 		bysort se_nochange: summarize es_converted_41
 	
 	/* Standard errors that are calculated the differently under 4.0 and 4.1 */
+	
+		*-> Indiv/ANCOVAregression/continuous; regression coefficient standard error reported: ([E.7.1] supp, Individual assignment column of Table 2 of Supplement)
+		
+		*-> Indiv/ANCOVAregression/continuous; model R2 value is reported: ([E.2.2] supp/v4.1, Individual assignment column of Table 3 of Supplement; same as [E.2.2] in v4.1 Procedures, page E-5)
+		
+		*-> Indiv/ANCOVAregression/continuous; cannot use either of the two above AND/OR only t-statistic reported: (SE=b/t)
+		
+		*-> Indiv/ANCOVAregression/continuous; cannot use either of the three above: (no change/ [E.1.4] v4.1, page E-3, v4.1 procedures handbook)
+		
+		*-> Indiv/GainScore/continuous: ([E.3.1] supp	Individual assignment column of Table 3 of Supplement)
+		
+		
+
+
+• use [E.3.1] (Individual assignment column of Table 3 of Supplement)"	[E.3.1] supp	Individual assignment column of Table 3 of Supplement
+
  		
 	/* Save final ES/SE conversion database */
 **# Bookmark #2
 	drop *_check OR
 	quietly compress
 	sort contrast_simple_number
-	save "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 v5_COMPLETED.dta", replace 
+	save "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 v5.1_COMPLETED.dta", replace 
 	
 	
 *=========================================================================================
