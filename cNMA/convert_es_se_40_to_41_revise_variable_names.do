@@ -3,7 +3,8 @@ rename ContrastNumbersimple_number contrast_simple_number
 rename Studyrecord_idSourceNNM study_id
 rename MRGlink mrg_link
 rename LevelofAssignmentSource level_of_assignment
-rename Outcometypecontinuousdichoto outcome_type
+rename (OutcomeSourceNNMAdatabase Outcometypecontinuousdichoto) ///
+       (outcome outcome_type)
 rename Analysismethodeffectsizecalc analytic_method
 rename (Interventionindividualanalytic Comparisonindividualanalytics Totalindividualanalyticsample Interventionclusteranalyticsa Comparisonclusteranalyticsamp TotalclusteranalyticsampleN AveragenperclusterNavg) ///
 	   (n_i_indiv n_c_indiv n_t_indiv n_i_cluster n_c_cluster n_t_cluster n_avg_cluster)
