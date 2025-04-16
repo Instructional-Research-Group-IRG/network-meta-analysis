@@ -435,7 +435,8 @@
       tabyl(dat_cNMS_icW$BAU)
         
       dat_cNMS_icW  %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, FF, RS, NL, VF, BAU) %>% print(na.print="NA", n=Inf)
-    
+      write_csv(dat_cNMS_icW, 'dat_cNMS_icW.csv')
+      
       #### Fit additive cNMA model
       res_mod_icW_cNMA <- rma.mv(effect_size, V_list, 
                                   mods = ~ FF + RS + NL + VF - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
