@@ -1,8 +1,8 @@
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
       name:  convert_es_se
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41.log
   log type:  text
- opened on:  16 Apr 2025, 16:29:46
+ opened on:  29 Apr 2025, 18:55:51
 
 . 
 . 
@@ -20,7 +20,7 @@
 . ***                                                                                                                                                                                       ***
 . *** Authors: Seth B. Morgan                                                                                                                                   ***
 . *** Start date: February 19, 2025                                                                                                                         ***
-. *** Last date modified: April 16, 2025                                                                                                    ***
+. *** Last date modified: April 29, 2025                                                                                                    ***
 . ***                                                                                                                                                                                       ***
 . *** Notes:                                                                                                                                                                        ***
 . ***                                                                                                                                                                                       ***
@@ -92,16 +92,16 @@ file C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-anal
 
 . rename Analysismethodeffectsizecalc analytic_method
 
-. rename (Interventionindividualanalytic Comparisonindividualanalytics Totalindividualanalyticsample Interventionclusteranalyticsa Comparisonclusteranalyticsamp TotalclusteranalyticsampleN AveragenperclusterNav
-> g) ///
+. rename (Interventionindividualanalytic Comparisonindividualanalytics Totalindividualanalyticsample Interventionclusteranalyticsa Comparisonclusteranalyticsamp TotalclusteranalyticsampleN Averagenpe
+> rclusterNavg) ///
 >            (n_i_indiv n_c_indiv n_t_indiv n_i_cluster n_c_cluster n_t_cluster n_avg_cluster)
 
 . rename (Interventionoutcomeadjustedme Comparisonoutcomeadjustedmean Interventionoutcomeunadjusted Comparisonoutcomeunadjustedme X Comparisonoutcomeunadjustedst) ///
 >            (mean_i_adj mean_c_adj mean_i_unadj mean_c_unadj mean_i_sd mean_c_sd)
 
-. rename (Regessioncoefficientunstandar /*Didoriginalstudyneedtoclust*/ Regressioncoefficientstandard AL ModelRsquaredR2Source DegreesoffreedomhSour tstatistictSourceMRG ANOVAFstatisticFSourc IntraclassCorrelat
-> ionCoefficie AR) ///
->            (regression_coef /*study_need_to_cluster*/ regression_coef_se_uc regression_coef_se_cc model_Rsqrd dof t_stata anova_f_stat icc log_odds_ratio)
+. rename (Regessioncoefficientunstandar /*Didoriginalstudyneedtoclust*/ Regressioncoefficientstandard AL ModelRsquaredR2Source DegreesoffreedomhSour tstatistictSourceMRG ANOVAFstatisticFSourc Intracl
+> assCorrelationCoefficie AR) ///
+>            (regression_coef /*study_need_to_cluster*/ regression_coef_se_uc regression_coef_se_cc model_Rsqrd dof t_stat anova_f_stat icc log_odds_ratio)
 
 . rename (Outcomeeffectsizereportedas EffectsizestandarderrorSo) ///
 >        (es_official_40 se_e14_40)
@@ -342,7 +342,22 @@ String variable: mrg_link
 
 .         
 .         /* Clean up numeric variables */
-.         foreach var of varlist mean_?_*adj mean_?_sd {
+.         replace regression_coef_se_uc="" if regression_coef_se_uc=="Not presented in report"
+(4 real changes made)
+
+.         replace regression_coef_se_cc="" if regression_coef_se_cc=="Not presented in report"
+(3 real changes made)
+
+.         replace regression_coef_se_cc="" if regression_coef_se_cc=="Not reported in main article."
+(6 real changes made)
+
+.         replace model_Rsqrd="" if model_Rsqrd=="Not reported"
+(5 real changes made)
+
+.         replace model_Rsqrd="" if model_Rsqrd=="Not presented in report"
+(1 real change made)
+
+.         foreach var of varlist mean_?_*adj mean_?_sd regression_coef_se_?c model_Rsqrd {
   2.                 display as input _n "Numeric variable: `var'"
   3.                 destring `var', replace
   4.         }
@@ -368,6 +383,18 @@ mean_i_sd: contains nonnumeric characters; no replace
 Numeric variable: mean_c_sd
 mean_c_sd: all characters numeric; replaced as double
 (118 missing values generated)
+
+Numeric variable: regression_coef_se_uc
+regression_coef_se_uc: all characters numeric; replaced as double
+(387 missing values generated)
+
+Numeric variable: regression_coef_se_cc
+regression_coef_se_cc: all characters numeric; replaced as double
+(340 missing values generated)
+
+Numeric variable: model_Rsqrd
+model_Rsqrd: all characters numeric; replaced as double
+(391 missing values generated)
 
 .         
 .         /* Calculate necessary variables from study-reported data */
@@ -595,8 +622,8 @@ variable n_t_cluster was byte now int
   |  cluster          .          .          .        3    15.79        19    100.00 |
   +---------------------------------------------------------------------------------+
 
-.                         tablist level_of_assignment contrast_id n_i_cluster n_c_cluster n_t_cluster if level_of_assignment=="cluster" & missing(n_t_cluster), sort(v) ab(32) // (!) Send to team for correction 
-> in database- contrast IDs: 87196, 90508.
+.                         tablist level_of_assignment contrast_id n_i_cluster n_c_cluster n_t_cluster if level_of_assignment=="cluster" & missing(n_t_cluster), sort(v) ab(32) // (!) Send to team for 
+> correction in database- contrast IDs: 87196, 90508.
 
   +-------------------------------------------------------------------------------------------------------------------+
   | level_of_assignment   contrast_id   n_i_cluster   n_c_cluster   n_t_cluster   _Freq_   _Perc_   _CFreq_   _CPerc_ |
@@ -607,7 +634,8 @@ variable n_t_cluster was byte now int
 
 .                         
 .                 *-> Average number of individuals per cluster
-.                         tablist level_of_assignment level_of_assignment n_i_indiv n_c_indiv n_t_indiv n_i_cluster n_c_cluster n_t_cluster n_avg_cluster if level_of_assignment=="cluster", sort(v) ab(32)
+.                         tablist level_of_assignment level_of_assignment n_i_indiv n_c_indiv n_t_indiv n_i_cluster n_c_cluster n_t_cluster n_avg_cluster if level_of_assignment=="cluster", sort(v) ab
+> (32)
 
   +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
   | level_of_assignment   level_of_assignment   n_i_indiv   n_c_indiv   n_t_indiv   n_i_cluster   n_c_cluster   n_t_cluster   n_avg_cluster   _Freq_   _Perc_   _CFreq_   _CPerc_ |
@@ -1179,21 +1207,21 @@ variable log_odds_post was byte now float
 
 . 
 .         /* Individual-level Assignment */
-.         tablist level_of_assignment analytic_method outcome_type if level_of_assignment=="individual"
+.         tablist level_of_assignment outcome_type analytic_method if level_of_assignment=="individual", sort(v) ab(32)
 
-  +--------------------------------------------------------------------------------------------+
-  | level_of~t             analytic_method   outcome_t~e   _Freq_   _Perc_   _CFreq_   _CPerc_ |
-  |--------------------------------------------------------------------------------------------|
-  | individual               no adjustment    continuous      159    45.95       159     45.95 |
-  | individual                      ANCOVA    continuous      100    28.90       259     74.86 |
-  | individual   HLM/multilevel regression    continuous       72    20.81       331     95.66 |
-  | individual              OLS regression    continuous        5     1.45       336     97.11 |
-  | individual                ANOVA F-test    continuous        4     1.16       340     98.27 |
-  |--------------------------------------------------------------------------------------------|
-  | individual                      ANCOVA                      3     0.87       343     99.13 |
-  | individual               no adjustment   dichotomous        2     0.58       345     99.71 |
-  | individual                      t-stat    continuous        1     0.29       346    100.00 |
-  +--------------------------------------------------------------------------------------------+
+  +------------------------------------------------------------------------------------------------------+
+  | level_of_assignment   outcome_type             analytic_method   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |------------------------------------------------------------------------------------------------------|
+  |          individual                                     ANCOVA        3     0.87         3      0.87 |
+  |          individual     continuous                      ANCOVA      100    28.90       103     29.77 |
+  |          individual     continuous                ANOVA F-test        4     1.16       107     30.92 |
+  |          individual     continuous   HLM/multilevel regression       72    20.81       179     51.73 |
+  |          individual     continuous              OLS regression        5     1.45       184     53.18 |
+  |------------------------------------------------------------------------------------------------------|
+  |          individual     continuous               no adjustment      159    45.95       343     99.13 |
+  |          individual     continuous                      t-stat        1     0.29       344     99.42 |
+  |          individual    dichotomous               no adjustment        2     0.58       346    100.00 |
+  +------------------------------------------------------------------------------------------------------+
 
 .                 
 .                 *-> Continuous Measures
@@ -1236,8 +1264,8 @@ variable log_odds_post was byte now float
   341
 
 .                         
-.                         //Note: For continuous measures with individual-level assignment using any analytical method besdies difference-in-differences, the v4.1 effect size calulations are the same as under v
-> 4.0.
+.                         //Note: For continuous measures with individual-level assignment using any analytical method besides difference-in-differences, the v4.1 effect size calulations are the same
+>  as under v4.0.
 .                         replace es_converted_41=es_official_40 if level_of_assignment=="individual" & outcome_type=="continuous" & analytic_method!="difference-in-differences"
 (341 real changes made)
 
@@ -1257,24 +1285,28 @@ es_offici~40 |        341    .5341806    .6759237      -1.44       4.08
 es_conver~41 |        341    .5341806    .6759237      -1.44       4.08
 
 .                         
-.                         /* (!) Think about these checks and recalcs a bit more.
+.                         /*(!) Think about these checks and recalcs a bit more.
 >                         **-->> Recalculate effect sizes based on no adjustment as a check
->                         tablist es_nochange level_of_assignment analytic_method outcome_type mean_i_unadj mean_c_unadj S_pooled_sd es_official_40 es_converted_41 if es_nochange==1 & analytic_method=="no adjus
-> tment", sort(v) ab(32)
->                         replace es_converted_41_check= (omega * (mean_i_unadj - mean_c_unadj)) / S_pooled_sd if es_nochange==1 & analytic_method=="no adjustment"
->                         tablist es_nochange level_of_assignment analytic_method outcome_type mean_i_unadj mean_c_unadj S_pooled_sd es_official_40 es_converted_41 es_converted_41_check if es_nochange==1 & anal
-> ytic_method=="no adjustment" & !missing(es_converted_41_check), sort(v) ab(32)
->                         summarize es_converted_41 es_converted_41_check if es_nochange==1 & analytic_method=="no adjustment" & !missing(es_converted_41_check)
->                         summarize es_converted_41 es_converted_41_check if es_nochange==1 & analytic_method=="no adjustment" & !missing(es_converted_41_check) // (!) Negative ESs?
+>                         generate es_converted_41_check=.
+>                         tablist level_of_assignment analytic_method outcome_type mean_i_unadj mean_c_unadj S_pooled_sd es_official_40 es_converted_41 if level_of_assignment=="individual" & outcome_
+> type=="continuous" & analytic_method=="no adjustment", sort(v) ab(32)
+>                         replace es_converted_41_check= (omega * (mean_i_unadj - mean_c_unadj)) / S_pooled_sd if level_of_assignment=="individual" & outcome_type=="continuous" & analytic_method=="no
+>  adjustment"
+>                         tablist level_of_assignment analytic_method outcome_type mean_i_unadj mean_c_unadj S_pooled_sd es_official_40 es_converted_41 es_converted_41_check if level_of_assignment=="
+> individual" & outcome_type=="continuous" & analytic_method=="no adjustment" & !missing(es_converted_41_check), sort(v) ab(32)
+>                         summarize es_converted_41 es_converted_41_check if level_of_assignment=="individual" & outcome_type=="continuous" & analytic_method=="no adjustment" & !missing(es_converted_
+> 41_check)
+>                         summarize es_converted_41 es_converted_41_check if level_of_assignment=="individual" & outcome_type=="continuous" & analytic_method=="no adjustment" & !missing(es_converted_
+> 41_check) // (!) Some very different. Study-reported ES not WWC Hedges' g, for example?
 >                         
 >                         *-> Additional adjustment if officially reported effect size calculated with unadjusted means but adjusted means are available
 >                         // Note: (!) Ask team about this. (!) Also about negative effect sizes if positive result is decrease in outcome.
->                         tablist es_nochange level_of_assignment analytic_method outcome_type mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj mean_i_sd mean_c_sd es_official_40 es_converted_41 if level_of_assi
-> gnment=="individual" & analytic_method=="no adjustment" & outcome_type=="continuous" & !missing(mean_i_sd) & !missing(mean_c_sd), sort(v) ab(32)
+>                         tablist es_nochange level_of_assignment analytic_method outcome_type mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj mean_i_sd mean_c_sd es_official_40 es_converted_41 if le
+> vel_of_assignment=="individual" & analytic_method=="no adjustment" & outcome_type=="continuous" & !missing(mean_i_sd) & !missing(mean_c_sd), sort(v) ab(32)
 >                         replace es_nochange=2 if level_of_assignment=="individual" & analytic_method=="no adjustment" & outcome_type=="continuous" & !missing(mean_i_sd) & !missing(mean_c_sd)
 >                         replace es_converted_41= (omega * (mean_i_adj - mean_c_adj)) / S_pooled_sd if es_nochange==2
->                         tablist es_nochange level_of_assignment analytic_method outcome_type mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj mean_i_sd mean_c_sd es_official_40 es_converted_41 if es_nochange==
-> 2, sort(v) ab(32)
+>                         tablist es_nochange level_of_assignment analytic_method outcome_type mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj mean_i_sd mean_c_sd es_official_40 es_converted_41 if es
+> _nochange==2, sort(v) ab(32)
 >                         */
 .                 
 .                 *-> Dichotmous Measures
@@ -1299,7 +1331,8 @@ es_conver~41 |        341    .5341806    .6759237      -1.44       4.08
   |          individual                      t-stat     continuous        1     0.25       395    100.00 |
   +------------------------------------------------------------------------------------------------------+
 
-.                         tablist level_of_assignment analytic_method outcome_type log_odds_post if level_of_assignment=="individual" & outcome_type=="dichotomous", sort(v) ab(32)                       
+.                         tablist level_of_assignment analytic_method outcome_type log_odds_post if level_of_assignment=="individual" & outcome_type=="dichotomous", sort(v) ab(32)                    
+>    
 
   +------------------------------------------------------------------------------------------------------------+
   | level_of_assignment   analytic_method   outcome_type   log_odds_post   _Freq_   _Perc_   _CFreq_   _CPerc_ |
@@ -1318,15 +1351,24 @@ es_conver~41 |        341    .5341806    .6759237      -1.44       4.08
 .                         replace es_converted_41= log_odds_post if level_of_assignment=="individual" & outcome_type=="dichotomous" & analytic_method!="difference-in-differences" 
 (2 real changes made)
 
-.                         tablist level_of_assignment analytic_method outcome_type outcome log_odds_post es_official_40 es_converted_41 omega if level_of_assignment=="individual" & outcome_type=="dichotomous" &
->  analytic_method!="difference-in-differences", sort(v) ab(32) // (!) These 4.1 recalculations are not similar to 4.0 values. 
+.                         tablist level_of_assignment analytic_method outcome_type outcome log_odds_post es_official_40 es_converted_41 omega if level_of_assignment=="individual" & outcome_type=="dic
+> hotomous" & analytic_method!="difference-in-differences", sort(v) ab(32) // (!) These 4.1 recalculations are not similar to 4.0 values. 
 
-  +--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-  | level_of_assignment   analytic_method   outcome_type                                       outcome   log_odds_post   es_official_40   es_converted_41      omega   _Freq_   _Perc_   _CFreq_   _CPerc_ |
-  |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-  |          individual     no adjustment    dichotomous   Find X (Fuchs & Seethaler 2008) dichotomous      -1.3359274             .088         -1.335927   .9923274        1    50.00         1     50.00 |
-  |          individual     no adjustment    dichotomous   Find X (Fuchs & Seethaler 2008) dichotomous       2.8552804             .778           2.85528   .9922481        1    50.00         2    100.00 |
-  +--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  +----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | analytic_method | outcome_type |                                     outcome | log_odds_post | es_official_40 | es_converted_41 |    omega | _Freq_ | _Perc_ | _CFreq_ |
+  |          individual |   no adjustment |  dichotomous | Find X (Fuchs & Seethaler 2008) dichotomous |    -1.3359274 |           .088 |       -1.335927 | .9923274 |      1 |  50.00 |       1 |
+  |----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                                                                                           _CPerc_                                                                                            |
+  |                                                                                             50.00                                                                                            |
+  +----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | analytic_method | outcome_type |                                     outcome | log_odds_post | es_official_40 | es_converted_41 |    omega | _Freq_ | _Perc_ | _CFreq_ |
+  |          individual |   no adjustment |  dichotomous | Find X (Fuchs & Seethaler 2008) dichotomous |     2.8552804 |           .778 |         2.85528 | .9922481 |      1 |  50.00 |       2 |
+  |----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                                                                                           _CPerc_                                                                                            |
+  |                                                                                            100.00                                                                                            |
+  +----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 . 
 .                         //Note: For dichotomous measures with individual-level assignment using difference-in-differences:
@@ -1392,8 +1434,8 @@ es_conver~41 |          2    .7596765    2.963631  -1.335927    2.85528
   19
 
 .                         
-.                         //Note: For continuous measures with cluster-level assignment, recalculate the student-level ES using the unbiased formula in Table 1 of the Supplement, which imposes a bias correction
-> , in place of [E.5.1] on page E-9 of v4.1 Procedures 
+.                         //Note: For continuous measures with cluster-level assignment, recalculate the student-level ES using the unbiased formula in Table 1 of the Supplement, which imposes a bias
+>  correction, in place of [E.5.1] on page E-9 of v4.1 Procedures 
 .                         //      which is the same equation as on page E-9 of v4.0 Procedures. Note that that the bias correction uses the intraclass correlation coefficient (ICC).
 .                         
 .                         tablist level_of_assignment analytic_method outcome_type icc if level_of_assignment=="cluster" & outcome_type=="continuous", sort(v) ab(32) 
@@ -1412,16 +1454,16 @@ es_conver~41 |          2    .7596765    2.963631  -1.335927    2.85528
   |             cluster               no adjustment     continuous   Not presented in report        4    21.05        19    100.00 |
   +--------------------------------------------------------------------------------------------------------------------------------+
 
-.                         replace icc="." if inlist(icc,"Not in article","Not in article but see comment","Not presented in report","Not reported in main article.","Not reported in the main article","Not report
-> ed in this study") 
+.                         replace icc="." if inlist(icc,"Not in article","Not in article but see comment","Not presented in report","Not reported in main article.","Not reported in the main article",
+> "Not reported in this study") 
 (30 real changes made)
 
 .                         destring icc, replace
 icc: all characters numeric; replaced as double
 (358 missing values generated)
 
-.                         replace icc= 0.2 if icc==. & level_of_assignment=="cluster" & outcome_type=="continuous" // (!) Placeholder. Needs to be updated by team. "As defaults, the WWC uses the ICC values of .
-> 20 for achievement outcomes and .10 for all other outcomes, but will use study-reported ICC values when available. (Procedures handbook 4.1, p. 20)"
+.                         replace icc= 0.2 if icc==. & level_of_assignment=="cluster" & outcome_type=="continuous" // (!) Placeholder. Needs to be updated by team. "As defaults, the WWC uses the ICC 
+> values of .20 for achievement outcomes and .10 for all other outcomes, but will use study-reported ICC values when available. (Procedures handbook 4.1, p. 20)"
 (10 real changes made)
 
 .                         tablist level_of_assignment analytic_method outcome_type icc if level_of_assignment=="cluster" & outcome_type=="continuous", sort(v) ab(32) // (!) Use 0.2 if ICC missing?
@@ -1441,7 +1483,8 @@ icc: all characters numeric; replaced as double
 .                         replace es_converted_41 = es_official_40 * sqrt( 1 - ( (2*(n_avg_cluster-1)*icc) / n_t_indiv-2) ) if level_of_assignment=="cluster" & outcome_type=="continuous"
 (16 real changes made)
 
-.                         tablist analytic_method es_official_40 es_converted_41 icc n_avg_cluster n_t_cluster n_t_indiv if level_of_assignment=="cluster"  & outcome_type=="continuous", sort(v) ab(32)
+.                         tablist analytic_method es_official_40 es_converted_41 icc n_avg_cluster n_t_cluster n_t_indiv if level_of_assignment=="cluster"  & outcome_type=="continuous", sort(v) ab(32
+> )
 
   +----------------------------------------------------------------------------------------------------------------------------------------------------+
   |           analytic_method   es_official_40   es_converted_41   icc   n_avg_cluster   n_t_cluster   n_t_indiv   _Freq_   _Perc_   _CFreq_   _CPerc_ |
@@ -1473,7 +1516,8 @@ icc: all characters numeric; replaced as double
 .                         replace es_converted_41 = es_official_40 if missing(es_converted_41) & level_of_assignment=="cluster" & outcome_type=="continuous"
 (3 real changes made)
 
-.                         tablist analytic_method es_official_40 es_converted_41 icc n_avg_cluster n_t_cluster n_t_indiv if level_of_assignment=="cluster"  & outcome_type=="continuous", sort(v) ab(32)
+.                         tablist analytic_method es_official_40 es_converted_41 icc n_avg_cluster n_t_cluster n_t_indiv if level_of_assignment=="cluster"  & outcome_type=="continuous", sort(v) ab(32
+> )
 
   +----------------------------------------------------------------------------------------------------------------------------------------------------+
   |           analytic_method   es_official_40   es_converted_41   icc   n_avg_cluster   n_t_cluster   n_t_indiv   _Freq_   _Perc_   _CFreq_   _CPerc_ |
@@ -1533,7 +1577,8 @@ es_conver~41 |         19    1.122095    1.167174  -.0277128   4.710857
   |          individual                      t-stat     continuous        1     0.25       395    100.00 |
   +------------------------------------------------------------------------------------------------------+
 
-.                         capture tablist level_of_assignment analytic_method outcome_type log_odds_post if level_of_assignment=="cluster" & outcome_type=="dichotomous", sort(v) ab(32)                  
+.                         capture tablist level_of_assignment analytic_method outcome_type log_odds_post if level_of_assignment=="cluster" & outcome_type=="dichotomous", sort(v) ab(32)               
+>    
 
 .                         count if level_of_assignment=="cluster" & outcome_type=="dichotomous"                   
   0
@@ -1548,35 +1593,1061 @@ es_conver~41 |         19    1.122095    1.167174  -.0277128   4.710857
 . *=========================================================================================
 . * III) CONVERT STANDARD ERRORS OF EFFECT SIZES FROM 4.0 to 4.1
 . *=========================================================================================     
-. /*      
->         //Note: Effect size standard errors (SEs) were not calculated under 4.0. The SEs in this database were calculated using equation [E.1.4] of Procedures Handbook Version 4.1 (page E.3).
-> 
->         /* Prepare data and variables for SE conversions */
->         summarize se_e14_40, detail
->         generate se_converted_41=.
->         label variable se_converted_41 "standard error of effect size converted from 4.0 to 4.1"
->         
->         /* Effect sizes that are calculated the same under 4.0 and 4.1 */       
->         generate se_nochange=0
->         
->                 *-> Individual-level assignment, analytic method "no adjustment"", continuous outcomes
->                 replace se_nochange=1 if level_of_assignment=="individual" & analytic_method=="no adjustment" & outcome_type=="continuous"
->                 tablist level_of_assignment analytic_method outcome_type se_nochange, sort(v)
->                 replace se_converted_41=se_e14_40 if se_nochange==1
->                 bysort se_nochange: summarize es_converted_41
->         
->         /* Standard errors that are calculated the differently under 4.0 and 4.1 */
->         
->                 *-> Indiv/ANCOVAregression/continuous; regression coefficient standard error reported: ([E.7.1] supp, Individual assignment column of Table 2 of Supplement)
->                 
->                 *-> Indiv/ANCOVAregression/continuous; model R2 value is reported: ([E.2.2] supp/v4.1, Individual assignment column of Table 3 of Supplement; same as [E.2.2] in v4.1 Procedures, page E-5)
->                 
->                 *-> Indiv/ANCOVAregression/continuous; cannot use either of the two above AND/OR only t-statistic reported: (SE=b/t)
->                 
->                 *-> Indiv/ANCOVAregression/continuous; cannot use either of the three above: (no change/ [E.1.4] v4.1, page E-3, v4.1 procedures handbook)
->                 
->                 *-> Indiv/GainScore/continuous: ([E.3.1] supp   Individual assignment column of Table 3 of Supplement)
-> */              
+. 
+.         //Note: Effect size standard errors (SEs) were not calculated under 4.0. The SEs in this database were calculated using equation [E.1.4] of Procedures Handbook Version 4.1 (page E.3).
+. 
+.         /* Prepare data and variables for SE conversions */
+.         summarize se_e14_40, detail
+
+         Effect size standard error
+
+
+[Source: NNMA
+                          database]
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%          .07            .07
+ 5%          .08            .07
+10%           .1            .07       Obs                 395
+25%          .15            .07       Sum of wgt.         395
+
+50%          .19                      Mean           .2089367
+                        Largest       Std. dev.      .0948731
+75%          .26            .59
+90%          .34            .61       Variance       .0090009
+95%          .37            .61       Skewness       1.548419
+99%          .59            .75       Kurtosis       7.472535
+
+.         generate se_converted_41=.
+(395 missing values generated)
+
+.         label variable se_converted_41 "standard error of effect size converted from 4.0 to 4.1"
+
+.         
+.         /* Individual-level Assignment */
+.         tablist level_of_assignment outcome_type analytic_method if level_of_assignment=="individual", sort(v) ab(32)   
+
+  +------------------------------------------------------------------------------------------------------+
+  | level_of_assignment   outcome_type             analytic_method   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |------------------------------------------------------------------------------------------------------|
+  |          individual                                     ANCOVA        3     0.87         3      0.87 |
+  |          individual     continuous                      ANCOVA      100    28.90       103     29.77 |
+  |          individual     continuous                ANOVA F-test        4     1.16       107     30.92 |
+  |          individual     continuous   HLM/multilevel regression       72    20.81       179     51.73 |
+  |          individual     continuous              OLS regression        5     1.45       184     53.18 |
+  |------------------------------------------------------------------------------------------------------|
+  |          individual     continuous               no adjustment      159    45.95       343     99.13 |
+  |          individual     continuous                      t-stat        1     0.29       344     99.42 |
+  |          individual    dichotomous               no adjustment        2     0.58       346    100.00 |
+  +------------------------------------------------------------------------------------------------------+
+
+.                 
+.                 *-> Continuous measures
+.                 tablist level_of_assignment outcome_type analytic_method if level_of_assignment=="individual" & outcome_type=="continuous", sort(v) ab(32)
+
+  +------------------------------------------------------------------------------------------------------+
+  | level_of_assignment   outcome_type             analytic_method   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |------------------------------------------------------------------------------------------------------|
+  |          individual     continuous                      ANCOVA      100    29.33       100     29.33 |
+  |          individual     continuous                ANOVA F-test        4     1.17       104     30.50 |
+  |          individual     continuous   HLM/multilevel regression       72    21.11       176     51.61 |
+  |          individual     continuous              OLS regression        5     1.47       181     53.08 |
+  |          individual     continuous               no adjustment      159    46.63       340     99.71 |
+  |------------------------------------------------------------------------------------------------------|
+  |          individual     continuous                      t-stat        1     0.29       341    100.00 |
+  +------------------------------------------------------------------------------------------------------+
+
+.                 
+.                         **-> ANCOVA or regression: decision tree
+.                         tablist level_of_assignment outcome_type analytic_method if level_of_assignment=="individual" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression")
+>  & outcome_type=="continuous", sort(v)     ab(32)
+
+  +------------------------------------------------------------------------------------------------------+
+  | level_of_assignment   outcome_type             analytic_method   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |------------------------------------------------------------------------------------------------------|
+  |          individual     continuous                      ANCOVA      100    56.50       100     56.50 |
+  |          individual     continuous   HLM/multilevel regression       72    40.68       172     97.18 |
+  |          individual     continuous              OLS regression        5     2.82       177    100.00 |
+  +------------------------------------------------------------------------------------------------------+
+
+.                         tablist level_of_assignment outcome_type analytic_method regression_coef regression_coef_se_uc regression_coef_se_cc model_Rsqrd t_stat if level_of_assignment=="individual" 
+> & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous", sort(v)      ab(32)
+
+  +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment   outcome_type             analytic_method   regression_coef   regression_coef_se_uc   regression_coef_se_cc   model_Rsqrd   t_stat   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |          individual     continuous                      ANCOVA               .52                       .                     .25             .        .        1     0.56         1      0.56 |
+  |          individual     continuous                      ANCOVA               .62                       .                     .36             .        .        1     0.56         2      1.13 |
+  |          individual     continuous                      ANCOVA               .77                       .                     .37             .        .        1     0.56         3      1.69 |
+  |          individual     continuous                      ANCOVA                 .                       .                       .             .        .       97    54.80       100     56.50 |
+  |          individual     continuous   HLM/multilevel regression               -.4                       .                      .3             .        .        1     0.56       101     57.06 |
+  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |          individual     continuous   HLM/multilevel regression               -.2                       .                     2.3             .        .        1     0.56       102     57.63 |
+  |          individual     continuous   HLM/multilevel regression              .004                       .                    .029             .        .        1     0.56       103     58.19 |
+  |          individual     continuous   HLM/multilevel regression              .008                       .                    .015             .        .        1     0.56       104     58.76 |
+  |          individual     continuous   HLM/multilevel regression              .011                       .                    .025             .        .        1     0.56       105     59.32 |
+  |          individual     continuous   HLM/multilevel regression              .019                       .                    .025             .        .        1     0.56       106     59.89 |
+  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |          individual     continuous   HLM/multilevel regression               .03                       .                    .022             .        .        1     0.56       107     60.45 |
+  |          individual     continuous   HLM/multilevel regression              .034                       .                    .014             .        .        1     0.56       108     61.02 |
+  |          individual     continuous   HLM/multilevel regression              .042                       .                    .014             .        .        1     0.56       109     61.58 |
+  |          individual     continuous   HLM/multilevel regression              .067                       .                     .04             .        .        1     0.56       110     62.15 |
+  |          individual     continuous   HLM/multilevel regression              .144                       .                    .026             .        .        1     0.56       111     62.71 |
+  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |          individual     continuous   HLM/multilevel regression              .148                       .                    .025             .        .        1     0.56       112     63.28 |
+  |          individual     continuous   HLM/multilevel regression              .401                       .                    .055             .        .        1     0.56       113     63.84 |
+  |          individual     continuous   HLM/multilevel regression               .43                       .                     .22             .        .        1     0.56       114     64.41 |
+  |          individual     continuous   HLM/multilevel regression              .468                       .                    .053             .        .        1     0.56       115     64.97 |
+  |          individual     continuous   HLM/multilevel regression                .5                     1.7                       .             .        .        1     0.56       116     65.54 |
+  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |          individual     continuous   HLM/multilevel regression                .5                     2.9                       .             .        .        1     0.56       117     66.10 |
+  |          individual     continuous   HLM/multilevel regression               .51                       .                       .             .        .        1     0.56       118     66.67 |
+  |          individual     continuous   HLM/multilevel regression               .53                       .                     .41             .        .        1     0.56       119     67.23 |
+  |          individual     continuous   HLM/multilevel regression               .54                       .                     .54             .        .        1     0.56       120     67.80 |
+  |          individual     continuous   HLM/multilevel regression               .56                       .                      .2             .        .        1     0.56       121     68.36 |
+  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |          individual     continuous   HLM/multilevel regression              .625                       .                    .611             .        .        1     0.56       122     68.93 |
+  |          individual     continuous   HLM/multilevel regression              .698                       .                       .             .        .        1     0.56       123     69.49 |
+  |          individual     continuous   HLM/multilevel regression              .752                       .                    .615             .        .        1     0.56       124     70.06 |
+  |          individual     continuous   HLM/multilevel regression               .92                       .                     .67             .        .        1     0.56       125     70.62 |
+  |          individual     continuous   HLM/multilevel regression               1.1                       .                       .             .      .55        1     0.56       126     71.19 |
+  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |          individual     continuous   HLM/multilevel regression               1.2                      .9                       .             .        .        1     0.56       127     71.75 |
+  |          individual     continuous   HLM/multilevel regression             1.221                       .                    .591             .        .        1     0.56       128     72.32 |
+  |          individual     continuous   HLM/multilevel regression               1.6                       .                      .7             .        .        1     0.56       129     72.88 |
+  |          individual     continuous   HLM/multilevel regression             1.897                       .                   1.204             .        .        1     0.56       130     73.45 |
+  |          individual     continuous   HLM/multilevel regression             1.973                       .                    .582             .        .        1     0.56       131     74.01 |
+  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |          individual     continuous   HLM/multilevel regression              2.07                       .                    .547             .        .        1     0.56       132     74.58 |
+  |          individual     continuous   HLM/multilevel regression             2.205                       .                       .             .        .        1     0.56       133     75.14 |
+  |          individual     continuous   HLM/multilevel regression              2.39                       .                    1.71             .        .        1     0.56       134     75.71 |
+  |          individual     continuous   HLM/multilevel regression              2.51                       .                    2.55             .        .        1     0.56       135     76.27 |
+  |          individual     continuous   HLM/multilevel regression             2.695                       .                    .605             .        .        1     0.56       136     76.84 |
+  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |          individual     continuous   HLM/multilevel regression               2.8                       .                     2.5             .        .        1     0.56       137     77.40 |
+  |          individual     continuous   HLM/multilevel regression             2.876                       .                       .             .        .        1     0.56       138     77.97 |
+  |          individual     continuous   HLM/multilevel regression             3.408                       .                       .             .        .        1     0.56       139     78.53 |
+  |          individual     continuous   HLM/multilevel regression             3.476                       .                       .             .        .        1     0.56       140     79.10 |
+  |          individual     continuous   HLM/multilevel regression               6.3                     2.4                       .             .        .        1     0.56       141     79.66 |
+  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |          individual     continuous   HLM/multilevel regression               7.8                       .                       .             .      .44        1     0.56       142     80.23 |
+  |          individual     continuous   HLM/multilevel regression              8.95                       .                       .             .        .        1     0.56       143     80.79 |
+  |          individual     continuous   HLM/multilevel regression             9.182                       .                   2.496             .        .        1     0.56       144     81.36 |
+  |          individual     continuous   HLM/multilevel regression             9.828                       .                    .996             .        .        1     0.56       145     81.92 |
+  |          individual     continuous   HLM/multilevel regression            11.725                       .                    .917             .        .        1     0.56       146     82.49 |
+  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |          individual     continuous   HLM/multilevel regression            11.868                       .                   1.397             .        .        1     0.56       147     83.05 |
+  |          individual     continuous   HLM/multilevel regression              12.9                       .                       .             .     2.71        1     0.56       148     83.62 |
+  |          individual     continuous   HLM/multilevel regression                 .                       .                     .07             .     1.41        1     0.56       149     84.18 |
+  |          individual     continuous   HLM/multilevel regression                 .                       .                     .17             .      .47        1     0.56       150     84.75 |
+  |          individual     continuous   HLM/multilevel regression                 .                       .                     .27             .      2.4        1     0.56       151     85.31 |
+  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |          individual     continuous   HLM/multilevel regression                 .                       .                    .444             .        .        1     0.56       152     85.88 |
+  |          individual     continuous   HLM/multilevel regression                 .                       .                    .684             .        .        1     0.56       153     86.44 |
+  |          individual     continuous   HLM/multilevel regression                 .                       .                     .93             .     5.21        1     0.56       154     87.01 |
+  |          individual     continuous   HLM/multilevel regression                 .                       .                   1.345             .        .        1     0.56       155     87.57 |
+  |          individual     continuous   HLM/multilevel regression                 .                       .                       .             .     2.32        1     0.56       156     88.14 |
+  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |          individual     continuous   HLM/multilevel regression                 .                       .                       .             .     3.88        1     0.56       157     88.70 |
+  |          individual     continuous   HLM/multilevel regression                 .                       .                       .             .     7.23        1     0.56       158     89.27 |
+  |          individual     continuous   HLM/multilevel regression                 .                       .                       .             .     8.94        1     0.56       159     89.83 |
+  |          individual     continuous   HLM/multilevel regression                 .                       .                       .             .        .       13     7.34       172     97.18 |
+  |          individual     continuous              OLS regression              -.94                      .1                       .           .34        .        1     0.56       173     97.74 |
+  |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |          individual     continuous              OLS regression               .29                     .11                       .           .19        .        1     0.56       174     98.31 |
+  |          individual     continuous              OLS regression               .94                     .09                       .           .44        .        1     0.56       175     98.87 |
+  |          individual     continuous              OLS regression              1.34                     .09                       .            .5        .        1     0.56       176     99.44 |
+  |          individual     continuous              OLS regression              1.56                     .07                       .           .65        .        1     0.56       177    100.00 |
+  +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+.                                 
+.                                 ***-> Indiv/ANCOVAregression/continuous; regression coefficient standard error reported: ([E.7.1] supp, Individual assignment column of Table 2 of Supplement)
+.                                 count if level_of_assignment=="individual" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous" & (!missing(r
+> egression_coef_se_uc) | !missing(regression_coef_se_cc) )
+  53
+
+.                                 replace se_converted_41= omega * sqrt( ((regression_coef_se_uc/S_pooled_sd)^2) + ((es_converted_41^2)/(2*n_t_indiv)) ) if level_of_assignment=="individual" & inlist(
+> analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous" & !missing(regression_coef_se_uc)
+(9 real changes made)
+
+.                                 replace se_converted_41= omega * sqrt( ((regression_coef_se_cc/S_pooled_sd)^2) + ((es_converted_41^2)/(2*n_t_indiv)) ) if level_of_assignment=="individual" & inlist(
+> analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous" & !missing(regression_coef_se_cc)
+(44 real changes made)
+
+.                                 
+.                                 ***-> Indiv/ANCOVAregression/continuous; model R2 value is reported: ([E.2.2] supp/v4.1, Individual assignment column of Table 3 of Supplement; same as [E.2.2] in v4
+> .1 Procedures, page E-5)
+.                                 // Note: None
+.                                 count if level_of_assignment=="individual" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous" & !missing(mo
+> del_Rsqrd) & missing(regression_coef_se_uc) & missing(regression_coef_se_cc)
+  0
+
+.                                 assert r(N)==0
+
+.                         
+.                                 ***-> Indiv/ANCOVAregression/continuous; cannot use either of the two above AND/OR only t-statistic reported: (SE=b/t)
+.                                 // Note: None
+.                                 count if level_of_assignment=="individual" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous" & !missing(t_
+> stat) & missing(model_Rsqrd) & missing(regression_coef_se_uc) & missing(regression_coef_se_cc)
+  7
+
+.                                 replace se_converted_41 = (regression_coef / t_stat) if level_of_assignment=="individual" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regressi
+> on") & outcome_type=="continuous" & !missing(t_stat) & missing(model_Rsqrd) & missing(regression_coef_se_uc) & missing(regression_coef_se_cc)
+(3 real changes made)
+
+.                         
+.                                 ***-> Indiv/ANCOVAregression/continuous; cannot use either of the three above: (no change/ [E.1.4] v4.1, page E-3, v4.1 procedures handbook)
+.                                 replace se_converted_41= se_e14_40 if missing(se_converted_41) & level_of_assignment=="individual" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel
+>  regression") & outcome_type=="continuous"
+(121 real changes made)
+
+.                                 
+.                         tablist level_of_assignment outcome_type analytic_method regression_coef regression_coef_se_uc regression_coef_se_cc model_Rsqrd t_stat se_converted_41 se_e14_40 if level_of
+> _assignment=="individual" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous", sort(v)    ab(32) 
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |             .52 |                     . |                   .25 |           . |      . |        .2937536 |       .37 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                  1                             |                               0.56                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |             .62 |                     . |                   .36 |           . |      . |        .3298646 |       .37 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                  2                             |                               1.13                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |             .77 |                     . |                   .37 |           . |      . |        .3180183 |       .38 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                  3                             |                               1.69                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .11 |       .11 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                  4                             |                               2.26                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .12 |       .12 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                  5                             |                               2.82                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .15 |       .15 |      7 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              3.95                            |                                 12                             |                               6.78                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .16 |       .16 |      2 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              1.13                            |                                 14                             |                               7.91                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .17 |       .17 |     16 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              9.04                            |                                 30                             |                              16.95                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .18 |       .18 |      6 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              3.39                            |                                 36                             |                              20.34                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .19 |       .19 |      3 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              1.69                            |                                 39                             |                              22.03                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |              .2 |        .2 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                 40                             |                              22.60                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .21 |       .21 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                 41                             |                              23.16                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .22 |       .22 |      6 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              3.39                            |                                 47                             |                              26.55                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .24 |       .24 |      9 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              5.08                            |                                 56                             |                              31.64                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .25 |       .25 |      5 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              2.82                            |                                 61                             |                              34.46                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .26 |       .26 |      2 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              1.13                            |                                 63                             |                              35.59                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .27 |       .27 |      9 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              5.08                            |                                 72                             |                              40.68                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .28 |       .28 |      5 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              2.82                            |                                 77                             |                              43.50                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .29 |       .29 |      3 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              1.69                            |                                 80                             |                              45.20                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |              .3 |        .3 |      2 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              1.13                            |                                 82                             |                              46.33                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .31 |       .31 |      2 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              1.13                            |                                 84                             |                              47.46                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .32 |       .32 |      2 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              1.13                            |                                 86                             |                              48.59                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .33 |       .33 |      3 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              1.69                            |                                 89                             |                              50.28                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .34 |       .34 |      5 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              2.82                            |                                 94                             |                              53.11                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .35 |       .35 |      3 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              1.69                            |                                 97                             |                              54.80                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |                    ANCOVA |               . |                     . |                     . |           . |      . |             .37 |       .37 |      3 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              1.69                            |                                100                             |                              56.50                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |             -.4 |                     . |                    .3 |           . |      . |        .0965231 |       .18 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                101                             |                              57.06                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |             -.2 |                     . |                   2.3 |           . |      . |        .1103691 |       .17 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                102                             |                              57.63                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |            .004 |                     . |                  .029 |           . |      . |        .1602271 |       .16 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                103                             |                              58.19                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |            .008 |                     . |                  .015 |           . |      . |        .1658924 |       .16 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                104                             |                              58.76                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |            .011 |                     . |                  .025 |           . |      . |        .0119535 |       .16 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                105                             |                              59.32                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |            .019 |                     . |                  .025 |           . |      . |        .0113361 |       .16 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                106                             |                              59.89                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |             .03 |                     . |                  .022 |           . |      . |        .0108108 |       .16 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                107                             |                              60.45                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |            .034 |                     . |                  .014 |           . |      . |        .1653759 |       .16 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                108                             |                              61.02                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |            .042 |                     . |                  .014 |           . |      . |        .1659803 |       .16 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                109                             |                              61.58                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |            .067 |                     . |                   .04 |           . |      . |        .0188408 |       .16 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                110                             |                              62.15                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |            .144 |                     . |                  .026 |           . |      . |        .1590069 |       .17 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                111                             |                              62.71                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |            .148 |                     . |                  .025 |           . |      . |        .1637879 |       .17 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                112                             |                              63.28                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |            .401 |                     . |                  .055 |           . |      . |        .0257351 |       .16 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                113                             |                              63.84                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |             .43 |                     . |                   .22 |           . |      . |        .2085349 |       .33 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                114                             |                              64.41                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |            .468 |                     . |                  .053 |           . |      . |        .0271687 |       .16 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                115                             |                              64.97                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |              .5 |                   1.7 |                     . |           . |      . |        .2858335 |        .2 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                116                             |                              65.54                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |              .5 |                   2.9 |                     . |           . |      . |        .1892277 |        .2 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                117                             |                              66.10                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |             .51 |                     . |                     . |           . |      . |             .07 |       .07 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                118                             |                              66.67                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |             .53 |                     . |                   .41 |           . |      . |        .0863108 |       .11 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                119                             |                              67.23                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |             .54 |                     . |                   .54 |           . |      . |        .0899063 |       .11 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                120                             |                              67.80                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |             .56 |                     . |                    .2 |           . |      . |        .2012375 |       .33 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                121                             |                              68.36                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |            .625 |                     . |                  .611 |           . |      . |        .1624051 |       .16 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                122                             |                              68.93                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |            .698 |                     . |                     . |           . |      . |             .07 |       .07 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                123                             |                              69.49                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |            .752 |                     . |                  .615 |           . |      . |        .1445809 |       .16 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                124                             |                              70.06                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |             .92 |                     . |                   .67 |           . |      . |        .0871901 |       .11 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                125                             |                              70.62                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |             1.1 |                     . |                     . |           . |    .55 |               2 |       .21 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                126                             |                              71.19                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |             1.2 |                    .9 |                     . |           . |      . |        .1480691 |        .2 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                127                             |                              71.75                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |           1.221 |                     . |                  .591 |           . |      . |        .1342352 |       .16 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                128                             |                              72.32                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |             1.6 |                     . |                    .7 |           . |      . |        .2122535 |       .18 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                129                             |                              72.88                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |           1.897 |                     . |                 1.204 |           . |      . |        .1646361 |       .16 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                130                             |                              73.45                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |           1.973 |                     . |                  .582 |           . |      . |         .136043 |       .17 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                131                             |                              74.01                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |            2.07 |                     . |                  .547 |           . |      . |        .1552333 |       .16 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                132                             |                              74.58                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |           2.205 |                     . |                     . |           . |      . |             .07 |       .07 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                133                             |                              75.14                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |            2.39 |                     . |                  1.71 |           . |      . |        .0723209 |       .11 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                134                             |                              75.71                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |            2.51 |                     . |                  2.55 |           . |      . |         .072677 |       .11 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                135                             |                              76.27                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |           2.695 |                     . |                  .605 |           . |      . |        .1609949 |       .17 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                136                             |                              76.84                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |             2.8 |                     . |                   2.5 |           . |      . |        .1641196 |       .18 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                137                             |                              77.40                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |           2.876 |                     . |                     . |           . |      . |             .07 |       .07 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                138                             |                              77.97                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |           3.408 |                     . |                     . |           . |      . |             .08 |       .08 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                139                             |                              78.53                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |           3.476 |                     . |                     . |           . |      . |             .07 |       .07 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                140                             |                              79.10                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |             6.3 |                   2.4 |                     . |           . |      . |        .1730644 |       .21 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                141                             |                              79.66                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |             7.8 |                     . |                     . |           . |    .44 |        17.72727 |       .21 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                142                             |                              80.23                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |            8.95 |                     . |                     . |           . |      . |             .13 |       .13 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                143                             |                              80.79                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |           9.182 |                     . |                 2.496 |           . |      . |        .1786465 |       .19 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                144                             |                              81.36                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |           9.828 |                     . |                  .996 |           . |      . |        .1803682 |       .18 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                145                             |                              81.92                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |          11.725 |                     . |                  .917 |           . |      . |        .2082234 |        .2 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                146                             |                              82.49                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |          11.868 |                     . |                 1.397 |           . |      . |        .2554543 |       .22 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                147                             |                              83.05                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |            12.9 |                     . |                     . |           . |   2.71 |        4.760148 |       .22 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                148                             |                              83.62                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |               . |                     . |                   .07 |           . |   1.41 |        .0550298 |        .1 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                149                             |                              84.18                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |               . |                     . |                   .17 |           . |    .47 |        .0692726 |        .1 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                150                             |                              84.75                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |               . |                     . |                   .27 |           . |    2.4 |        .0749873 |        .1 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                151                             |                              85.31                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |               . |                     . |                  .444 |           . |      . |        .1195355 |       .14 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                152                             |                              85.88                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |               . |                     . |                  .684 |           . |      . |        .1375296 |       .14 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                153                             |                              86.44                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |               . |                     . |                   .93 |           . |   5.21 |        .0743452 |        .1 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                154                             |                              87.01                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |               . |                     . |                 1.345 |           . |      . |        .1122885 |       .14 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                155                             |                              87.57                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |               . |                     . |                     . |           . |   2.32 |              .1 |        .1 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                156                             |                              88.14                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |               . |                     . |                     . |           . |   3.88 |              .1 |        .1 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                157                             |                              88.70                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |               . |                     . |                     . |           . |   7.23 |              .1 |        .1 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                158                             |                              89.27                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |               . |                     . |                     . |           . |   8.94 |              .1 |        .1 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                159                             |                              89.83                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |               . |                     . |                     . |           . |      . |             .13 |       .13 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                160                             |                              90.40                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |               . |                     . |                     . |           . |      . |             .14 |       .14 |      2 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              1.13                            |                                162                             |                              91.53                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |               . |                     . |                     . |           . |      . |             .15 |       .15 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                163                             |                              92.09                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous | HLM/multilevel regression |               . |                     . |                     . |           . |      . |             .21 |       .21 |      9 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              5.08                            |                                172                             |                              97.18                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |            OLS regression |            -.94 |                    .1 |                     . |         .34 |      . |         .940756 |       .13 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                173                             |                              97.74                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |            OLS regression |             .29 |                   .11 |                     . |         .19 |      . |        .0768781 |       .12 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                174                             |                              98.31                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |            OLS regression |             .94 |                   .09 |                     . |         .44 |      . |          .06282 |       .13 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                175                             |                              98.87                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |            OLS regression |            1.34 |                   .09 |                     . |          .5 |      . |        .0847765 |       .15 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                176                             |                              99.44                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+  | level_of_assignment | outcome_type |           analytic_method | regression_coef | regression_coef_se_uc | regression_coef_se_cc | model_Rsqrd | t_stat | se_converted_41 | se_e14_40 | _Freq_ |
+  |          individual |   continuous |            OLS regression |            1.56 |                   .07 |                     . |         .65 |      . |         .110877 |       .17 |      1 |
+  |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+  |                            _Perc_                            |                            _CFreq_                             |                            _CPerc_                             |
+  |                              0.56                            |                                177                             |                             100.00                             |
+  +------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+.                         
+.                         **-> Gain Scores
+.                         // Note: None
+.                         tablist level_of_assignment outcome_type analytic_method if level_of_assignment=="individual" & outcome_type=="continuous", sort(v) ab(32)
+
+  +------------------------------------------------------------------------------------------------------+
+  | level_of_assignment   outcome_type             analytic_method   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |------------------------------------------------------------------------------------------------------|
+  |          individual     continuous                      ANCOVA      100    29.33       100     29.33 |
+  |          individual     continuous                ANOVA F-test        4     1.17       104     30.50 |
+  |          individual     continuous   HLM/multilevel regression       72    21.11       176     51.61 |
+  |          individual     continuous              OLS regression        5     1.47       181     53.08 |
+  |          individual     continuous               no adjustment      159    46.63       340     99.71 |
+  |------------------------------------------------------------------------------------------------------|
+  |          individual     continuous                      t-stat        1     0.29       341    100.00 |
+  +------------------------------------------------------------------------------------------------------+
+
+.                         assert analytic_method!="gain score" if level_of_assignment=="individual" & outcome_type=="continuous"
+
+.                         
+.                         **-> Difference-in-differences
+.                         // Note: None
+.                         tablist level_of_assignment outcome_type analytic_method if level_of_assignment=="individual" & outcome_type=="continuous", sort(v) ab(32)
+
+  +------------------------------------------------------------------------------------------------------+
+  | level_of_assignment   outcome_type             analytic_method   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |------------------------------------------------------------------------------------------------------|
+  |          individual     continuous                      ANCOVA      100    29.33       100     29.33 |
+  |          individual     continuous                ANOVA F-test        4     1.17       104     30.50 |
+  |          individual     continuous   HLM/multilevel regression       72    21.11       176     51.61 |
+  |          individual     continuous              OLS regression        5     1.47       181     53.08 |
+  |          individual     continuous               no adjustment      159    46.63       340     99.71 |
+  |------------------------------------------------------------------------------------------------------|
+  |          individual     continuous                      t-stat        1     0.29       341    100.00 |
+  +------------------------------------------------------------------------------------------------------+
+
+.                         assert analytic_method!="difference-in-differences" if level_of_assignment=="individual" & outcome_type=="continuous"
+
+.                         
+.                         **-> No adjustment
+.                         tablist level_of_assignment outcome_type analytic_method if level_of_assignment=="individual", sort(v) ab(32)
+
+  +------------------------------------------------------------------------------------------------------+
+  | level_of_assignment   outcome_type             analytic_method   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |------------------------------------------------------------------------------------------------------|
+  |          individual                                     ANCOVA        3     0.87         3      0.87 |
+  |          individual     continuous                      ANCOVA      100    28.90       103     29.77 |
+  |          individual     continuous                ANOVA F-test        4     1.16       107     30.92 |
+  |          individual     continuous   HLM/multilevel regression       72    20.81       179     51.73 |
+  |          individual     continuous              OLS regression        5     1.45       184     53.18 |
+  |------------------------------------------------------------------------------------------------------|
+  |          individual     continuous               no adjustment      159    45.95       343     99.13 |
+  |          individual     continuous                      t-stat        1     0.29       344     99.42 |
+  |          individual    dichotomous               no adjustment        2     0.58       346    100.00 |
+  +------------------------------------------------------------------------------------------------------+
+
+.                         replace se_converted_41= se_e14_40 if level_of_assignment=="individual" & analytic_method=="no adjustment" & outcome_type=="continuous"
+(159 real changes made)
+
+. 
+.                 *-> Dichotomous measures
+.                 tablist level_of_assignment outcome_type analytic_method if level_of_assignment=="individual"  & outcome_type=="dichotomous", sort(v) ab(32)    
+
+  +--------------------------------------------------------------------------------------------+
+  | level_of_assignment   outcome_type   analytic_method   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |--------------------------------------------------------------------------------------------|
+  |          individual    dichotomous     no adjustment        2   100.00         2    100.00 |
+  +--------------------------------------------------------------------------------------------+
+
+.                 
+.                         **-> Indiv/DnD/dichotomous: ([E.4.4], Individual assignment column of Table 3 of Supplement)
+.                         //Note: None
+.                         assert analytic_method!="difference-in-differences" if level_of_assignment=="individual" & outcome_type=="dichotomous"
+
+.                         
+.                         **-> Indiv/AnyOtherAnalysis/dichotomous: ([E.4.4], Individual assignment column of Table 3 of Supplement)
+. **# Bookmark #1
+.                         ********replace se_converted_41= (1/1.65) * ( sqrt( ) )
+.                         
+.         /* Cluster-level Assignment */
+.         //Note:  All cluster-level assignment studies report student-level effect sizes (i.e., there are no cluster-level effect sizes reported in the cNMA database). (!) confirm with RTL
+.         tablist level_of_assignment analytic_method outcome_type if level_of_assignment=="cluster", sort(v) ab(32)
+
+  +------------------------------------------------------------------------------------------------------+
+  | level_of_assignment             analytic_method   outcome_type   _Freq_   _Perc_   _CFreq_   _CPerc_ |
+  |------------------------------------------------------------------------------------------------------|
+  |             cluster   HLM/multilevel regression     continuous       11    57.89        11     57.89 |
+  |             cluster               no adjustment     continuous        8    42.11        19    100.00 |
+  +------------------------------------------------------------------------------------------------------+
+
+.         
 .         /* Save final ES/SE conversion database */
 .         quietly compress
 
@@ -1598,5 +2669,5 @@ file C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-anal
       name:  convert_es_se
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41.log
   log type:  text
- closed on:  16 Apr 2025, 16:29:47
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ closed on:  29 Apr 2025, 18:55:51
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

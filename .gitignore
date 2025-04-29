@@ -28,5 +28,4 @@ NMA_metafor_allnodes_ic_osftest.R
 cNMA/Data inventory for 4.0 to 4.dta
 cNMA/DATABASE*
 cNMA/_archive*
-cNMA/dat_cNMS_icW.csv
-cNMA/dat_cNMS_icW.zip
+cNMA/dat_cNMS_icW.*
