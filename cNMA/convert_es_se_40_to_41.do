@@ -17,7 +17,7 @@ log using "C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network met
 ***																							  ***
 *** Authors: Seth B. Morgan																      ***
 *** Start date: February 19, 2025															  ***
-*** Last date modified: April 29, 2025												          ***
+*** Last date modified: April 30, 2025												          ***
 ***																							  ***
 *** Notes:																					  ***
 ***																							  ***
@@ -308,20 +308,58 @@ pause off
 			replace se_converted_41= se_e14_40 if level_of_assignment=="individual" & analytic_method=="no adjustment" & outcome_type=="continuous"
 
 		*-> Dichotomous measures
-		tablist level_of_assignment outcome_type analytic_method if level_of_assignment=="individual"  & outcome_type=="dichotomous", sort(v) ab(32)	
+		tablist level_of_assignment outcome_type analytic_method if level_of_assignment=="individual" & outcome_type=="dichotomous", sort(v) ab(32)	
 		
 			**-> Indiv/DnD/dichotomous: ([E.4.4], Individual assignment column of Table 3 of Supplement)
 			//Note: None
 			assert analytic_method!="difference-in-differences" if level_of_assignment=="individual" & outcome_type=="dichotomous"
 			
 			**-> Indiv/AnyOtherAnalysis/dichotomous: ([E.4.4], Individual assignment column of Table 3 of Supplement)
-**# Bookmark #1
-			********replace se_converted_41= (1/1.65) * ( sqrt( ) )
+			tablist study_id contrast_id es_id level_of_assignment outcome_type analytic_method n_i_indiv n_c_indiv mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj se_converted_41 if level_of_assignment=="individual" & outcome_type=="dichotomous", sort(v) ab(32)	
+			replace se_converted_41= (1/1.65) * ( sqrt(             (1/(mean_i_unadj*n_i_indiv))   +   (1/(1-mean_i_unadj)*n_i_indiv)   +   (1/(mean_c_unadj*n_c_indiv))   +   (1/(1-mean_c_unadj)*n_c_indiv)               ) ) if es_id==117 | es_id==129
+			***replace se_converted_41= (1/1.65) * ( sqrt(             (1/(mean_i_adj  *n_i_indiv))   +   (1/(1-mean_i_adj  )*n_i_indiv)   +   (1/(mean_c_unadj*n_c_indiv))   +   (1/(1-mean_c_unadj)*n_c_indiv)               ) ) if es_id==129 (!) why calculation comes out missing?
 			
 	/* Cluster-level Assignment */
 	//Note:  All cluster-level assignment studies report student-level effect sizes (i.e., there are no cluster-level effect sizes reported in the cNMA database). (!) confirm with RTL
 	tablist level_of_assignment analytic_method outcome_type if level_of_assignment=="cluster", sort(v) ab(32)
 	
+			**-> ANCOVA or regression: decision tree
+			tablist level_of_assignment outcome_type analytic_method if level_of_assignment=="cluster" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous", sort(v)	ab(32)
+			tablist level_of_assignment outcome_type analytic_method regression_coef study_clustered regression_coef_se_uc regression_coef_se_cc model_Rsqrd t_stat if level_of_assignment=="cluster" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous", sort(v)	ab(32)
+				
+				***-> Indiv/ANCOVAregression/continuous; regression coefficient standard error reported: ([E.7.1] supp, Individual assignment column of Table 2 of Supplement)
+				count if level_of_assignment=="cluster" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous" & !missing(regression_coef_se_cc)
+				replace se_converted_41= omega * sqrt( ((regression_coef_se_cc/S_pooled_sd)^2) + ((es_converted_41^2)/(2*n_t_indiv)) ) if level_of_assignment=="cluster" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous" & !missing(regression_coef_se_cc)
+				
+				***-> Indiv/ANCOVAregression/continuous; model R2 value is reported: ([E.2.2] supp/v4.1, Individual assignment column of Table 3 of Supplement; same as [E.2.2] in v4.1 Procedures, page E-5)
+				// Note: None
+				count if level_of_assignment=="cluster" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous" & !missing(model_Rsqrd) & missing(regression_coef_se_uc) & missing(regression_coef_se_cc)
+				assert r(N)==0
+			
+				***-> Indiv/ANCOVAregression/continuous; cannot use either of the two above AND/OR only t-statistic reported: (SE=b/t)
+				// Note: None
+				count if level_of_assignment=="cluster" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous" & !missing(t_stat) & missing(model_Rsqrd) & missing(regression_coef_se_uc) & missing(regression_coef_se_cc)
+				assert r(N)==0
+				
+				***-> Indiv/ANCOVAregression/continuous; cannot use either of the three above: (no change/ [E.1.4] v4.1, page E-3, v4.1 procedures handbook)
+				replace se_converted_41= se_e14_40 if missing(se_converted_41) & level_of_assignment=="cluster" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous"
+				
+			tablist level_of_assignment outcome_type analytic_method regression_coef study_clustered regression_coef_se_uc regression_coef_se_cc model_Rsqrd t_stat se_converted_41 se_e14_40 if level_of_assignment=="cluster" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous", sort(v)	ab(32) 
+
+			**-> No adjustment
+			tablist level_of_assignment outcome_type analytic_method if level_of_assignment=="cluster" & analytic_method=="no adjustment", sort(v) ab(32)
+			tablist level_of_assignment outcome_type analytic_method n_i_indiv n_c_indiv n_avg_cluster icc if level_of_assignment=="cluster" & analytic_method=="no adjustment", sort(v) ab(32) 
+			replace se_converted_41= omega * sqrt(    ///
+													( (n_i_indiv+n_c_indiv)/(n_i_indiv*n_c_indiv) ) * (1 + (n_avg_cluster-1)*icc) + ///
+													(es_official_40^2)* (         ///
+														(    (n_t_indiv-2)*((1-icc)^2) + n_avg_cluster*(n_t_indiv- (2*n_avg_cluster)*(icc^2)) + 2*(n_t_indiv-(2*n_avg_cluster))*(icc^2) + (2*(n_t_indiv-(2*n_avg_cluster))*icc*(1-icc))                   ) / /// numerator
+														(2* ( ( (n_t_indiv-2)- ( 2*(n_avg_cluster-1)*icc )  )^2 )  ) /// denominator
+														)       ///
+									         )  if level_of_assignment=="cluster" & analytic_method=="no adjustment" & outcome_type=="continuous" // (!) N vs n; cluster or indiv?	
+						
+			replace se_converted_41= se_e14_40 if missing(se_converted_41) & level_of_assignment=="cluster" & analytic_method=="no adjustment" & outcome_type=="continuous" 
+			tablist level_of_assignment outcome_type analytic_method n_i_indiv n_c_indiv n_avg_cluster icc se_e14_40 se_converted_41 if level_of_assignment=="cluster" & analytic_method=="no adjustment", sort(v) ab(32)
+			
 	/* Save final ES/SE conversion database */
 	quietly compress
 	sort contrast_simple_number
