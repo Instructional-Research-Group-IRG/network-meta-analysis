@@ -19,3 +19,9 @@ rename (Outcomeeffectsizereportedas EffectsizestandarderrorSo) ///
 rename (Areoutcomeandbaselinethesam Baselineoutcomecorrelationp) ///
 	   (pre_post_same_measure pre_post_correlation)
 rename LogoddsratioLORcalcula log_odds_post	   
+
+label variable outcome_type "outcome type"
+label variable analytic_method "analytic method"
+label variable es_official_40 "official effect size, 4.0"
+label variable se_e14_40 "standard error of effect size, 4.0"
+label variable level_of_assignment "level of assignment"

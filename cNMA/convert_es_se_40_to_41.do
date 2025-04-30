@@ -89,7 +89,8 @@ pause off
 	replace regression_coef_se_cc="" if regression_coef_se_cc=="Not reported in main article."
 	replace model_Rsqrd="" if model_Rsqrd=="Not reported"
 	replace model_Rsqrd="" if model_Rsqrd=="Not presented in report"
-	foreach var of varlist mean_?_*adj mean_?_sd regression_coef_se_?c model_Rsqrd {
+	replace icc="." if inlist(icc,"Not in article","Not in article but see comment","Not presented in report","Not reported in main article.","Not reported in the main article","Not reported in this study")
+	foreach var of varlist mean_?_*adj mean_?_sd regression_coef_se_?c model_Rsqrd icc {
 		display as input _n "Numeric variable: `var'"
 		destring `var', replace
 	}
@@ -154,7 +155,7 @@ pause off
 	drop if missing(es_official_40) // (!)
 	
 	generate es_converted_41=.
-	label variable es_converted_41 "effect size converted from 4.0 to 4.1"
+	label variable es_converted_41 "effect size, 4.1"
 
 	/* Individual-level Assignment */
 	tablist level_of_assignment outcome_type analytic_method if level_of_assignment=="individual", sort(v) ab(32)
@@ -172,8 +173,10 @@ pause off
 			//			• the same as under v4.0 if the pre- and posttests are not the same; but 
 			//     		• different from v4.0 if the pre- and posttests are the same.
 			//      However, there are no continuous measures with individual-level assignment analyzed using difference-in-differences in the NNMA database.
-			assert !(level_of_assignment=="individual" & outcome_type=="continuous" & analytic_method=="difference-in-differences")
+			count if level_of_assignment=="individual" & outcome_type=="continuous" & analytic_method=="difference-in-differences"
+			assert r(N)==0
 			
+			tablist level_of_assignment analytic_method outcome_type es_official_40 es_converted_41 if level_of_assignment=="individual" & outcome_type=="continuous", sort(v) ab(32)
 			summarize es_official_40 es_converted_41 if level_of_assignment=="individual" & outcome_type=="continuous"
 			
 			/*(!) Think about these checks and recalcs a bit more.
@@ -203,15 +206,17 @@ pause off
 			//			• the Cox effect size (d_Cox) was calculated with the small-sample bias adjustment omega under v4.0 (p. E-7, v4.0 procedures handbook);
 			//          • however, under v4.1, this adjustment is not applied (equation E.4.3, v4.1 procedures handbook).
 			replace es_converted_41= log_odds_post if level_of_assignment=="individual" & outcome_type=="dichotomous" & analytic_method!="difference-in-differences" 
-			tablist level_of_assignment analytic_method outcome_type outcome log_odds_post es_official_40 es_converted_41 omega if level_of_assignment=="individual" & outcome_type=="dichotomous" & analytic_method!="difference-in-differences", sort(v) ab(32) // (!) These 4.1 recalculations are not similar to 4.0 values. 
+			tablist level_of_assignment analytic_method outcome_type mean_i_adj mean_c_adj mean_i_unadj mean_c_unadj log_odds_post es_official_40 es_converted_41 omega if level_of_assignment=="individual" & outcome_type=="dichotomous" & analytic_method!="difference-in-differences", sort(v) ab(32) // (!) These 4.1 recalculations are not similar to 4.0 values. 
 
 			//Note: For dichotomous measures with individual-level assignment using difference-in-differences:
 			//			• the Cox effect size (d_Cox) was calculated with the small-sample bias adjustment omega under v4.0 (p. E-7, v4.0 procedures handbook);
 			//          • however, under v4.1, this adjustment is not applied (equation E.4.3, v4.1 procedures handbook);
 			//          • in addition, v4.1 adds the population correlation to the diff-in-diff adjustment compared to v4.0
 			//      However, there are no dichotomous measures with individual-level assignment analyzed using difference-in-differences in the NNMA database.
-			assert !(level_of_assignment=="individual" & outcome_type=="dichotomous" & analytic_method=="difference-in-differences")
+			count if level_of_assignment=="individual" & outcome_type=="dichotomous" & analytic_method=="difference-in-differences"
+			assert r(N)==0
 			
+			tablist level_of_assignment analytic_method outcome_type es_official_40 es_converted_41 omega if level_of_assignment=="individual" & outcome_type=="dichotomous", sort(v) ab(32)
 			summarize es_official_40 es_converted_41 if level_of_assignment=="individual" & outcome_type=="dichotomous"
 	
 	/* Cluster-level Assignment */
@@ -225,13 +230,11 @@ pause off
 			count if level_of_assignment=="cluster" & outcome_type=="continuous"
 			
 			//Note: For continuous measures with cluster-level assignment, recalculate the student-level ES using the unbiased formula in Table 1 of the Supplement, which imposes a bias correction, in place of [E.5.1] on page E-9 of v4.1 Procedures 
-			//      which is the same equation as on page E-9 of v4.0 Procedures. Note that that the bias correction uses the intraclass correlation coefficient (ICC).
+			//      which is the same equation as on page E-9 of v4.0 Procedures. Note that the bias correction uses the intraclass correlation coefficient (ICC).
 			
-			tablist level_of_assignment analytic_method outcome_type icc if level_of_assignment=="cluster" & outcome_type=="continuous", sort(v) ab(32) 
-			replace icc="." if inlist(icc,"Not in article","Not in article but see comment","Not presented in report","Not reported in main article.","Not reported in the main article","Not reported in this study") 
-			destring icc, replace
+			tablist level_of_assignment analytic_method outcome_type icc if level_of_assignment=="cluster" & outcome_type=="continuous", sort(v) ab(32)  
 			replace icc= 0.2 if icc==. & level_of_assignment=="cluster" & outcome_type=="continuous" // (!) Placeholder. Needs to be updated by team. "As defaults, the WWC uses the ICC values of .20 for achievement outcomes and .10 for all other outcomes, but will use study-reported ICC values when available. (Procedures handbook 4.1, p. 20)"
-			tablist level_of_assignment analytic_method outcome_type icc if level_of_assignment=="cluster" & outcome_type=="continuous", sort(v) ab(32) // (!) Use 0.2 if ICC missing?
+			tablist level_of_assignment analytic_method outcome_type icc if level_of_assignment=="cluster" & outcome_type=="continuous", sort(v) ab(32)
 			
 			*Calculate 4.1 effect size for outcome measures of cluster-level assignment studies: unbiased [E.5.1] formula of Table 1 of the Supplement
 			replace es_converted_41 = es_official_40 * sqrt( 1 - ( (2*(n_avg_cluster-1)*icc) / n_t_indiv-2) ) if level_of_assignment=="cluster" & outcome_type=="continuous"
@@ -239,17 +242,17 @@ pause off
 			replace es_converted_41 = es_official_40 if missing(es_converted_41) & level_of_assignment=="cluster" & outcome_type=="continuous"
 			tablist analytic_method es_official_40 es_converted_41 icc n_avg_cluster n_t_cluster n_t_indiv if level_of_assignment=="cluster"  & outcome_type=="continuous", sort(v) ab(32)
 			
+			tablist level_of_assignment analytic_method outcome_type es_official_40 es_converted_41 if level_of_assignment=="cluster" & outcome_type=="continuous", sort(v) ab(32)
 			summarize es_official_40 es_converted_41 if level_of_assignment=="cluster" & outcome_type=="continuous"
 			
 		*-> Dichotmous Measures
 			
-			tablist level_of_assignment analytic_method outcome_type, sort(v) ab(32)
-			capture tablist level_of_assignment analytic_method outcome_type log_odds_post if level_of_assignment=="cluster" & outcome_type=="dichotomous", sort(v) ab(32)			
-			count if level_of_assignment=="cluster" & outcome_type=="dichotomous"			
+			//Note: None	
+			count if level_of_assignment=="cluster" & outcome_type=="dichotomous"	
+			assert r(N)==0
 
-			//Note: For continuous measures with cluster-level assignment, the calculation of ESs is not explicitly covered in either v4.0 or v4.1 Prociedures or v4.1 Supplement.
-			//      However, there are no dichotomous measures with cluster-level assignment in the NNMA database.
-			assert !(level_of_assignment=="cluster" & outcome_type=="dichotomous")
+	tablist study_id contrast_id es_id level_of_assignment outcome_type analytic_method es_official_40 es_converted_41 if missing(es_converted_41), sort(v) ab(32) // (!) clean this up with Q's for team
+	replace es_converted_41=es_official_40 if missing(es_converted_41)
 	
 	
 *=========================================================================================
@@ -261,7 +264,7 @@ pause off
 	/* Prepare data and variables for SE conversions */
 	summarize se_e14_40, detail
 	generate se_converted_41=.
-	label variable se_converted_41 "standard error of effect size converted from 4.0 to 4.1"
+	label variable se_converted_41 "standard error of effect size, 4.1"
 	
 	/* Individual-level Assignment */
 	tablist level_of_assignment outcome_type analytic_method if level_of_assignment=="individual", sort(v) ab(32)	
@@ -284,10 +287,10 @@ pause off
 				assert r(N)==0
 			
 				***-> Indiv/ANCOVAregression/continuous; cannot use either of the two above AND/OR only t-statistic reported: (SE=b/t)
-				// Note: None
 				count if level_of_assignment=="individual" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous" & !missing(t_stat) & missing(model_Rsqrd) & missing(regression_coef_se_uc) & missing(regression_coef_se_cc)
 				replace se_converted_41 = (regression_coef / t_stat) if level_of_assignment=="individual" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous" & !missing(t_stat) & missing(model_Rsqrd) & missing(regression_coef_se_uc) & missing(regression_coef_se_cc)
-			
+				tablist level_of_assignment outcome_type analytic_method regression_coef regression_coef_se_uc regression_coef_se_cc model_Rsqrd t_stat se_converted_41 if level_of_assignment=="individual" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous" & !missing(t_stat) & missing(model_Rsqrd) & missing(regression_coef_se_uc) & missing(regression_coef_se_cc), sort(v) ab(32)
+				
 				***-> Indiv/ANCOVAregression/continuous; cannot use either of the three above: (no change/ [E.1.4] v4.1, page E-3, v4.1 procedures handbook)
 				replace se_converted_41= se_e14_40 if missing(se_converted_41) & level_of_assignment=="individual" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous"
 				
@@ -295,15 +298,16 @@ pause off
 			
 			**-> Gain Scores
 			// Note: None
-			tablist level_of_assignment outcome_type analytic_method if level_of_assignment=="individual" & outcome_type=="continuous", sort(v) ab(32)
-			assert analytic_method!="gain score" if level_of_assignment=="individual" & outcome_type=="continuous"
+			count if level_of_assignment=="individual" & outcome_type=="continuous" & analytic_method=="gain score"
+			assert r(N)==0
 			
 			**-> Difference-in-differences
 			// Note: None
-			tablist level_of_assignment outcome_type analytic_method if level_of_assignment=="individual" & outcome_type=="continuous", sort(v) ab(32)
-			assert analytic_method!="difference-in-differences" if level_of_assignment=="individual" & outcome_type=="continuous"
+			count if level_of_assignment=="individual" & outcome_type=="continuous" & analytic_method=="difference-in-differences" 
+			assert r(N)==0
 			
 			**-> No adjustment
+			// Note: Use [E.1.4], page E-3 of v4.1 Procedures); Calculation is same as under 4.0.
 			tablist level_of_assignment outcome_type analytic_method if level_of_assignment=="individual", sort(v) ab(32)
 			replace se_converted_41= se_e14_40 if level_of_assignment=="individual" & analytic_method=="no adjustment" & outcome_type=="continuous"
 
@@ -312,12 +316,14 @@ pause off
 		
 			**-> Indiv/DnD/dichotomous: ([E.4.4], Individual assignment column of Table 3 of Supplement)
 			//Note: None
-			assert analytic_method!="difference-in-differences" if level_of_assignment=="individual" & outcome_type=="dichotomous"
+			count if level_of_assignment=="individual" & outcome_type=="dichotomous" & analytic_method=="difference-in-differences"
+			assert r(N)==0
 			
 			**-> Indiv/AnyOtherAnalysis/dichotomous: ([E.4.4], Individual assignment column of Table 3 of Supplement)
 			tablist study_id contrast_id es_id level_of_assignment outcome_type analytic_method n_i_indiv n_c_indiv mean_i_unadj mean_c_unadj mean_i_adj mean_c_adj se_converted_41 if level_of_assignment=="individual" & outcome_type=="dichotomous", sort(v) ab(32)	
-			replace se_converted_41= (1/1.65) * ( sqrt(             (1/(mean_i_unadj*n_i_indiv))   +   (1/(1-mean_i_unadj)*n_i_indiv)   +   (1/(mean_c_unadj*n_c_indiv))   +   (1/(1-mean_c_unadj)*n_c_indiv)               ) ) if es_id==117 | es_id==129
-			***replace se_converted_41= (1/1.65) * ( sqrt(             (1/(mean_i_adj  *n_i_indiv))   +   (1/(1-mean_i_adj  )*n_i_indiv)   +   (1/(mean_c_unadj*n_c_indiv))   +   (1/(1-mean_c_unadj)*n_c_indiv)               ) ) if es_id==129 (!) why calculation comes out missing?
+			replace se_converted_41= (1/1.65) * ( sqrt(             (1/(mean_i_unadj*n_i_indiv))   +   (1/((1-mean_i_unadj)*n_i_indiv))   +   (1/(mean_c_unadj*n_c_indiv))   +   (1/((1-mean_c_unadj)*n_c_indiv))               ) ) if es_id==117 | es_id==129
+			***replace se_converted_41= (1/1.65) * ( sqrt(             (1/(mean_i_adj  *n_i_indiv))   +   (1/(1-mean_i_adj  )*n_i_indiv)   +   (1/(mean_c_unadj*n_c_indiv))   +   (1/(1-mean_c_unadj)*n_c_indiv)               ) ) if es_id==129 (!) why does calculation come out missing?
+			tablist study_id contrast_id es_id level_of_assignment outcome_type se_e14_40 se_converted_41 if level_of_assignment=="individual" & outcome_type=="dichotomous", sort(v) ab(32)	
 			
 	/* Cluster-level Assignment */
 	//Note:  All cluster-level assignment studies report student-level effect sizes (i.e., there are no cluster-level effect sizes reported in the cNMA database). (!) confirm with RTL
@@ -344,7 +350,7 @@ pause off
 				***-> Indiv/ANCOVAregression/continuous; cannot use either of the three above: (no change/ [E.1.4] v4.1, page E-3, v4.1 procedures handbook)
 				replace se_converted_41= se_e14_40 if missing(se_converted_41) & level_of_assignment=="cluster" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous"
 				
-			tablist level_of_assignment outcome_type analytic_method regression_coef study_clustered regression_coef_se_uc regression_coef_se_cc model_Rsqrd t_stat se_converted_41 se_e14_40 if level_of_assignment=="cluster" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous", sort(v)	ab(32) 
+			tablist level_of_assignment outcome_type analytic_method regression_coef study_clustered regression_coef_se_uc regression_coef_se_cc model_Rsqrd t_stat se_e14_40 se_converted_41 if level_of_assignment=="cluster" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression") & outcome_type=="continuous", sort(v)	ab(32) 
 
 			**-> No adjustment
 			tablist level_of_assignment outcome_type analytic_method if level_of_assignment=="cluster" & analytic_method=="no adjustment", sort(v) ab(32)
@@ -359,7 +365,10 @@ pause off
 						
 			replace se_converted_41= se_e14_40 if missing(se_converted_41) & level_of_assignment=="cluster" & analytic_method=="no adjustment" & outcome_type=="continuous" 
 			tablist level_of_assignment outcome_type analytic_method n_i_indiv n_c_indiv n_avg_cluster icc se_e14_40 se_converted_41 if level_of_assignment=="cluster" & analytic_method=="no adjustment", sort(v) ab(32)
-			
+		
+	tablist study_id contrast_id es_id level_of_assignment outcome_type analytic_method se_e14_40 se_converted_41 if missing(se_converted_41), sort(v) ab(32) // (!) clean this up with Q's for team
+	replace se_converted_41=se_e14_40 if missing(se_converted_41)	
+		
 	/* Save final ES/SE conversion database */
 	quietly compress
 	sort contrast_simple_number
@@ -370,7 +379,11 @@ pause off
 * IV) DESCRIPTIVE STATISTICS
 *=========================================================================================     
 	
-	/* */
-
+	/* Effect sizes */
+	table (level_of_assignment outcome_type analytic_method), statistic(mean es_official_40 es_converted_41) statistic(n es_official_40 es_converted_41) nototals
+	
+	/* Standard errors */
+	table (level_of_assignment outcome_type analytic_method), statistic(mean se_e14_40 se_converted_41) statistic(n se_e14_40 se_converted_41)  nototals	
+	
 
 log close convert_es_se
