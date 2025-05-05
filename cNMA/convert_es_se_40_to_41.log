@@ -2,7 +2,7 @@
       name:  convert_es_se
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41.log
   log type:  text
- opened on:   5 May 2025, 18:47:44
+ opened on:   5 May 2025, 18:49:10
 
 . 
 . 
@@ -4591,15 +4591,15 @@ file C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-anal
 . * IV) DESCRIPTIVE STATISTICS
 . *=========================================================================================     
 .         
-.         log using "C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41_descriptives.log", replace name(convert_es_se_40_to_41_des)
+.         log using "$root\convert_es_se_40_to_41_descriptives.log", replace name(convert_es_se_40_to_41_des)
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
       name:  convert_es_se_40_to_41_des
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41_descriptives.log
   log type:  text
- opened on:   5 May 2025, 18:47:44
+ opened on:   5 May 2025, 18:49:10
 
-.         ////lllll
->                 /* Effect sizes */
+. 
+.                 /* Effect sizes */
 .                 summarize es_official_40 es_converted_41
 
     Variable |        Obs        Mean    Std. dev.       Min        Max
@@ -4677,7 +4677,7 @@ level of assignment                 |
       name:  convert_es_se_40_to_41_des
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41_descriptives.log
   log type:  text
- closed on:   5 May 2025, 18:47:45
+ closed on:   5 May 2025, 18:49:11
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 .         
@@ -4685,5 +4685,5 @@ level of assignment                 |
       name:  convert_es_se
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41.log
   log type:  text
- closed on:   5 May 2025, 18:47:45
+ closed on:   5 May 2025, 18:49:11
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

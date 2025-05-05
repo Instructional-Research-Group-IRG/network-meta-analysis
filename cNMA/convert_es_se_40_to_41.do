@@ -464,8 +464,8 @@ pause off
 * IV) DESCRIPTIVE STATISTICS
 *=========================================================================================     
 	
-	log using "C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41_descriptives.log", replace name(convert_es_se_40_to_41_des)
-	////lllll
+	log using "$root\convert_es_se_40_to_41_descriptives.log", replace name(convert_es_se_40_to_41_des)
+
 		/* Effect sizes */
 		summarize es_official_40 es_converted_41
 		table (level_of_assignment outcome_type analytic_method), statistic(mean es_official_40 es_converted_41) statistic(n es_official_40 es_converted_41) nototals
