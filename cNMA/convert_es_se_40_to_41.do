@@ -14,6 +14,7 @@ log using "C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network met
 ***    I) PREPARE CNMA DATABASE                                                               ***
 ***    II) CONVERT EFFECT SIZES FROM 4.0 to 4.1                                               ***
 ***    III) CONVERT STANDARD ERRORS OF EFFECT SIZES FROM 4.0 to 4.1                           ***
+***    IV) DESCRIPTIVE STATISTICS                                                             ***
 ***                                                                                           ***
 *** Authors: Seth B. Morgan                                                                   ***
 *** Start date: February 19, 2025                                                             ***
