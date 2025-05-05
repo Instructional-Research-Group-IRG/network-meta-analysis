@@ -2,29 +2,26 @@
       name:  convert_es_se
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41.log
   log type:  text
- opened on:   5 May 2025, 18:22:40
+ opened on:   5 May 2025, 18:47:44
 
 . 
 . 
 . *************************************************************************************************
 . ***                                                                                           ***
 . *** Program name: convert_es_se_40_to_41.do                                                   ***
-. *** Project: Component Network Meta-Analysis                                                                                              ***
+. *** Project: Component Network Meta-Analysis                                                  ***
 . *** Purpose: Convert effect sizes and their standard errors from 4.0 to 4.1 WWC Standards     ***    
-. ***                                                                                                                                                                                       ***
-. *** Contents:                                                                                                                                                             ***
-. ***    0) SET UP CODE                                                                                                                                             ***
-. ***    I) PREPARE CNMA DATABASE                                                                                                                           ***
-. ***    II) CONVERT EFFECT SIZES FROM 4.0 to 4.1                                                                                           ***
-. ***    III) CONVERT STANDARD ERRORS OF EFFECT SIZES FROM 4.0 to 4.1                                               ***
-. ***                                                                                                                                                                                       ***
-. *** Authors: Seth B. Morgan                                                                                                                                   ***
-. *** Start date: February 19, 2025                                                                                                                         ***
-. *** Last date modified: May 5, 2025                                                                                                           ***
-. ***                                                                                                                                                                                       ***
-. *** Notes:                                                                                                                                                                        ***
-. ***                                                                                                                                                                                       ***
-. ***                                                                                                                                                                                   ***
+. ***                                                                                           ***
+. *** Contents:                                                                                 ***
+. ***    0) SET UP CODE                                                                         ***
+. ***    I) PREPARE CNMA DATABASE                                                               ***
+. ***    II) CONVERT EFFECT SIZES FROM 4.0 to 4.1                                               ***
+. ***    III) CONVERT STANDARD ERRORS OF EFFECT SIZES FROM 4.0 to 4.1                           ***
+. ***                                                                                           ***
+. *** Authors: Seth B. Morgan                                                                   ***
+. *** Start date: February 19, 2025                                                             ***
+. *** Last date modified: May 5, 2025                                                           ***
+. ***                                                                                           ***
 . *************************************************************************************************
 . 
 . clear all
@@ -4595,15 +4592,14 @@ file C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-anal
 . *=========================================================================================     
 .         
 .         log using "C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41_descriptives.log", replace name(convert_es_se_40_to_41_des)
-(file C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41_descriptives.log not found)
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
       name:  convert_es_se_40_to_41_des
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41_descriptives.log
   log type:  text
- opened on:   5 May 2025, 18:22:41
+ opened on:   5 May 2025, 18:47:44
 
-.         
-.                 /* Effect sizes */
+.         ////lllll
+>                 /* Effect sizes */
 .                 summarize es_official_40 es_converted_41
 
     Variable |        Obs        Mean    Std. dev.       Min        Max
@@ -4681,7 +4677,7 @@ level of assignment                 |
       name:  convert_es_se_40_to_41_des
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41_descriptives.log
   log type:  text
- closed on:   5 May 2025, 18:22:41
+ closed on:   5 May 2025, 18:47:45
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 .         
@@ -4689,5 +4685,5 @@ level of assignment                 |
       name:  convert_es_se
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41.log
   log type:  text
- closed on:   5 May 2025, 18:22:41
+ closed on:   5 May 2025, 18:47:45
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

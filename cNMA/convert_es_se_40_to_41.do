@@ -6,22 +6,19 @@ log using "C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network met
 *************************************************************************************************
 ***                                                                                           ***
 *** Program name: convert_es_se_40_to_41.do                                                   ***
-*** Project: Component Network Meta-Analysis												  ***
+*** Project: Component Network Meta-Analysis                                                  ***
 *** Purpose: Convert effect sizes and their standard errors from 4.0 to 4.1 WWC Standards     ***    
-***																							  ***
-*** Contents:																				  ***
-***    0) SET UP CODE																		  ***
-***    I) PREPARE CNMA DATABASE																  ***
-***    II) CONVERT EFFECT SIZES FROM 4.0 to 4.1												  ***
-***    III) CONVERT STANDARD ERRORS OF EFFECT SIZES FROM 4.0 to 4.1     					  ***
-***																							  ***
-*** Authors: Seth B. Morgan																      ***
-*** Start date: February 19, 2025															  ***
-*** Last date modified: May 5, 2025												              ***
-***																							  ***
-*** Notes:																					  ***
-***																							  ***
-***																						      ***
+***                                                                                           ***
+*** Contents:                                                                                 ***
+***    0) SET UP CODE                                                                         ***
+***    I) PREPARE CNMA DATABASE                                                               ***
+***    II) CONVERT EFFECT SIZES FROM 4.0 to 4.1                                               ***
+***    III) CONVERT STANDARD ERRORS OF EFFECT SIZES FROM 4.0 to 4.1                           ***
+***                                                                                           ***
+*** Authors: Seth B. Morgan                                                                   ***
+*** Start date: February 19, 2025                                                             ***
+*** Last date modified: May 5, 2025                                                           ***
+***                                                                                           ***
 *************************************************************************************************
 
 clear all
@@ -468,7 +465,7 @@ pause off
 *=========================================================================================     
 	
 	log using "C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41_descriptives.log", replace name(convert_es_se_40_to_41_des)
-	
+	////lllll
 		/* Effect sizes */
 		summarize es_official_40 es_converted_41
 		table (level_of_assignment outcome_type analytic_method), statistic(mean es_official_40 es_converted_41) statistic(n es_official_40 es_converted_41) nototals
