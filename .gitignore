@@ -5,6 +5,7 @@
 
 archive/
 *.docx
+*.stswp
 Doing Meta-Analysis With R.R
 dat.lopez2019.txt
 metafor_CBT_example.R
