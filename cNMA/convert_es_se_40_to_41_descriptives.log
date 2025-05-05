@@ -1,0 +1,87 @@
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  convert_es_se_40_to_41_des
+       log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41_descriptives.log
+  log type:  text
+ opened on:   5 May 2025, 18:22:41
+
+.         
+.                 /* Effect sizes */
+.                 summarize es_official_40 es_converted_41
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+es_offici~40 |        395    .5341408    .6707549      -1.44       4.08
+es_conver~41 |        395    .5359458    .6745049      -1.44       4.08
+
+.                 table (level_of_assignment outcome_type analytic_method), statistic(mean es_official_40 es_converted_41) statistic(n es_official_40 es_converted_41) nototals
+
+----------------------------------------------------------------------------------------------------------------------------------
+                                    |                      Mean                                Number of nonmissing values        
+                                    |  official effect size, 4.0   effect size, 4.1   official effect size, 4.0   effect size, 4.1
+------------------------------------+---------------------------------------------------------------------------------------------
+level of assignment                 |                                                                                             
+  cluster                           |                                                                                             
+    outcome type                    |                                                                                             
+      continuous                    |                                                                                             
+        analytic method             |                                                                                             
+          HLM/multilevel regression |                   .4799333           .5309747                          15                 15
+          no adjustment             |                   1.106875           1.093442                           8                  8
+  individual                        |                                                                                             
+    outcome type                    |                                                                                             
+      continuous                    |                                                                                             
+        analytic method             |                                                                                             
+          HLM/multilevel regression |                   .2979861           .2979861                          72                 72
+          no adjustment             |                   .7097962           .7097962                         159                159
+          ANCOVA                    |                   .4001359           .4001359                         103                103
+          ANOVA F-test              |                     .28825             .28825                           4                  4
+          OLS regression            |                      1.354              1.354                           5                  5
+          t-stat                    |                       .086               .086                           1                  1
+      dichotomous                   |                                                                                             
+        analytic method             |                                                                                             
+          no adjustment             |                       .433             .46041                           2                  2
+----------------------------------------------------------------------------------------------------------------------------------
+
+.                 
+.                 /* Standard errors */
+.                 summarize se_e14_40 se_converted_41     
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+   se_e14_40 |        395    .2089367    .0948731        .07        .75
+se_conver~41 |        395    .2096194    .1084374   .0108108    .940756
+
+.                 table (level_of_assignment outcome_type analytic_method), statistic(mean se_e14_40 se_converted_41) statistic(n se_e14_40 se_converted_41)  nototals    
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                                    |                                    Mean                                                          Number of nonmissing values                      
+                                    |  standard error of effect size, 4.0   standard error of effect size, 4.1   standard error of effect size, 4.0   standard error of effect size, 4.1
+------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------
+level of assignment                 |                                                                                                                                                   
+  cluster                           |                                                                                                                                                   
+    outcome type                    |                                                                                                                                                   
+      continuous                    |                                                                                                                                                   
+        analytic method             |                                                                                                                                                   
+          HLM/multilevel regression |                                .182                             .2144485                                   15                                   15
+          no adjustment             |                               .2275                             .2808403                                    8                                    8
+  individual                        |                                                                                                                                                   
+    outcome type                    |                                                                                                                                                   
+      continuous                    |                                                                                                                                                   
+        analytic method             |                                                                                                                                                   
+          HLM/multilevel regression |                            .1593056                             .1369106                                   72                                   72
+          no adjustment             |                            .1937736                             .1937736                                  159                                  159
+          ANCOVA                    |                            .2380583                             .2363266                                  103                                  103
+          ANOVA F-test              |                                 .35                                  .35                                    4                                    4
+          OLS regression            |                                 .14                             .2552215                                    5                                    5
+          t-stat                    |                                 .35                                  .35                                    1                                    1
+      dichotomous                   |                                                                                                                                                   
+        analytic method             |                                                                                                                                                   
+          no adjustment             |                                .205                             .4904467                                    2                                    2
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+.         
+.         log close convert_es_se_40_to_41_des
+      name:  convert_es_se_40_to_41_des
+       log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41_descriptives.log
+  log type:  text
+ closed on:   5 May 2025, 18:22:41
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

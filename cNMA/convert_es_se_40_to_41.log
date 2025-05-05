@@ -2,7 +2,7 @@
       name:  convert_es_se
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41.log
   log type:  text
- opened on:   5 May 2025, 18:12:52
+ opened on:   5 May 2025, 18:22:40
 
 . 
 . 
@@ -4594,15 +4594,24 @@ file C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-anal
 . * IV) DESCRIPTIVE STATISTICS
 . *=========================================================================================     
 .         
-.         /* Effect sizes */
-.         summarize es_official_40 es_converted_41
+.         log using "C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41_descriptives.log", replace name(convert_es_se_40_to_41_des)
+(file C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41_descriptives.log not found)
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  convert_es_se_40_to_41_des
+       log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41_descriptives.log
+  log type:  text
+ opened on:   5 May 2025, 18:22:41
+
+.         
+.                 /* Effect sizes */
+.                 summarize es_official_40 es_converted_41
 
     Variable |        Obs        Mean    Std. dev.       Min        Max
 -------------+---------------------------------------------------------
 es_offici~40 |        395    .5341408    .6707549      -1.44       4.08
 es_conver~41 |        395    .5359458    .6745049      -1.44       4.08
 
-.         table (level_of_assignment outcome_type analytic_method), statistic(mean es_official_40 es_converted_41) statistic(n es_official_40 es_converted_41) nototals
+.                 table (level_of_assignment outcome_type analytic_method), statistic(mean es_official_40 es_converted_41) statistic(n es_official_40 es_converted_41) nototals
 
 ----------------------------------------------------------------------------------------------------------------------------------
                                     |                      Mean                                Number of nonmissing values        
@@ -4630,16 +4639,16 @@ level of assignment                 |
           no adjustment             |                       .433             .46041                           2                  2
 ----------------------------------------------------------------------------------------------------------------------------------
 
-.         
-.         /* Standard errors */
-.         summarize se_e14_40 se_converted_41     
+.                 
+.                 /* Standard errors */
+.                 summarize se_e14_40 se_converted_41     
 
     Variable |        Obs        Mean    Std. dev.       Min        Max
 -------------+---------------------------------------------------------
    se_e14_40 |        395    .2089367    .0948731        .07        .75
 se_conver~41 |        395    .2096194    .1084374   .0108108    .940756
 
-.         table (level_of_assignment outcome_type analytic_method), statistic(mean se_e14_40 se_converted_41) statistic(n se_e14_40 se_converted_41)  nototals    
+.                 table (level_of_assignment outcome_type analytic_method), statistic(mean se_e14_40 se_converted_41) statistic(n se_e14_40 se_converted_41)  nototals    
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
                                     |                                    Mean                                                          Number of nonmissing values                      
@@ -4668,10 +4677,17 @@ level of assignment                 |
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 .         
-. 
+.         log close convert_es_se_40_to_41_des
+      name:  convert_es_se_40_to_41_des
+       log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41_descriptives.log
+  log type:  text
+ closed on:   5 May 2025, 18:22:41
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+.         
 . log close convert_es_se
       name:  convert_es_se
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41.log
   log type:  text
- closed on:   5 May 2025, 18:12:53
+ closed on:   5 May 2025, 18:22:41
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
