@@ -1,8 +1,8 @@
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
       name:  convert_es_se_40_to_41_des
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41_descriptives.log
   log type:  text
- opened on:   5 May 2025, 19:07:05
+ opened on:  14 May 2025, 11:04:31
 
 . 
 .                 /* Effect sizes */
@@ -10,8 +10,8 @@
 
     Variable |        Obs        Mean    Std. dev.       Min        Max
 -------------+---------------------------------------------------------
-es_offici~40 |        395    .5341408    .6707549      -1.44       4.08
-es_conver~41 |        395    .5359458    .6745049      -1.44       4.08
+es_offici~40 |        376     .534616    .6754023      -1.44       4.08
+es_conver~41 |        376    .5365122    .6793134      -1.44       4.08
 
 .                 table (level_of_assignment outcome_type analytic_method), statistic(mean es_official_40 es_converted_41) statistic(n es_official_40 es_converted_41) nototals
 
@@ -30,7 +30,7 @@ level of assignment                 |
     outcome type                    |                                                                                             
       continuous                    |                                                                                             
         analytic method             |                                                                                             
-          HLM/multilevel regression |                   .2979861           .2979861                          72                 72
+          HLM/multilevel regression |                   .2778205           .2778205                          78                 78
           no adjustment             |                   .7097962           .7097962                         159                159
           ANCOVA                    |                   .4001359           .4001359                         103                103
           ANOVA F-test              |                     .28825             .28825                           4                  4
@@ -47,8 +47,8 @@ level of assignment                 |
 
     Variable |        Obs        Mean    Std. dev.       Min        Max
 -------------+---------------------------------------------------------
-   se_e14_40 |        395    .2089367    .0948731        .07        .75
-se_conver~41 |        395    .2096194    .1084374   .0108108    .940756
+   se_e14_40 |        376    .1990426    .0769598        .07        .39
+se_conver~41 |        376    .1996339    .0938992   .0108108    .940756
 
 .                 table (level_of_assignment outcome_type analytic_method), statistic(mean se_e14_40 se_converted_41) statistic(n se_e14_40 se_converted_41)  nototals    
 
@@ -61,13 +61,13 @@ level of assignment                 |
     outcome type                    |                                                                                                                                                   
       continuous                    |                                                                                                                                                   
         analytic method             |                                                                                                                                                   
-          HLM/multilevel regression |                                .182                             .2144485                                   15                                   15
+          HLM/multilevel regression |                                .182                             .2112958                                   15                                   15
           no adjustment             |                               .2275                             .2808403                                    8                                    8
   individual                        |                                                                                                                                                   
     outcome type                    |                                                                                                                                                   
       continuous                    |                                                                                                                                                   
         analytic method             |                                                                                                                                                   
-          HLM/multilevel regression |                            .1593056                             .1369106                                   72                                   72
+          HLM/multilevel regression |                            .1532051                             .1325329                                   78                                   78
           no adjustment             |                            .1937736                             .1937736                                  159                                  159
           ANCOVA                    |                            .2380583                             .2363266                                  103                                  103
           ANOVA F-test              |                                 .35                                  .35                                    4                                    4
@@ -83,5 +83,5 @@ level of assignment                 |
       name:  convert_es_se_40_to_41_des
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41_descriptives.log
   log type:  text
- closed on:   5 May 2025, 19:07:05
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ closed on:  14 May 2025, 11:04:32
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

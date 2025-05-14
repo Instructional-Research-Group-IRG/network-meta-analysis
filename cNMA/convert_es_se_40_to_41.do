@@ -18,7 +18,7 @@ log using "C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network met
 ***                                                                                           ***
 *** Authors: Seth B. Morgan                                                                   ***
 *** Start date: February 19, 2025                                                             ***
-*** Last date modified: May 5, 2025                                                           ***
+*** Last date modified: May 14, 2025                                                           ***
 ***                                                                                           ***
 *************************************************************************************************
 
@@ -59,7 +59,8 @@ pause off
 	
 	/*Keep only valid rows */
 	count
-	drop if missing(contrast_simple_number) // (!) Asking Sarah K. about the contrast IDs added to lines 400-508 of the database with no other info (no study ID, ES ID, effect size, se, etc.)
+	drop if missing(contrast_simple_number) // The entries without a contrast simple number in the conversion database (lines 400-508) do not have any relation to the conversion process and can be deleted and ignored (SKK).
+	drop if inlist(contrast_simple_number,"d","e","f","h","i") | inlist(contrast_simple_number,"j","k","l","m","n","o") // These are the studies that are rated as DNMS and therefore have some data, though incomplete in many cases. We do not need to attend to these contrasts because they were not used in the NNMA nor will they be used in the CNMA (SKK).
 	count
 	
 	/* Save cNMA database as .dta */
@@ -69,11 +70,7 @@ pause off
 	tab1 level_of_assignment analytic_method outcome_type, missing
 	tablist level_of_assignment outcome_type analytic_method, sort(v) ab(32)
 	tablist contrast_simple_number contrast_id study_id es_id if missing(outcome_type) & missing(level_of_assignment), sort(v) ab(32)	
-		/*
 		* study_id==MI21847; contrast_id==87196; es_id== 201: Outcome not included in MRG. Cannot determine from manuscript if info for outcome reported in Table 2 is for analyitc sample. ES and SE will retain 4.0 values since they cannot be recalculated.
-		* study_id==MI70138; contrast_id==90578; es_id== 335 - 340: "NP: I don't see this MRG in the Dropbox folder." // (!)
-		* contrast_simple_number d-o: Asking if these are additions by RTL b/c MRGs say not eligible/not reviewed but database inlcudes sample sizes, effect sizes, and standard errors for these. // (!)
-		*/
 		
 	/* Clean up string variables */
 	foreach var of varlist _all {
@@ -152,8 +149,6 @@ pause off
 
 	/* Prepare data and variables for ES conversions */
 	summarize es_official_40, detail
-	tablist study_id contrast_simple_number contrast_id es_id outcome outcome_type es_official_40 mrg_link if missing(es_official_40), sort(v) ab(32)
-		* study_id= MI70408; contrast_simple_number= n; contrast_id= 90506; es_id= 457; mrg_link= "No finalized reviews exist for this study. ""
 	generate es_converted_41=.
 	label variable es_converted_41 "effect size, 4.1"
 
@@ -263,15 +258,9 @@ pause off
 	
 	/* Finalize effect size conversions */
 	tablist contrast_simple_number study_id contrast_id es_id level_of_assignment outcome_type analytic_method es_official_40 es_converted_41 if missing(es_converted_41), sort(v) ab(32)
-		/*
 		* study_id==MI21847; contrast_id==87196; es_id== 201: Outcome not included in MRG. Cannot determine from manuscript if info for outcome reported in Table 2 is for analyitc sample. ES and SE will retain 4.0 values since they cannot be recalculated.
-		* study_id==93; contrast_id==; es_id== 335 - 340: "NP: I don't see this MRG in the Dropbox folder." // (!)
-		* contrast_simple_number d-o: Asking if these are additions by RTL b/c MRGs say not eligible/not reviewed but database inlcudes sample sizes, effect sizes, and standard errors for these. // (!)
-		*/
 
 	replace es_converted_41=es_official_40 if missing(es_converted_41)
-	tablist level_of_assignment outcome_type  analytic_method contrast_simple_number study_id contrast_id es_id es_official_40 es_converted_41 mrg_link if missing(es_converted_41), sort(v) ab(32)
-	replace es_converted_41=.m if missing(es_converted_41) // No finalized reviews exist for this study.
 	tablist level_of_assignment outcome_type  analytic_method contrast_simple_number study_id contrast_id es_id es_official_40 es_converted_41, sort(v) ab(32)
 	summarize es_official_40 es_converted_41
 	
@@ -382,8 +371,8 @@ pause off
 					  tablist level_of_assignment outcome_type analytic_method regression_coef study_clustered regression_coef_se_cc n_avg_cluster n_t_indiv icc if level_of_assignment=="cluster" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression","t-stat") & outcome_type=="continuous" & !missing(regression_coef_se_cc), sort(v) ab(32)
 					  // 𝛾= 1 − (2(𝑛−1)icc)/(N-2)) ; Table 2 note, supplement
 					  generate y= 1 - (  (2*(n_avg_cluster-1)*icc) / (n_t_indiv-2)  ) if level_of_assignment=="cluster" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression","t-stat") & outcome_type=="continuous" & !missing(regression_coef_se_cc)
-					  // ℎ =   [(𝑁−2)−2(𝑛−1)icc]^2    /   (𝑁−2)(1−icc)^2 + 𝑛(𝑁−2𝑛)icc^2 +2(𝑁−2𝑛)𝜌(1−icc) ; Table 2 note, supplement
-					  generate h= (   ( (n_t_indiv-2)-(2*(n_avg_cluster-1)*icc) )^2   )  /  (   ( (n_t_indiv-2)*((1-icc)^2) )  +  ( n_avg_cluster*(n_t_indiv-(2*n_avg_cluster))*(icc^2) )  +  ( 2*(n_t_indiv-(2*n_avg_cluster))*(1-icc) )   ) /// // (!) extra icc in denominator?
+					  // ℎ =   [(𝑁−2)−2(𝑛−1)icc]^2    /   (𝑁−2)(1−icc)^2 + 𝑛(𝑁−2𝑛)icc^2 +2(𝑁−2𝑛)icc(1−icc) ; Table 2 note, supplement
+					  generate h= (   ( (n_t_indiv-2)-(2*(n_avg_cluster-1)*icc) )^2   )  /  (   ( (n_t_indiv-2)*((1-icc)^2) )  +  ( n_avg_cluster*(n_t_indiv-(2*n_avg_cluster))*(icc^2) )  +  ( 2*(n_t_indiv-(2*n_avg_cluster))*(icc)*(1-icc) )   ) /// 
 								if level_of_assignment=="cluster" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression","t-stat") & outcome_type=="continuous" & !missing(regression_coef_se_cc)
 					
 					  tablist level_of_assignment outcome_type analytic_method regression_coef study_clustered regression_coef_se_cc n_avg_cluster n_t_indiv icc y h se_converted_41 if level_of_assignment=="cluster" & inlist(analytic_method,"ANCOVA","OLS regression","HLM/multilevel regression","t-stat") & outcome_type=="continuous" & !missing(regression_coef_se_cc), sort(v) ab(32)
@@ -442,14 +431,9 @@ pause off
 		
 	/* Finalize standard error conversions */
 	tablist contrast_simple_number study_id contrast_id es_id level_of_assignment outcome_type analytic_method se_e14_40 se_converted_41 if missing(se_converted_41), sort(v) ab(32)
-		/*
 		* study_id==MI21847; contrast_id==87196; es_id== 201: Outcome not included in MRG. Cannot determine from manuscript if info for outcome reported in Table 2 is for analyitc sample. ES and SE will retain 4.0 values since they cannot be recalculated.
-		* study_id==93; contrast_id==; es_id== 335 - 340: "NP: I don't see this MRG in the Dropbox folder." // (!)
-		* contrast_simple_number d-o: Asking if these are additions by RTL b/c MRGs say not eligible/not reviewed but database inlcudes sample sizes, effect sizes, and standard errors for these. // (!)
-		*/
+
 	replace se_converted_41=se_e14_40 if missing(se_converted_41)
-	tablist contrast_simple_number study_id contrast_id es_id level_of_assignment outcome_type analytic_method se_e14_40 se_converted_41 mrg_link if missing(se_converted_41), sort(v) ab(32)
-	replace se_converted_41=.m if missing(se_converted_41) // No finalized reviews exist for this study.
 	tablist contrast_simple_number study_id contrast_id es_id level_of_assignment outcome_type analytic_method se_e14_40 se_converted_41, sort(v) ab(32)
 	summarize se_e14_40 se_converted_41	
 		
