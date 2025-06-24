@@ -18,7 +18,7 @@ log using "C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network met
 ***                                                                                           ***
 *** Authors: Seth B. Morgan                                                                   ***
 *** Start date: February 19, 2025                                                             ***
-*** Last date modified: May 14, 2025                                                           ***
+*** Last date modified: June 24, 2025                                                           ***
 ***                                                                                           ***
 *************************************************************************************************
 
@@ -443,6 +443,7 @@ pause off
 	quietly compress
 	sort contrast_simple_number
 	save "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 COMPLETED.dta", replace 
+	export excel using "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 COMPLETED.xlsx", replace
 	
 	
 *=========================================================================================
