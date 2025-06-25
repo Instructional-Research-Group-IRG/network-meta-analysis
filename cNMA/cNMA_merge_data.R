@@ -1,4 +1,4 @@
-pacman::p_load(dplyr, tidyr, readxl, janitor, psych)
+pacman::p_load(dplyr, tidyr, readxl, janitor, psych, readr)
 
 # Load the cNMA data from Excel file in working directory
 
@@ -36,12 +36,14 @@ pacman::p_load(dplyr, tidyr, readxl, janitor, psych)
   describe(es_se_41_data$se_converted_41) # Should be n=376, mean=0.54, range= [0.01, 0.94]
   
   es_se_41_data_merge <- es_se_41_data %>%
-    select(study_id, contrast_id, es_id, es_converted_41, se_converted_41) 
+    select(study_id, contrast_id, es_id, contrast, domain, outcome, outcome_type,	level_of_assignment, analytic_method, es_converted_41, se_converted_41) 
+  write_csv(es_se_41_data_merge, 'es_se_41_data_merge.csv')
   
 # Merge the cNMA data with the updated ESs and SEs
   
   cNMA_data_4.1_merge <- cNMA_data %>%
-    select(study_id, contrast_id, es_id, simple_number) 
+    select(study_id, contrast_id, es_id, simple_number, contrast_name, measure_name, domain, effect_size, standard_error) 
+  write_csv(cNMA_data_4.1_merge, 'cNMA_data_4.1_merge.csv')
   
   # cNMA_data_4.1 <- cNMA_data %>%
   #   left_join(es_se_41_data_merge, by = c("study_id", "contrast_id", "es_id"))

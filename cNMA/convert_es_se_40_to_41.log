@@ -2,7 +2,7 @@
       name:  convert_es_se
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41.log
   log type:  text
- opened on:  24 Jun 2025, 17:59:21
+ opened on:  25 Jun 2025, 15:20:44
 
 . 
 . 
@@ -6117,7 +6117,7 @@ se_conver~41 |        376    .1996339    .0938992   .0108108    .940756
 .         save "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 COMPLETED.dta", replace 
 file C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\DATABASE Converting ESs and SEs from 4.0 to 4.1 COMPLETED.dta saved
 
-.         export excel using "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 COMPLETED.xlsx", replace
+.         export excel using "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 COMPLETED.xlsx", firstrow(variables) replace
 file C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\DATABASE Converting ESs and SEs from 4.0 to 4.1 COMPLETED.xlsx saved
 
 .         
@@ -6131,7 +6131,7 @@ file C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-anal
       name:  convert_es_se_40_to_41_des
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41_descriptives.log
   log type:  text
- opened on:  24 Jun 2025, 17:59:22
+ opened on:  25 Jun 2025, 15:20:45
 
 . 
 .                 /* Effect sizes */
@@ -6212,7 +6212,7 @@ level of assignment                 |
       name:  convert_es_se_40_to_41_des
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41_descriptives.log
   log type:  text
- closed on:  24 Jun 2025, 17:59:22
+ closed on:  25 Jun 2025, 15:20:45
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 .         
@@ -6220,5 +6220,5 @@ level of assignment                 |
       name:  convert_es_se
        log:  C:\Users\sethb\Documents\Career\freelance\IRG\assignments\network meta-analysis\network-meta-analysis\cNMA\convert_es_se_40_to_41.log
   log type:  text
- closed on:  24 Jun 2025, 17:59:22
+ closed on:  25 Jun 2025, 15:20:45
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

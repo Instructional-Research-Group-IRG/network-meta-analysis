@@ -443,7 +443,7 @@ pause off
 	quietly compress
 	sort contrast_simple_number
 	save "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 COMPLETED.dta", replace 
-	export excel using "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 COMPLETED.xlsx", replace
+	export excel using "$root\DATABASE Converting ESs and SEs from 4.0 to 4.1 COMPLETED.xlsx", firstrow(variables) replace
 	
 	
 *=========================================================================================
