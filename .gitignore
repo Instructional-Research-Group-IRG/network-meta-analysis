@@ -33,5 +33,4 @@ cNMA/dat_cNMS_icW.*
 cNMA/MRGs/*.pdf
 cNMA/CNMA Master Database 4-22-25*.xlsx
 cNMA/*.csv
-cNMA/cNMA_merge_check_Stata.do
 cnma_merge_errors.xlsx
