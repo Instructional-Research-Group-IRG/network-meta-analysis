@@ -24,6 +24,7 @@ NMA_counts_by_domain*
 NMA_output_check*
 new NMA check*
 NMA_metafor_allnodes_ic_osftest.R
+dat.lopez2019.R
 
 
 cNMA/Data inventory*.dta
@@ -34,3 +35,5 @@ cNMA/MRGs/*.pdf
 cNMA/CNMA Master Database 4-22-25*.xlsx
 cNMA/*.csv
 cnma_merge_errors.xlsx
+
+cNMA/CNMA*test*
