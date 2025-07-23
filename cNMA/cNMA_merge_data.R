@@ -1,4 +1,7 @@
-pacman::p_load(dplyr, tidyr, readxl, janitor, psych, readr)
+# This script merges the CNMA Master Database with the updated WWC v4.1 effect sizes (ESs) and standard errors (SEs) from the conversion database.
+
+# Load required packages
+  pacman::p_load(dplyr, tidyr, readxl, janitor, psych, readr)
 
 # Load the cNMA data from Excel file in working directory
 

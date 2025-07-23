@@ -1,8 +1,7 @@
-# Network meta-analysis (NMA) is a multivariate meta-regression technique for comparing multiple interventions from a network of studies 
-# within a single analysis. In effect, NMAs allow for comparisons of interventions not evaluated within the same study. Because a network 
-# meta-analysis accounts for all evidence, that is evidence from both direct and indirect comparisons, it produces more precise estimates 
-# than those obtained from a traditional multivariate meta-regression, which only includes direct comparisons of interventions. NMA also 
-# allows for the ranking of interventions.  
+# This script performs a network meta-analysis (NMA) of mathematics education interventions using outcomes in the general mathematics achievement and the whole and ration numbers domains. 
+# Sample: all nodes
+# Variable for defining outcome domain: domain
+# Disaggregated by domain: Yes
 
 # Load required packages
   
@@ -246,15 +245,6 @@
   str(num_contrasts_d1gma_long3)
   print(num_contrasts_d1gma_long3) 
  
-  # ## Remove one-contrast bundles
-  # print(num_contrasts_d1gma_long3) ##NL+RS bundle is in only one contrast
-  # tabyl(NMA_data_analysis_subset_grpID_d1gma$intervention_prelim)
-  # tabyl(NMA_data_analysis_subset_grpID_d1gma$comparison_prelim)
-  # NMA_data_analysis_subset_grpID_d1gma <- NMA_data_analysis_subset_grpID_d1gma %>% filter(intervention_prelim!="NL+RS")
-  # #NMA_data_analysis_subset_grpID_d1gma <- NMA_data_analysis_subset_grpID_d1gma %>% filter(comparison_prelim!="NL+RS")
-  # tabyl(NMA_data_analysis_subset_grpID_d1gma$intervention_prelim)
-  # tabyl(NMA_data_analysis_subset_grpID_d1gma$comparison_prelim)  
-   
   ## Calculate the number of students within each intervention bundle across all unique study-contrasts
   num_students_d1gma <- NMA_data_analysis_subset_grpID_d1gma %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
   print(num_students_d1gma)
@@ -536,15 +526,6 @@
   str(num_contrasts_d2rn_long3)
   print(num_contrasts_d2rn_long3)
   
-  ## Remove one-contrast bundles
-  # print(num_contrasts_d2rn_long3)
-  # tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
-  # tabyl(NMA_data_analysis_subset_grpID_d2rn$comparison_prelim)
-  # NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% filter(intervention_prelim!="NL+SE+VF+RS" & intervention_prelim!="SE+VF+RS")
-  # #NMA_data_analysis_subset_grpID_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% filter(comparison_prelim!="NL+SE+VF+RS" & comparison_prelim!="SE+VF+RS")
-  # tabyl(NMA_data_analysis_subset_grpID_d2rn$intervention_prelim)
-  # tabyl(NMA_data_analysis_subset_grpID_d2rn$comparison_prelim)  
-
   ## Calculate the number of students within each intervention bundle across all unique study-contrasts
   num_students_d2rn <- NMA_data_analysis_subset_grpID_d2rn %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
   print(num_students_d2rn)
@@ -832,16 +813,7 @@
   num_contrasts_d3wn_long3$intervention <- gsub("\\+", ".", num_contrasts_d3wn_long3$intervention)
   str(num_contrasts_d3wn_long3)
   print(num_contrasts_d3wn_long3) 
-  
-  # ## Remove one-contrast bundles
-  # print(num_contrasts_d3wn_long3)
-  # tabyl(NMA_data_analysis_subset_grpID_d3wn$intervention_prelim)
-  # tabyl(NMA_data_analysis_subset_grpID_d3wn$comparison_prelim)
-  # NMA_data_analysis_subset_grpID_d3wn <- NMA_data_analysis_subset_grpID_d3wn %>% filter(intervention_prelim!="NL+RS")
-  # #NMA_data_analysis_subset_grpID_d3wn <- NMA_data_analysis_subset_grpID_d3wn %>% filter(comparison_prelim!="NL+RS")
-  # tabyl(NMA_data_analysis_subset_grpID_d3wn$intervention_prelim)
-  # tabyl(NMA_data_analysis_subset_grpID_d3wn$comparison_prelim)   
-  
+
   ## Calculate the number of students within each intervention bundle across all unique study-contrasts
   num_students_d3wn <- NMA_data_analysis_subset_grpID_d3wn %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
   print(num_students_d3wn, n=Inf)

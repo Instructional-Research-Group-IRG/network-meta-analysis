@@ -37,3 +37,5 @@ cNMA/*.csv
 cnma_merge_errors.xlsx
 
 cNMA/CNMA*test*
+cNMA/dat_CNMAtest_v4.csv
+cnma_conversion_unmatched_postmerge_formatted*.xlsx

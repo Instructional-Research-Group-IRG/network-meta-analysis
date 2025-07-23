@@ -1,8 +1,7 @@
-# Network meta-analysis (NMA) is a multivariate meta-regression technique for comparing multiple interventions from a network of studies 
-# within a single analysis. In effect, NMAs allow for comparisons of interventions not evaluated within the same study. Because a network 
-# meta-analysis accounts for all evidence, that is evidence from both direct and indirect comparisons, it produces more precise estimates 
-# than those obtained from a traditional multivariate meta-regression, which only includes direct comparisons of interventions. NMA also 
-# allows for the ranking of interventions.  
+# This script performs a network meta-analysis (NMA) of mathematics education interventions using outcomes in the whole and ration numbers domains. 
+# Sample: all nodes
+# Variable for defining outcome domain: intervention_content
+# Disaggregated by domain: No
 
 # Load required packages
   
@@ -254,16 +253,7 @@
   num_contrasts_all_long3$intervention <- gsub("\\+", ".", num_contrasts_all_long3$intervention)
   str(num_contrasts_all_long3)
   print(num_contrasts_all_long3) 
- 
-  # ## Remove one-contrast bundles
-  # print(num_contrasts_all_long3) ##NL+RS bundle is in only one contrast
-  # tabyl(NMA_data_analysis_subset_grpID_all$intervention_prelim)
-  # tabyl(NMA_data_analysis_subset_grpID_all$comparison_prelim)
-  # NMA_data_analysis_subset_grpID_all <- NMA_data_analysis_subset_grpID_all %>% filter(intervention_prelim!="NL+RS")
-  # #NMA_data_analysis_subset_grpID_all <- NMA_data_analysis_subset_grpID_all %>% filter(comparison_prelim!="NL+RS")
-  # tabyl(NMA_data_analysis_subset_grpID_all$intervention_prelim)
-  # tabyl(NMA_data_analysis_subset_grpID_all$comparison_prelim)  
-   
+
   ## Calculate the number of students within each intervention bundle across all unique study-contrasts
   num_students_all <- NMA_data_analysis_subset_grpID_all %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
   print(num_students_all)

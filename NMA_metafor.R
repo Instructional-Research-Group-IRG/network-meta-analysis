@@ -1,8 +1,7 @@
-# Network meta-analysis (NMA) is a multivariate meta-regression technique for comparing multiple interventions from a network of studies 
-# within a single analysis. In effect, NMAs allow for comparisons of interventions not evaluated within the same study. Because a network 
-# meta-analysis accounts for all evidence, that is evidence from both direct and indirect comparisons, it produces more precise estimates 
-# than those obtained from a traditional multivariate meta-regression, which only includes direct comparisons of interventions. NMA also 
-# allows for the ranking of interventions.  
+# This script performs a network meta-analysis (NMA) of mathematics education interventions using outcomes in the general mathematics achievement and the whole and ration numbers domains. 
+# Sample: no one-contrast nodes
+# Variable for defining outcome domain: domain 
+# Disaggregated by domain: Yes
 
 # Load required packages
   
