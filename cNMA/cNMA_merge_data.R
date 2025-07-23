@@ -78,7 +78,9 @@
   #    left_join(es_se_41_data_merge_short, by = c("study_id", "contrast_id", "es_id"))  
   matched_count_postL <- cNMA_data_4.1_merge_postL %>% filter(!is.na(es_converted_41)) %>% nrow()
   matched_count_postL # 367/409 observations in cNMA database matched to conversion database. 367/367 observations in conversion database matched to cNMA (n=all). 
-
+  cNMA_data_4.1 <- cNMA_data_4.1_merge_postL #This is our final merged dataset.
+  cNMA_data_4.1 <- cNMA_data_4.1 %>% arrange(study_id, contrast_id, es_id)
+  
   cNMA_data_4.1_merge_postF <- cNMA_data_4.1_merge %>%
     full_join(es_se_41_data_merge, by = c("study_id", "contrast_id", "es_id"))
   matched_count_postF <- cNMA_data_4.1_merge_postF %>% filter(!is.na(cnma_row_num) & !is.na(esse_row_num)) %>% nrow()
