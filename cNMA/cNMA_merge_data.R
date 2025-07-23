@@ -72,27 +72,37 @@
     dplyr::select(study_id, contrast_id, es_id, contrast, domain, outcome, outcome_type,	level_of_assignment, analytic_method, es_converted_41, se_converted_41) 
   
 # Merge the cNMA data with the updated ESs and SEs
-   cNMA_data_4.1_merge_postL <- cNMA_data_4.1_merge %>%
+  cNMA_data_4.1_merge_postL <- cNMA_data_4.1_merge %>%
      left_join(es_se_41_data_merge, by = c("study_id", "contrast_id", "es_id")) #Use left join because we want to retain the observations in the CNMA Master Database
   # cNMA_data_4.1_merge_postL <- cNMA_data_4.1_merge_short %>%
   #    left_join(es_se_41_data_merge_short, by = c("study_id", "contrast_id", "es_id"))  
   matched_count_postL <- cNMA_data_4.1_merge_postL %>% filter(!is.na(es_converted_41)) %>% nrow()
   matched_count_postL # 367/409 observations in cNMA database matched to conversion database. 367/367 observations in conversion database matched to cNMA (n=all). 
+
+    ##Explore the 409 - 367 = 42 observations that did not match across the two databases. They should all be observations that are exclusive to the CNMA Master Database.
+    cNMA_data_4.1_merge_postF <- cNMA_data_4.1_merge %>%
+      full_join(es_se_41_data_merge, by = c("study_id", "contrast_id", "es_id"))
+    matched_count_postF <- cNMA_data_4.1_merge_postF %>% filter(!is.na(cnma_row_num) & !is.na(esse_row_num)) %>% nrow()
+    matched_count_postF  
+    
+    unmatched_postF <- cNMA_data_4.1_merge_postF %>% filter(is.na(cnma_row_num) | is.na(esse_row_num))
+      unmatched_postF %>% count() #48 unmatched from cNMA databae + 15 unmatched from conversion database = 63 total unmatched
+      unmatched_postF <- unmatched_postF %>% arrange(cnma_row_num, esse_row_num, study_id, contrast_id, es_id)
+      unmatched_postF <- unmatched_postF %>% mutate(cnma_data= !is.na(cnma_row_num))
+      unmatched_postF <- unmatched_postF %>% mutate(esse_data= !is.na(esse_row_num))
+      unmatched_postF <- unmatched_postF %>% relocate(cnma_data, esse_data)
+      unmatched_postF <- unmatched_postF %>% select(-cnma_row_num, -esse_row_num)
+      #View(unmatched_postF)
+      write_csv(unmatched_postF, 'cnma_esse_unmatched_postmerge.csv')
+  
+#Finalize the merged dataset  
   cNMA_data_4.1 <- cNMA_data_4.1_merge_postL #This is our final merged dataset.
+  cNMA_data_4.1 %>% count() #409
   cNMA_data_4.1 <- cNMA_data_4.1 %>% arrange(study_id, contrast_id, es_id)
-  
-  cNMA_data_4.1_merge_postF <- cNMA_data_4.1_merge %>%
-    full_join(es_se_41_data_merge, by = c("study_id", "contrast_id", "es_id"))
-  matched_count_postF <- cNMA_data_4.1_merge_postF %>% filter(!is.na(cnma_row_num) & !is.na(esse_row_num)) %>% nrow()
-  matched_count_postF
-  
-# Explore the 409 - 367 = 42 observations that did not match across the two databases. They should all be observations that are exclusive to the CNMA Master Database.
-  unmatched_postF <- cNMA_data_4.1_merge_postF %>% filter(is.na(cnma_row_num) | is.na(esse_row_num))
-  unmatched_postF %>% count() #48 unmatched from cNMA databae + 15 unmatched from conversion database = 63 total unmatched
-  unmatched_postF <- unmatched_postF %>% arrange(cnma_row_num, esse_row_num, study_id, contrast_id, es_id)
-  unmatched_postF <- unmatched_postF %>% mutate(cnma_data= !is.na(cnma_row_num))
-  unmatched_postF <- unmatched_postF %>% mutate(esse_data= !is.na(esse_row_num))
-  unmatched_postF <- unmatched_postF %>% relocate(cnma_data, esse_data)
-  unmatched_postF <- unmatched_postF %>% select(-cnma_row_num, -esse_row_num)
-  View(unmatched_postF)
-  write_csv(unmatched_postF, 'cnma_esse_unmatched_postmerge.csv')
+  cNMA_data_4.1 <- cNMA_data_4.1 %>%
+    mutate(effect_size_final = if_else(!is.na(es_converted_41), es_converted_41, effect_size))
+  cNMA_data_4.1 <- cNMA_data_4.1 %>%
+    mutate(standard_error_final = if_else(!is.na(se_converted_41), se_converted_41, standard_error))  
+  cNMA_data_4.1_check= cNMA_data_4.1 %>% select(study_id, contrast_id, es_id, effect_size, es_converted_41, effect_size_final, standard_error, se_converted_41, standard_error_final)
+  View(cNMA_data_4.1_check)
+  write_csv(cNMA_data_4.1_check, 'cNMA_data_4.1_check.csv')
