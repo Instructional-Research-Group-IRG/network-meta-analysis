@@ -24,8 +24,8 @@
   cNMA_data_4.1_merge <- cNMA_data_4.1_merge %>% arrange(study_id, contrast_id, es_id)
   cNMA_data_4.1_merge <- cNMA_data_4.1_merge %>% mutate(cnma_row_num = row_number()) #To help track which observations had a match in the merge
   cNMA_data_4.1_merge %>% count() #409
-  cNMA_data_4.1_merge_short <- cNMA_data_4.1_merge %>%
-    dplyr::select(study_id, contrast_id, es_id, simple_number, contrast_name, measure_name, domain, effect_size, standard_error) 
+  # cNMA_data_4.1_merge_short <- cNMA_data_4.1_merge %>%
+  #   dplyr::select(study_id, contrast_id, es_id, simple_number, contrast_name, measure_name, domain, effect_size, standard_error) 
 
 # Load effect sizes (ESs) and their standard errors (SEs) updated to WWC standards, version 4.1
   es_se_41_data <- read_xlsx("DATABASE Converting ESs and SEs from 4.0 to 4.1 COMPLETED.xlsx")
@@ -72,7 +72,6 @@
     dplyr::select(study_id, contrast_id, es_id, contrast, domain, outcome, outcome_type,	level_of_assignment, analytic_method, es_converted_41, se_converted_41) 
   
 # Merge the cNMA data with the updated ESs and SEs
-
    cNMA_data_4.1_merge_postL <- cNMA_data_4.1_merge %>%
      left_join(es_se_41_data_merge, by = c("study_id", "contrast_id", "es_id")) #Use left join because we want to retain the observations in the CNMA Master Database
   # cNMA_data_4.1_merge_postL <- cNMA_data_4.1_merge_short %>%
@@ -80,8 +79,12 @@
   matched_count_postL <- cNMA_data_4.1_merge_postL %>% filter(!is.na(es_converted_41)) %>% nrow()
   matched_count_postL # 367/409 observations in cNMA database matched to conversion database. 367/367 observations in conversion database matched to cNMA (n=all). 
 
-# Explore the 409 - 367 = 42 observations that did not match across the two databases. They should all be observations that are exclusive to the CNMA Master Database.
+  cNMA_data_4.1_merge_postF <- cNMA_data_4.1_merge %>%
+    full_join(es_se_41_data_merge, by = c("study_id", "contrast_id", "es_id"))
+  matched_count_postF <- cNMA_data_4.1_merge_postF %>% filter(!is.na(cnma_row_num) & !is.na(esse_row_num)) %>% nrow()
+  matched_count_postF
   
+# Explore the 409 - 367 = 42 observations that did not match across the two databases. They should all be observations that are exclusive to the CNMA Master Database.
   unmatched_postF <- cNMA_data_4.1_merge_postF %>% filter(is.na(cnma_row_num) | is.na(esse_row_num))
   unmatched_postF %>% count() #48 unmatched from cNMA databae + 15 unmatched from conversion database = 63 total unmatched
   unmatched_postF <- unmatched_postF %>% arrange(cnma_row_num, esse_row_num, study_id, contrast_id, es_id)
