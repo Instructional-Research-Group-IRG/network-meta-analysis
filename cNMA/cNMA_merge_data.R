@@ -8,7 +8,7 @@
   
   # Read the sheet
   #cNMA_data <- read_xlsx("CNMA Master Database 4-22-25 v2 BZfixed.xlsx", sheet = "Master Database")
-  cNMA_data <- read_sheet("https://docs.google.com/spreadsheets/d/11G1fDRmtuXgpUM2_bZCx4b9CuKP98sFTQkPayriyBp0/edit?gid=931222966#gid=931222966", sheet = "Master Database")  
+  cNMA_data <- read_sheet("https://docs.google.com/spreadsheets/d/1oCcRHU6OSc64OWVNLx1uksOu4QQlf2Xo7p4SZahPMio/edit?gid=931222966#gid=931222966", sheet = "Master Database")  
   str(cNMA_data)
   cNMA_data %>% count()
   
