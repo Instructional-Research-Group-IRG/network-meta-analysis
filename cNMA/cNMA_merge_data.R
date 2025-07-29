@@ -1,23 +1,33 @@
 # This script merges the CNMA Master Database with the updated WWC v4.1 effect sizes (ESs) and standard errors (SEs) from the conversion database.
 
 # Load required packages
-  pacman::p_load(dplyr, tidyr, readxl, janitor, psych, readr)
+  pacman::p_load(dplyr, tidyr, readxl, janitor, psych, readr, googlesheets4)
   options(max.print = 1000000)
 
 # Load the cNMA data from Excel file in working directory
-  cNMA_data <- read_xlsx("CNMA Master Database 4-22-25 v2 BZfixed.xlsx", sheet = "Master Database")
+  
+  # Read the sheet
+  #cNMA_data <- read_xlsx("CNMA Master Database 4-22-25 v2 BZfixed.xlsx", sheet = "Master Database")
+  cNMA_data <- read_sheet("https://docs.google.com/spreadsheets/d/11G1fDRmtuXgpUM2_bZCx4b9CuKP98sFTQkPayriyBp0/edit?gid=931222966#gid=931222966", sheet = "Master Database")  
   str(cNMA_data)
   cNMA_data %>% count()
   
   ##Check column/variable classes
   class(cNMA_data$study_id)
-  class(cNMA_data$contrast_id)
+  class(cNMA_data$contrast_id) #This is a list that needs to be converted to a character string.
   class(cNMA_data$es_id)
   
   ##Review column/variable values
   tabyl(cNMA_data$study_id)
   tabyl(cNMA_data$contrast_id)
   tabyl(cNMA_data$es_id)
+  
+  ##Make necessary corrections to CNMA Master Databasefor merging with the conversion database 
+  tabyl(cNMA_data$es_id)
+  # cNMA_data <- cNMA_data %>% mutate(es_id = replace(es_id, es_id == 104.5, 104)) # (?) es_id 104 already exists
+  # cNMA_data <- cNMA_data %>% mutate(es_id = replace(es_id, es_id == 105.5, 105)) # (?) es_id 105 already exists
+  # cNMA_data <- cNMA_data %>% mutate(es_id = replace(es_id, es_id == 107.5, 107)) # (?) es_id 107 already exists
+  # tabyl(cNMA_data$es_id)
   
   ##Prepare database for merging
   cNMA_data_4.1_merge <- cNMA_data
@@ -104,5 +114,5 @@
   cNMA_data_4.1 <- cNMA_data_4.1 %>%
     mutate(standard_error_final = if_else(!is.na(se_converted_41), se_converted_41, standard_error))  
   cNMA_data_4.1_check= cNMA_data_4.1 %>% select(study_id, contrast_id, es_id, effect_size, es_converted_41, effect_size_final, standard_error, se_converted_41, standard_error_final)
-  View(cNMA_data_4.1_check)
+  #View(cNMA_data_4.1_check)
   write_csv(cNMA_data_4.1_check, 'cNMA_data_4.1_check.csv')
