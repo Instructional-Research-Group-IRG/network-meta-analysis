@@ -16,30 +16,54 @@
 # Load (read) data (i.e., copy data to 'dat')
   cNMA_data_4.1 <- read_csv('cNMA_data_4.1.csv')
   
-# Merge on intervention_prelim & comparison_prelim  
-  NMA_data_analysis_subset_grpID_short <- NMA_data_analysis_subset_grpID  %>% rename(study_id=record_id)
-  NMA_data_analysis_subset_grpID_short <- NMA_data_analysis_subset_grpID_short %>% dplyr::select(study_id, contrast_id, es_id, intervention_prelim, comparison_prelim)
+  class(cNMA_data_4.1$study_id)
+  class(cNMA_data_4.1$contrast_id)
+  class(cNMA_data_4.1$es_id)
+  
+  cNMA_data_4.1 <- cNMA_data_4.1 %>% mutate(contrast_id = as.character(contrast_id))
+  class(cNMA_data_4.1$contrast_id)
+  tabyl(cNMA_data_4.1$contrast_id)
+  
+# Merge on intervention_prelim & comparison_prelim to cNMA_data_4.1 intervention and comparison columns are added to the CNMA database 
+  NNMA_Data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_mN43K7HH3C7WhsPMnPsB1HDuRLE4/edit#gid=0") #Full data set
+  
+  NMA_data_analysis_subset <- subset(NNMA_Data, (measure_type=="Main" | measure_type=="Follow Up (10-14 Days)") & aggregated=="IN" & (wwc_rating=="MWOR" | wwc_rating=="MWR") & (TvsT==1 | TvsT==0))
+  NMA_data_analysis_subset <- NMA_data_analysis_subset  %>% rename(study_id=record_id)  
+  
+  class(NMA_data_analysis_subset$contrast_id)
+  NMA_data_analysis_subset <- NMA_data_analysis_subset %>% mutate(contrast_id = as.character(contrast_id))
+  class(NMA_data_analysis_subset$contrast_id)
+  tabyl(NMA_data_analysis_subset$contrast_id)
+  NMA_data_analysis_subset$contrast_id <- gsub("_disagg", "", NMA_data_analysis_subset$contrast_id) # "_disagg" dropped from contrast IDs in the CNMA Master Database
+  NMA_data_analysis_subset$contrast_id <- tolower(NMA_data_analysis_subset$contrast_id) # Convert contrast IDs to lowercase to match CNMA Master Database
+  NMA_data_analysis_subset$contrast_id <- gsub("87213_t2", "87213_a", NMA_data_analysis_subset$contrast_id) # "87213_t2" changed to "87213_a" in the CNMA Master Database
+  tabyl(NMA_data_analysis_subset$contrast_id)
+  
+  NMA_data_analysis_subset_short <- NMA_data_analysis_subset %>% dplyr::select(study_id, contrast_id, es_id, intervention_prelim, comparison_prelim)
+  
   cNMA_data_4.1 <- cNMA_data_4.1 %>%
-    right_join(NMA_data_analysis_subset_grpID_short, by = c("study_id", "contrast_id", "es_id")) #Use left join because we want to retain the observations in the CNMA Master Database
-
+    inner_join(NMA_data_analysis_subset_short, by = c("study_id", "contrast_id", "es_id")) #Use left join because we want to retain the observations in the CNMA Master Database
+  cNMA_data_4.1 <- cNMA_data_4.1 %>% filter(!is.na(intervention_prelim) & !is.na(comparison_prelim)) # Drop rows where intervention_prelim or comparison_prelim is NA
+  
+  ## Calculate variance from standard error and sample size
+  cNMA_data_4.1_icW <- cNMA_data_4.1_icW %>% mutate(sample_size= intervention_n + comparison_n)
+  cNMA_data_4.1_icW <- cNMA_data_4.1_icW %>% mutate(variance = ((standard_error_final^2) * sample_size)) # SE^2 x n
+  describe(cNMA_data_4.1_icW$standard_error_final)
+  describe(cNMA_data_4.1_icW$variance)
+  cNMA_data_4.1_icW_Vcheck <- cNMA_data_4.1_icW %>% dplyr::select(study_id, contrast_id, es_id, domain, intervention_content, sample_size, standard_error_final, variance, intervention_prelim, comparison_prelim)
+  View(cNMA_data_4.1_icW_Vcheck)
+  
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: intervention_content == "Whole Numbers (W)"
 
   ## Subset analysis data frame further to just the Whole Numbers (W) intervention content (icW)
   tabyl(cNMA_data_4.1$intervention_content)
   tabyl(cNMA_data_4.1$domain)
-  cNMA_data_4.1_domain <- cNMA_data_4.1 %>% dplyr::select(study_id, contrast_id, es_id, domain, intervention_content)
-  
+  cNMA_data_4.1 %>% count(domain, intervention_content, sort = TRUE)
+
   cNMA_data_4.1_icW <- cNMA_data_4.1 %>% filter(intervention_content == "W")
   tabyl(cNMA_data_4.1_icW$intervention_content)
   cNMA_data_4.1_icW_c <- cNMA_data_4.1_icW %>% distinct(contrast_id, .keep_all = TRUE)
   cNMA_data_4.1_icW_c %>% count()
-  
-  cNMA_data_4.1_icW <- cNMA_data_4.1_icW %>% mutate(sample_size= intervention_n + comparison_n)
-  cNMA_data_4.1_icW <- cNMA_data_4.1_icW %>% mutate(variance = ((standard_error_final^2) * sample_size)) # SE^2 x n
-  describe(cNMA_data_4.1_icW$standard_error_final)
-  describe(cNMA_data_4.1_icW$variance)
-  cNMA_data_4.1_icW_Vcheck <- cNMA_data_4.1_icW %>% dplyr::select(study_id, contrast_id, es_id, domain, intervention_content, sample_size, standard_error_final, variance) # Check for negative variances
-  #View(cNMA_data_4.1_icW_Vcheck)
   
   ## Pooling ESs at the contrast level using metafor
   mod_es_icW <- rma.mv(yi = effect_size_final, V = variance, data = cNMA_data_4.1_icW,
