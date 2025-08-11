@@ -96,9 +96,9 @@
   mod_addCNMA_icW <- netcomb(mod_baseNMA_icW, inactive = "BAU")
   mod_addCNMA_icW
   
-# Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: intervention_content == "Rational Numbers (W)"
+# Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: intervention_content == "Rational Numbers (R)"
   
-  ## Subset analysis data frame further to just the Rational Numbers (R) intervention content (icW)
+  ## Subset analysis data frame further to just the Rational Numbers (R) intervention content (icR)
   tabyl(cNMA_data_4.1$intervention_content)
   tabyl(cNMA_data_4.1$domain)
   cNMA_data_4.1 %>% count(domain, intervention_content, sort = TRUE)
@@ -128,7 +128,7 @@
   
   ## Base NMA and Additive CNMA
   mod_baseNMA_icR <- netmeta(pooled_es, pooled_se, intervention_prelim, comparison_prelim, studlab = contrast_id,
-                             data = dat_es_icR, ref = "BAU", sm = "SMD", common = FALSE, method.tau = "REML")
+                             data = dat_es_icR, ref = "BAU", sm = "SMD", common = FALSE, method.tau = "REML", )
   
   mod_addCNMA_icR <- netcomb(mod_baseNMA_icR, inactive = "BAU")
   mod_addCNMA_icR  

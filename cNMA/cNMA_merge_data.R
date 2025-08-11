@@ -6,7 +6,7 @@
 
 # Load the cNMA data from Excel file in working directory
   
-  # Read the sheet
+  ## Read the sheet
   cNMA_data <- read_sheet("https://docs.google.com/spreadsheets/d/1oCcRHU6OSc64OWVNLx1uksOu4QQlf2Xo7p4SZahPMio/edit?gid=931222966#gid=931222966", sheet = "Master Database")  
   str(cNMA_data)
   cNMA_data %>% count() # n=424
@@ -78,7 +78,9 @@
   es_se_41_data_merge <- es_se_41_data_merge %>% mutate(esse_row_num = row_number()) #To help track which observations had a match in the merge
   es_se_41_data_merge %>% count() # n=367
   es_se_41_data_merge_short <- es_se_41_data_merge %>%
-    dplyr::select(study_id, contrast_id, es_id, es_converted_41, se_converted_41, esse_row_num) 
+    dplyr::select(study_id, contrast_id, es_id, es_converted_41, se_converted_41, esse_row_num, outcome, domain) 
+  es_se_41_data_merge_short <- es_se_41_data_merge_short %>% rename(measure_name_conversion=outcome)
+  es_se_41_data_merge_short <- es_se_41_data_merge_short %>% rename(domain_conversion=domain)
   
 # Merge the cNMA data with the updated ESs and SEs
   cNMA_data_4.1_merge_postL <- cNMA_data_4.1_merge %>%
@@ -89,8 +91,10 @@
     ##Explore the 424 - 367 = 57 observations that did not match across the two databases. They should all be observations that are exclusive to the CNMA Master Database.
     cNMA_data_4.1_merge_postF <- cNMA_data_4.1_merge %>%
       full_join(es_se_41_data_merge_short, by = c("study_id", "contrast_id", "es_id"))
+    merge_check <- cNMA_data_4.1_merge_postF %>% dplyr::filter(es_id >=104 & es_id < 108) # Check that all es_ids in the conversion database are matched to the CNMA Master Database)
+    write_csv(merge_check, 'merge_check.csv')
     matched_count_postF <- cNMA_data_4.1_merge_postF %>% filter(!is.na(cnma_row_num) & !is.na(esse_row_num)) %>% nrow()
-    matched_count_postF  
+    matched_count_postF 
     
     unmatched_postF <- cNMA_data_4.1_merge_postF %>% filter(is.na(cnma_row_num) | is.na(esse_row_num))
       unmatched_postF %>% count() # n=57 unmatched 
