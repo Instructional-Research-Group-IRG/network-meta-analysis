@@ -532,7 +532,7 @@
       #      vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_all_long5$intervention_comparison, vertex.label.dist=num_students_all_long4$dist)      
  
     ### Create funnel plot to assess publication bias
-      metafor::funnel(res_mod_all, yaxis="sei", main="Funnel Plot for the RN-NMA", xlab="Effect Size", ylab="Standard Error")           
+      metafor::funnel(res_mod_all, yaxis="sei", main="Funnel Plot for the NMA", xlab="Effect Size", ylab="Standard Error")           
 
       
 #===================================== ANALYSIS SAMPLE SIZES =====================================#        
