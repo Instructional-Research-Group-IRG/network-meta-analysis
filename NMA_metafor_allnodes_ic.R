@@ -15,8 +15,9 @@
 
 # Load (read) data (i.e., copy data to 'dat')
   #dat <- read_sheet("https://docs.google.com/spreadsheets/d/1bWugw06yFyetIVYlhAHHzM_d3KGhegxxLBm-5463j2Q/edit#gid=0") #Test data
-  NNMA_Data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_mN43K7HH3C7WhsPMnPsB1HDuRLE4/edit#gid=0") #Full data set
-
+  #NNMA_Data <- read_sheet("https://docs.google.com/spreadsheets/d/1cv5ftm6-XV28pZ_mN43K7HH3C7WhsPMnPsB1HDuRLE4/edit#gid=0") #Full data set
+  NNMA_Data <- read_sheet("https://docs.google.com/spreadsheets/d/1ayNoKwbxnUVa1XspqAWpS2YBFIwApvS5t3lld5Kx2VA/edit?gid=0#gid=0", sheet="Master Database") # <<Copy of NNMA Master Database - March 17, 11:18 AM>>; The master database changed after submission of publication in late March 2025. This recovered older version from 3/17/25 reproduces the results reported in the publication.
+  
   ## Explore data  
   NNMA_Data %>% count() 
   head(NNMA_Data)
@@ -641,7 +642,11 @@
       #      layout=layout_in_circle(g, order=c("BAU", "RS","NL+RS","FF","FF+RS")),
       #      vertex.size=log((num_students_icW_long5$sum_num_students_bundle3))*2.5, vertex.color=num_students_icW_long4$color,
       #      vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_icW_long5$intervention_comparison, vertex.label.dist=num_students_icW_long4$dist)      
-      
+
+    ### Create funnel plot to assess publication bias
+      metafor::funnel(res_mod_icW, yaxis="sei", main="Funnel Plot for the WN-NMA", xlab="Effect Size", ylab="Standard Error")
+        
+            
 # Execute network meta-analysis using a contrast-based random-effects model using BAU as the reference condition: intervention_content == "Rational Numbers (R)"
       
   ## Subset analysis data frame further to just the Rational Numbers (R) intervention content (icR)
@@ -1078,7 +1083,9 @@
       #      vertex.size=log((num_students_icR_long5$sum_num_students_bundle3))*2.5, vertex.color=num_students_icR_long4$color,
       #      vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_icR_long5$intervention_comparison, vertex.label.dist=num_students_icR_long4$dist)
 
-
+    ### Create funnel plot to assess publication bias
+      metafor::funnel(res_mod_icR, yaxis="sei", main="Funnel Plot for the RN-NMA", xlab="Effect Size", ylab="Standard Error")
+      
 #===================================== ANALYSIS SAMPLE SIZES =====================================#        
 
 # Combine final analysis files by domain
