@@ -293,6 +293,87 @@
                             data=NMA_data_analysis_subset_grpID_icW)
     summary(res_mod_icW) 
 
+    res_mod_icW_var <- rma.mv(effect_size, variance, #using variance instead of the variance-covariance matrix as a sensitivity check
+                          mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS - 1, # BAU is excluded to serve as the reference level for the comparisons.
+                          random = ~ 1 | record_id/es_id,
+                          rho=0.60,
+                          data=NMA_data_analysis_subset_grpID_icW)
+    summary(res_mod_icW_var)
+    
+    ### Fit standard pairwise meta-analysis model for "RS vs BAU" only as a check that the indirect evidence is being correctly estimated by and included in the results of the NMA model above
+    NMA_data_analysis_subset_grpID_icW_RS <- NMA_data_analysis_subset_grpID_icW %>% filter((intervention_prelim=="RS" & comparison_prelim=="BAU") | (intervention_prelim=="BAU" & comparison_prelim=="RS"))
+    
+    tabyl(NMA_data_analysis_subset_grpID_icW_RS$intervention_prelim)
+    tabyl(NMA_data_analysis_subset_grpID_icW_RS$comparison_prelim)
+    V_list_RS <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_icW_RS)
+    
+    res_mod_icW_RS <- rma.mv(effect_size, V_list_RS, 
+                             mods = ~ RS - 1, # BAU is excluded to serve as the reference level for the comparisons.
+                             random = ~ 1 | record_id/es_id, 
+                             rho=0.60, 
+                             data=NMA_data_analysis_subset_grpID_icW_RS)
+    summary(res_mod_icW_RS) 
+    
+    res_mod_icW_RS <- rma.mv(effect_size, V_list_RS, 
+                             random = ~ 1 | record_id/es_id, 
+                             rho=0.60, 
+                             data=NMA_data_analysis_subset_grpID_icW_RS)
+    summary(res_mod_icW_RS) 
+    
+    res_mod_icW_RS <- rma.mv(effect_size, V_list_RS, 
+                          random = ~ 1 | record_id/es_id, 
+                          rho=0.60, 
+                          data= subset(NMA_data_analysis_subset_grpID_icW, intervention_prelim=="RS" & comparison_prelim=="BAU"))
+    summary(res_mod_icW_RS)   
+    
+    
+    res_mod_icW_RS <- rma.mv(effect_size, variance, 
+                             mods = ~ RS - 1, # BAU is excluded to serve as the reference level for the comparisons.
+                             random = ~ 1 | record_id/es_id, 
+                             rho=0.60, 
+                             data=NMA_data_analysis_subset_grpID_icW_RS)
+    summary(res_mod_icW_RS) 
+    
+    res_mod_icW_RS <- rma.mv(effect_size, variance, 
+                             random = ~ 1 | record_id/es_id, 
+                             rho=0.60, 
+                             data=NMA_data_analysis_subset_grpID_icW_RS)
+    summary(res_mod_icW_RS) 
+
+    
+    res_mod_icW <- rma.mv(effect_size, variance, 
+                          random = ~ 1 | record_id/es_id, 
+                          rho=0.60, 
+                          data= subset(NMA_data_analysis_subset_grpID_icW, (intervention_prelim=="RS" & comparison_prelim=="BAU" | intervention_prelim=="BAU" & comparison_prelim=="RS")))
+    summary(res_mod_icW)        
+    
+    #FF
+    NMA_data_analysis_subset_grpID_icW_FF <- NMA_data_analysis_subset_grpID_icW %>% filter((intervention_prelim=="FF" & comparison_prelim=="BAU") | (intervention_prelim=="BAU" & comparison_prelim=="FF"))
+    
+    tabyl(NMA_data_analysis_subset_grpID_icW_FF$intervention_prelim)
+    tabyl(NMA_data_analysis_subset_grpID_icW_FF$comparison_prelim)
+    V_list_FF <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_icW_FF)
+    
+    res_mod_icW_FF <- rma.mv(effect_size, V_list_FF, 
+                             mods = ~ FF - 1, # BAU is excluded to serve as the reference level for the comparisons.
+                             random = ~ 1 | record_id/es_id, 
+                             rho=0.60, 
+                             data=NMA_data_analysis_subset_grpID_icW_FF)
+    summary(res_mod_icW_FF)
+    
+    res_mod_icW_FF <- rma.mv(effect_size, variance, 
+                             mods = ~ FF - 1, # BAU is excluded to serve as the reference level for the comparisons.
+                             random = ~ 1 | record_id/es_id, 
+                             rho=0.60, 
+                             data=NMA_data_analysis_subset_grpID_icW_FF)
+    summary(res_mod_icW_FF)
+    
+    res_mod_icW <- rma.mv(effect_size, variance, 
+                          random = ~ 1 | record_id/es_id, 
+                          rho=0.60, 
+                          data= subset(NMA_data_analysis_subset_grpID_icW, (intervention_prelim=="FF" & comparison_prelim=="BAU" | intervention_prelim=="BAU" & comparison_prelim=="FF")))
+    summary(res_mod_icW) 
+    
     ### Fit Jackson's model to test for inconsistency 
     
       #### Note: First create both a contrast variable and design variable to enter into the random argument as the inconsistency variance component for testing for inconsistency.
