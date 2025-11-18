@@ -252,15 +252,18 @@
   print(num_contrasts_icW_long3) 
 
   ## Calculate the number of students within each intervention bundle across all unique study-contrasts
-  num_students_icW <- NMA_data_analysis_subset_grpID_icW %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
-  print(num_students_icW)
-  num_students_icW2 <- num_students_icW %>% distinct(record_id, contrast_id, .keep_all = TRUE) #Keep only unique entries of each unique study-contrast so that each group of students is not summed more than once (because of multiple measures within some contrasts).
-  print(num_students_icW2) 
-  num_students_icW_long <- num_students_icW2 %>% pivot_longer(c(intervention_prelim, comparison_prelim ), names_to= "group_IC", values_to="intervention_comparison") #Put intervention and comparison groups in same row for summing students receiving the same intervention bundle regardless of whether it was received in the intervention or comparison group assignment.
+  num_students_icW <- NMA_data_analysis_subset_grpID_icW %>% dplyr::select(record_id, contrast_id, intervention_content, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
+  print(num_students_icW, n=Inf)
+  num_students_icW2 <- num_students_icW %>% distinct(record_id, contrast_id, .keep_all = TRUE) #Keep only one entry of each unique study-contrast so that each group of students is not double counted for each measure within the same contrast (because of multiple measures within some contrasts).
+  print(num_students_icW2, n=Inf)
+  num_students_icW_long <- num_students_icW2 %>% pivot_longer(c(intervention_prelim, comparison_prelim ), names_to= "group_IC", values_to="intervention_comparison") #Put intervention and comparison group assignments in same column.
   print(num_students_icW_long, n=20)
-  num_students_icW_long2 <- num_students_icW_long %>% mutate(num_students_bundle= ifelse(group_IC == "intervention_prelim", intervention_n, comparison_n)) # Put number of students by assignment group in same column condition on the intervention/comparison group assignment.
+  num_students_icW_long2 <- num_students_icW_long %>% mutate(num_students_bundle= ifelse(group_IC == "intervention_prelim", intervention_n, comparison_n)) # Put number of students by assignment group in same column matching the intervention/comparison group assignment.
+  num_students_icW_long2 <- num_students_icW_long2 %>% dplyr::select(record_id, group_IC, intervention_comparison, num_students_bundle)
   print(num_students_icW_long2)
-  num_students_icW_long3 <- num_students_icW_long2 %>% group_by(intervention_comparison) %>% summarize(sum_num_students_bundle= sum(num_students_bundle)) # Sum students by intervention bundle.
+  num_students_icW_long2_1 <- num_students_icW_long2 %>% distinct(record_id, intervention_comparison, .keep_all = TRUE) #Keep only one row of each unique intervention bundle within each study so that each group of students of a specific assignment group is not summed more than once across multiple contrasts of the same study (because of multiple contrasts within some studies). We assume these are the same groups of students in these cases.
+  print(num_students_icW_long2_1)
+  num_students_icW_long3 <- num_students_icW_long2_1 %>% group_by(intervention_comparison) %>% summarize(sum_num_students_bundle= sum(num_students_bundle)) # Sum students by intervention bundle.
   str(num_students_icW_long3)
   print(num_students_icW_long3)
   target_icW <- c("BAU","FF","FF+RS","NL+FF+RS","NL+RS","RS","VF+FF+RS","VF+RS")
@@ -761,16 +764,19 @@
   print(num_contrasts_icR_long3)
 
   ## Calculate the number of students within each intervention bundle across all unique study-contrasts
-  num_students_icR <- NMA_data_analysis_subset_grpID_icR %>% dplyr::select(record_id, contrast_id, domain, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
-  print(num_students_icR)
-  num_students_icR2 <- num_students_icR %>% distinct(record_id, contrast_id, .keep_all = TRUE) #Keep only unique entries of each unique study-contrast so that each group of students is not summed more than once (because of multiple measures within some contrasts).
-  print(num_students_icR2) 
-  num_students_icR_long <- num_students_icR2 %>% pivot_longer(c(intervention_prelim, comparison_prelim ), names_to= "group_IC", values_to="intervention_comparison") #Put intervention and comparison groups in same row for summing students receiving the same intervention bundle regardless of whether it was received in the intervention or comparison group assignment.
-  print(num_students_icR_long, n=20)
-  num_students_icR_long2 <- num_students_icR_long %>% mutate(num_students_bundle= ifelse(group_IC == "intervention_prelim", intervention_n, comparison_n)) # Put number of students by assignment group in same column condition on the intervention/comparison group assignment.
-  print(num_students_icR_long2)
-  num_students_icR_long3 <- num_students_icR_long2 %>% group_by(intervention_comparison) %>% summarize(sum_num_students_bundle= sum(num_students_bundle)) # Sum students by intervention bundle.
-  str(num_students_icR_long3)
+  num_students_icR <- NMA_data_analysis_subset_grpID_icR %>% dplyr::select(record_id, contrast_id, intervention_content, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
+  print(num_students_icR, n=Inf)
+  num_students_icR2 <- num_students_icR %>% distinct(record_id, contrast_id, .keep_all = TRUE) #Keep only one entry of each unique study-contrast so that each group of students is not double counted for each measure within the same contrast (because of multiple measures within some contrasts).
+  print(num_students_icR2, n=Inf)
+  num_students_icR_long <- num_students_icR2 %>% pivot_longer(c(intervention_prelim, comparison_prelim ), names_to= "group_IC", values_to="intervention_comparison") #Put intervention and comparison group assignments in same column.
+  print(num_students_icR_long, n=Inf)
+  num_students_icR_long2 <- num_students_icR_long %>% mutate(num_students_bundle= ifelse(group_IC == "intervention_prelim", intervention_n, comparison_n)) #Put number of students by assignment group in same column matching the intervention/comparison group assignment.
+  print(num_students_icR_long2, n=Inf)
+  num_students_icR_long2 <- num_students_icR_long2 %>% dplyr::select(record_id, group_IC, intervention_comparison, num_students_bundle)
+  print(num_students_icR_long2, n=Inf)
+  num_students_icR_long2_1 <- num_students_icR_long2 %>% distinct(record_id, intervention_comparison, .keep_all = TRUE) #Keep only one row of each unique intervention bundle within each study so that each group of students of a specific assignment group is not summed more than once across multiple contrasts of the same study (because of multiple contrasts within some studies). We assume these are the same groups of students in these cases.
+  print(num_students_icR_long2_1, n=Inf)
+  num_students_icR_long3 <- num_students_icR_long2_1 %>% group_by(intervention_comparison) %>% summarize(sum_num_students_bundle= sum(num_students_bundle)) # Sum students by intervention bundle.
   print(num_students_icR_long3)
   target_icR <- c("BAU","NL+FF+RS","NL+RS","NL+SE+FF+RS","NL+SE+RS","NL+SE+VF+RS","RS","SE+RS")
   num_students_icR_long3 <- num_students_icR_long3[match(target_icR, num_students_icR_long3$intervention_comparison),]
