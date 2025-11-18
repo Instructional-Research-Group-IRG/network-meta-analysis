@@ -293,229 +293,229 @@
                             data=NMA_data_analysis_subset_grpID_icW)
     summary(res_mod_icW) 
 
-    res_mod_icW_var <- rma.mv(effect_size, variance, #using variance instead of the variance-covariance matrix as a sensitivity check
-                          mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS - 1, # BAU is excluded to serve as the reference level for the comparisons.
-                          random = ~ 1 | record_id/es_id,
-                          rho=0.60,
-                          data=NMA_data_analysis_subset_grpID_icW)
-    summary(res_mod_icW_var)
+    # res_mod_icW_var <- rma.mv(effect_size, variance, #using variance instead of the variance-covariance matrix as a sensitivity check
+    #                       mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS - 1, # BAU is excluded to serve as the reference level for the comparisons.
+    #                       random = ~ 1 | record_id/es_id,
+    #                       rho=0.60,
+    #                       data=NMA_data_analysis_subset_grpID_icW)
+    # summary(res_mod_icW_var)
+    # 
+    # ### Fit standard pairwise meta-analysis model for "RS vs BAU" only as a check that the indirect evidence is being correctly estimated by and included in the results of the NMA model above
+    # NMA_data_analysis_subset_grpID_icW_RS <- NMA_data_analysis_subset_grpID_icW %>% filter((intervention_prelim=="RS" & comparison_prelim=="BAU") | (intervention_prelim=="BAU" & comparison_prelim=="RS"))
+    # 
+    # tabyl(NMA_data_analysis_subset_grpID_icW_RS$intervention_prelim)
+    # tabyl(NMA_data_analysis_subset_grpID_icW_RS$comparison_prelim)
+    # V_list_RS <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_icW_RS)
+    # 
+    # res_mod_icW_RS <- rma.mv(effect_size, V_list_RS, 
+    #                          mods = ~ RS - 1, # BAU is excluded to serve as the reference level for the comparisons.
+    #                          random = ~ 1 | record_id/es_id, 
+    #                          rho=0.60, 
+    #                          data=NMA_data_analysis_subset_grpID_icW_RS)
+    # summary(res_mod_icW_RS) 
+    # 
+    # res_mod_icW_RS <- rma.mv(effect_size, V_list_RS, 
+    #                          random = ~ 1 | record_id/es_id, 
+    #                          rho=0.60, 
+    #                          data=NMA_data_analysis_subset_grpID_icW_RS)
+    # summary(res_mod_icW_RS) 
+    # 
+    # res_mod_icW_RS <- rma.mv(effect_size, V_list_RS, 
+    #                       random = ~ 1 | record_id/es_id, 
+    #                       rho=0.60, 
+    #                       data= subset(NMA_data_analysis_subset_grpID_icW, intervention_prelim=="RS" & comparison_prelim=="BAU"))
+    # summary(res_mod_icW_RS)   
+    # 
+    # 
+    # res_mod_icW_RS <- rma.mv(effect_size, variance, 
+    #                          mods = ~ RS - 1, # BAU is excluded to serve as the reference level for the comparisons.
+    #                          random = ~ 1 | record_id/es_id, 
+    #                          rho=0.60, 
+    #                          data=NMA_data_analysis_subset_grpID_icW_RS)
+    # summary(res_mod_icW_RS) 
+    # 
+    # res_mod_icW_RS <- rma.mv(effect_size, variance, 
+    #                          random = ~ 1 | record_id/es_id, 
+    #                          rho=0.60, 
+    #                          data=NMA_data_analysis_subset_grpID_icW_RS)
+    # summary(res_mod_icW_RS) 
+    # 
+    # 
+    # res_mod_icW <- rma.mv(effect_size, variance, 
+    #                       random = ~ 1 | record_id/es_id, 
+    #                       rho=0.60, 
+    #                       data= subset(NMA_data_analysis_subset_grpID_icW, (intervention_prelim=="RS" & comparison_prelim=="BAU" | intervention_prelim=="BAU" & comparison_prelim=="RS")))
+    # summary(res_mod_icW)        
+    # 
+    # #FF
+    # NMA_data_analysis_subset_grpID_icW_FF <- NMA_data_analysis_subset_grpID_icW %>% filter((intervention_prelim=="FF" & comparison_prelim=="BAU") | (intervention_prelim=="BAU" & comparison_prelim=="FF"))
+    # 
+    # tabyl(NMA_data_analysis_subset_grpID_icW_FF$intervention_prelim)
+    # tabyl(NMA_data_analysis_subset_grpID_icW_FF$comparison_prelim)
+    # V_list_FF <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_icW_FF)
+    # 
+    # res_mod_icW_FF <- rma.mv(effect_size, V_list_FF, 
+    #                          mods = ~ FF - 1, # BAU is excluded to serve as the reference level for the comparisons.
+    #                          random = ~ 1 | record_id/es_id, 
+    #                          rho=0.60, 
+    #                          data=NMA_data_analysis_subset_grpID_icW_FF)
+    # summary(res_mod_icW_FF)
+    # 
+    # res_mod_icW_FF <- rma.mv(effect_size, variance, 
+    #                          mods = ~ FF - 1, # BAU is excluded to serve as the reference level for the comparisons.
+    #                          random = ~ 1 | record_id/es_id, 
+    #                          rho=0.60, 
+    #                          data=NMA_data_analysis_subset_grpID_icW_FF)
+    # summary(res_mod_icW_FF)
+    # 
+    # res_mod_icW <- rma.mv(effect_size, variance, 
+    #                       random = ~ 1 | record_id/es_id, 
+    #                       rho=0.60, 
+    #                       data= subset(NMA_data_analysis_subset_grpID_icW, (intervention_prelim=="FF" & comparison_prelim=="BAU" | intervention_prelim=="BAU" & comparison_prelim=="FF")))
+    # summary(res_mod_icW) 
     
-    ### Fit standard pairwise meta-analysis model for "RS vs BAU" only as a check that the indirect evidence is being correctly estimated by and included in the results of the NMA model above
-    NMA_data_analysis_subset_grpID_icW_RS <- NMA_data_analysis_subset_grpID_icW %>% filter((intervention_prelim=="RS" & comparison_prelim=="BAU") | (intervention_prelim=="BAU" & comparison_prelim=="RS"))
-    
-    tabyl(NMA_data_analysis_subset_grpID_icW_RS$intervention_prelim)
-    tabyl(NMA_data_analysis_subset_grpID_icW_RS$comparison_prelim)
-    V_list_RS <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_icW_RS)
-    
-    res_mod_icW_RS <- rma.mv(effect_size, V_list_RS, 
-                             mods = ~ RS - 1, # BAU is excluded to serve as the reference level for the comparisons.
-                             random = ~ 1 | record_id/es_id, 
-                             rho=0.60, 
-                             data=NMA_data_analysis_subset_grpID_icW_RS)
-    summary(res_mod_icW_RS) 
-    
-    res_mod_icW_RS <- rma.mv(effect_size, V_list_RS, 
-                             random = ~ 1 | record_id/es_id, 
-                             rho=0.60, 
-                             data=NMA_data_analysis_subset_grpID_icW_RS)
-    summary(res_mod_icW_RS) 
-    
-    res_mod_icW_RS <- rma.mv(effect_size, V_list_RS, 
-                          random = ~ 1 | record_id/es_id, 
-                          rho=0.60, 
-                          data= subset(NMA_data_analysis_subset_grpID_icW, intervention_prelim=="RS" & comparison_prelim=="BAU"))
-    summary(res_mod_icW_RS)   
-    
-    
-    res_mod_icW_RS <- rma.mv(effect_size, variance, 
-                             mods = ~ RS - 1, # BAU is excluded to serve as the reference level for the comparisons.
-                             random = ~ 1 | record_id/es_id, 
-                             rho=0.60, 
-                             data=NMA_data_analysis_subset_grpID_icW_RS)
-    summary(res_mod_icW_RS) 
-    
-    res_mod_icW_RS <- rma.mv(effect_size, variance, 
-                             random = ~ 1 | record_id/es_id, 
-                             rho=0.60, 
-                             data=NMA_data_analysis_subset_grpID_icW_RS)
-    summary(res_mod_icW_RS) 
-
-    
-    res_mod_icW <- rma.mv(effect_size, variance, 
-                          random = ~ 1 | record_id/es_id, 
-                          rho=0.60, 
-                          data= subset(NMA_data_analysis_subset_grpID_icW, (intervention_prelim=="RS" & comparison_prelim=="BAU" | intervention_prelim=="BAU" & comparison_prelim=="RS")))
-    summary(res_mod_icW)        
-    
-    #FF
-    NMA_data_analysis_subset_grpID_icW_FF <- NMA_data_analysis_subset_grpID_icW %>% filter((intervention_prelim=="FF" & comparison_prelim=="BAU") | (intervention_prelim=="BAU" & comparison_prelim=="FF"))
-    
-    tabyl(NMA_data_analysis_subset_grpID_icW_FF$intervention_prelim)
-    tabyl(NMA_data_analysis_subset_grpID_icW_FF$comparison_prelim)
-    V_list_FF <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_icW_FF)
-    
-    res_mod_icW_FF <- rma.mv(effect_size, V_list_FF, 
-                             mods = ~ FF - 1, # BAU is excluded to serve as the reference level for the comparisons.
-                             random = ~ 1 | record_id/es_id, 
-                             rho=0.60, 
-                             data=NMA_data_analysis_subset_grpID_icW_FF)
-    summary(res_mod_icW_FF)
-    
-    res_mod_icW_FF <- rma.mv(effect_size, variance, 
-                             mods = ~ FF - 1, # BAU is excluded to serve as the reference level for the comparisons.
-                             random = ~ 1 | record_id/es_id, 
-                             rho=0.60, 
-                             data=NMA_data_analysis_subset_grpID_icW_FF)
-    summary(res_mod_icW_FF)
-    
-    res_mod_icW <- rma.mv(effect_size, variance, 
-                          random = ~ 1 | record_id/es_id, 
-                          rho=0.60, 
-                          data= subset(NMA_data_analysis_subset_grpID_icW, (intervention_prelim=="FF" & comparison_prelim=="BAU" | intervention_prelim=="BAU" & comparison_prelim=="FF")))
-    summary(res_mod_icW) 
-    
-    ### Fit Jackson's model to test for inconsistency 
-    
-      #### Note: First create both a contrast variable and design variable to enter into the random argument as the inconsistency variance component for testing for inconsistency.
-      ####       The contrast variable is a character string that combines the intervention and comparison conditions of each specific contrast into a single variable.
-      ####       The design variable is a character string that combines all the intervention and comparison conditions of all the contrasts of a specific study into a single variable.
-      ####       These variables must be created after reducing the dataset to the domain level because studies with contrasts that only have outcome measures in one of the two domains
-      ####       should only contribute to the concatenated bundles of the design variable for the domain to which all its outcome measures belong.
-      
-      #### Create contrast variable
-      NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% mutate(intervention_prelim= as.character(intervention_prelim), comparison_prelim= as.character(comparison_prelim))
-      NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% mutate(contrast = paste(intervention_prelim, comparison_prelim, sep = "_"))
-      tabyl(NMA_data_analysis_subset_grpID_icW$contrast)
-      NMA_data_analysis_subset_grpID_icW_select1 <- dplyr::select(NMA_data_analysis_subset_grpID_icW, record_id, contrast_id, intervention_prelim, comparison_prelim, contrast)
-      print(NMA_data_analysis_subset_grpID_icW_select1)
-      
-      #### Create design variable
-      
-        ##### Reduce dataset from measure level to contrast level
-        Jackson_icW <- NMA_data_analysis_subset_grpID_icW %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
-        print(Jackson_icW)
-        Jackson_icW_unique <- Jackson_icW %>% distinct(record_id, contrast_id, .keep_all = TRUE)
-        print(Jackson_icW_unique)
-      
-        ##### Reshape data long so that each intervention/comparison group bundle of each unique contrast of each study is a row
-        Jackson_icW_unique_long <- Jackson_icW_unique %>% pivot_longer(c(intervention_prelim, comparison_prelim), names_to="group_assignment", values_to="bundle")
-        print(Jackson_icW_unique_long, n=Inf)
-        
-        ##### Keep only the unique intervention/comparison group bundles across all contrasts of each study, numbering each within study  
-        Jackson_icW_unique_long_unique <- Jackson_icW_unique_long %>% distinct(record_id, bundle, .keep_all = TRUE)
-        print(Jackson_icW_unique_long_unique, n=Inf)
-        Jackson_icW_unique_long_unique <- Jackson_icW_unique_long_unique %>% dplyr::select(record_id, bundle) #Now that we've reduced the dataset to the unique intervention/comparison group bundles across all contrasts within the same study, we can drop the contrast_id column.
-        Jackson_icW_unique_long_unique <- Jackson_icW_unique_long_unique %>% group_by(record_id) %>% mutate(running_count = row_number()) %>% ungroup()
-        print(Jackson_icW_unique_long_unique, n=Inf)
-        
-        ##### Reshape data wide format so that each unique intervention/comparison group bundle within each study is a column
-        Jackson_icW_unique_long_unique_wide <- Jackson_icW_unique_long_unique %>% pivot_wider(record_id, names_from="running_count", values_from="bundle")
-        print(Jackson_icW_unique_long_unique_wide, n=Inf)
-      
-        ##### Create design variable
-        Jackson_icW_unique_long_unique_wide <- Jackson_icW_unique_long_unique_wide %>% mutate(design = paste(`1`, `2`, `3`, `4`, sep = "_"))
-        print(Jackson_icW_unique_long_unique_wide, n=Inf)
-
-        Jackson_icW_contrast_design <- Jackson_icW_unique_long_unique_wide %>% dplyr::select(record_id, design)
-        print(Jackson_icW_contrast_design, n=Inf)
-        Jackson_icW_contrast_design$design <- gsub("_NA","", Jackson_icW_contrast_design$design)
-        tabyl(Jackson_icW_contrast_design$design)
-      
-        Jackson_icW_contrast_design <- Jackson_icW_contrast_design %>% mutate(design = ifelse(design == "FF_BAU_FF+RS", "FF+RS_FF_BAU", design))
-        Jackson_icW_contrast_design <- Jackson_icW_contrast_design %>% mutate(design = ifelse(design == "RS_BAU_FF", "FF+RS_BAU", design))
-        Jackson_icW_contrast_design <- Jackson_icW_contrast_design %>% mutate(design = ifelse(design == "VF+FF+RS_BAU_FF+RS", "VF+FF+RS_FF+RS_BAU", design))
-        tabyl(Jackson_icW_contrast_design$design)
-      
-        ##### Merge design variable onto main dataset
-        NMA_data_analysis_subset_grpID_icW <- left_join(NMA_data_analysis_subset_grpID_icW, Jackson_icW_contrast_design, by = c("record_id"))
-        tabyl(NMA_data_analysis_subset_grpID_icW$contrast)
-        tabyl(NMA_data_analysis_subset_grpID_icW$design)
-        NMA_data_analysis_subset_grpID_icW_select2 <- dplyr::select(NMA_data_analysis_subset_grpID_icW, record_id, contrast_id, intervention_prelim, comparison_prelim, contrast, design)
-        print(NMA_data_analysis_subset_grpID_icW_select2)
-      
-    res_mod_icW_J <- rma.mv(effect_size, V_list,
-                              mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons 
-                              random = list(~ 1 | record_id/es_id, ~ contrast | record_id, ~ contrast | design),
-                              rho=0.60, phi=1/2,
-                              data=NMA_data_analysis_subset_grpID_icW)
-    summary(res_mod_icW_J)
-      
-      #### profile likelihood CIs for tau^2_beta and tau^2_omega
-      confint(res_mod_icW_J, tau2=1, digits=2)
-      confint(res_mod_icW_J, gamma2=1, digits=2)
-      
-      #### LRT comparing res_mod_icW_J and res_mod_icW
-      anova(res_mod_icW_J, res_mod_icW)   
-      
-    ### Fit cNMA model 
-      
-      #### Notes: The following are the bundles from the Whole Numbers domain entered as mods in the domain's NMA: FF + FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS. 
-      ####        Each component of the bundles entered as mods in the NMA above needs its own binary variable in the mods argument of the cNMA model.
-      ####        Binaries for components FF, RS, and BAU were already created as part of the NMA above because some bundles consisted of just one of these component. 
-      ####        As such, we need to create binaries for the other components included within the bundles of the Whole Numbers domain: NL and RS.
-      ####        Each component binary is (+) 1 if that component is part of the intervention bundle.
-      ####        Each component binary is (-) 1 if that component is part of the comparison bundle.
-      
-      dat_cNMS_icW <- NMA_data_analysis_subset_grpID_icW
-      dat_cNMS_icW %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, FF, FF.RS, NL.FF.RS, NL.RS, RS, VF.FF.RS, VF.RS, BAU) %>% print(na.print="NA", n=Inf) 
-      
-      #### Prepare component binaries for cNMA
-      dat_cNMS_icW$NL <- 0
-      dat_cNMS_icW$VF <- 0
-      
-      tabyl(dat_cNMS_icW$FF)
-      tabyl(dat_cNMS_icW$RS)
-      tabyl(dat_cNMS_icW$NL)
-      tabyl(dat_cNMS_icW$VF)
-      tabyl(dat_cNMS_icW$BAU)
-      
-      dat_cNMS_icW  %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, FF, RS, NL, VF, BAU) %>% print(na.print="NA", n=Inf)
-      
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(intervention_prelim=="FF+RS",1, FF))
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(intervention_prelim=="FF+RS",1, RS))
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(comparison_prelim=="FF+RS",-1, FF))
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(comparison_prelim=="FF+RS",-1, RS))
-      
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(NL = ifelse(intervention_prelim=="NL+FF+RS",1, NL))
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(intervention_prelim=="NL+FF+RS",1, FF))
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(intervention_prelim=="NL+FF+RS",1, RS))
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(NL = ifelse(comparison_prelim=="NL+FF+RS",-1, NL))
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(comparison_prelim=="NL+FF+RS",-1, FF))
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(comparison_prelim=="NL+FF+RS",-1, RS))        
-      
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(NL = ifelse(intervention_prelim=="NL+RS",1, NL))
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(intervention_prelim=="NL+RS",1, RS))
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(NL = ifelse(comparison_prelim=="NL+RS",-1, NL))
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(comparison_prelim=="NL+RS",-1, RS))
-      
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(VF = ifelse(intervention_prelim=="VF+FF+RS",1, VF))
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(intervention_prelim=="VF+FF+RS",1, FF))
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(intervention_prelim=="VF+FF+RS",1, RS))     
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(VF = ifelse(comparison_prelim=="VF+FF+RS",-1, VF))
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(comparison_prelim=="VF+FF+RS",-1, FF))
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(comparison_prelim=="VF+FF+RS",-1, RS))      
-  
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(VF = ifelse(intervention_prelim=="VF+RS",1, VF))
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(intervention_prelim=="VF+RS",1, RS))         
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(VF = ifelse(comparison_prelim=="VF+RS",-1, VF))
-      dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(comparison_prelim=="VF+RS",-1, RS))    
-      
-      tabyl(dat_cNMS_icW$FF)
-      tabyl(dat_cNMS_icW$RS)
-      tabyl(dat_cNMS_icW$NL)
-      tabyl(dat_cNMS_icW$VF)
-      tabyl(dat_cNMS_icW$BAU)
-        
-      dat_cNMS_icW  %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, FF, RS, NL, VF, BAU) %>% print(na.print="NA", n=Inf)
-      write_csv(dat_cNMS_icW, 'dat_cNMS_icW.csv')
-      
-      #### Fit additive cNMA model
-      res_mod_icW_cNMA <- rma.mv(effect_size, V_list, 
-                                  mods = ~ FF + RS + NL + VF - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
-                                  random = ~ 1 | record_id/es_id, 
-                                  rho=0.60, 
-                                  data=dat_cNMS_icW)
-      summary(res_mod_icW_cNMA) 
+    # ### Fit Jackson's model to test for inconsistency 
+    # 
+    #   #### Note: First create both a contrast variable and design variable to enter into the random argument as the inconsistency variance component for testing for inconsistency.
+    #   ####       The contrast variable is a character string that combines the intervention and comparison conditions of each specific contrast into a single variable.
+    #   ####       The design variable is a character string that combines all the intervention and comparison conditions of all the contrasts of a specific study into a single variable.
+    #   ####       These variables must be created after reducing the dataset to the domain level because studies with contrasts that only have outcome measures in one of the two domains
+    #   ####       should only contribute to the concatenated bundles of the design variable for the domain to which all its outcome measures belong.
+    #   
+    #   #### Create contrast variable
+    #   NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% mutate(intervention_prelim= as.character(intervention_prelim), comparison_prelim= as.character(comparison_prelim))
+    #   NMA_data_analysis_subset_grpID_icW <- NMA_data_analysis_subset_grpID_icW %>% mutate(contrast = paste(intervention_prelim, comparison_prelim, sep = "_"))
+    #   tabyl(NMA_data_analysis_subset_grpID_icW$contrast)
+    #   NMA_data_analysis_subset_grpID_icW_select1 <- dplyr::select(NMA_data_analysis_subset_grpID_icW, record_id, contrast_id, intervention_prelim, comparison_prelim, contrast)
+    #   print(NMA_data_analysis_subset_grpID_icW_select1)
+    #   
+    #   #### Create design variable
+    #   
+    #     ##### Reduce dataset from measure level to contrast level
+    #     Jackson_icW <- NMA_data_analysis_subset_grpID_icW %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
+    #     print(Jackson_icW)
+    #     Jackson_icW_unique <- Jackson_icW %>% distinct(record_id, contrast_id, .keep_all = TRUE)
+    #     print(Jackson_icW_unique)
+    #   
+    #     ##### Reshape data long so that each intervention/comparison group bundle of each unique contrast of each study is a row
+    #     Jackson_icW_unique_long <- Jackson_icW_unique %>% pivot_longer(c(intervention_prelim, comparison_prelim), names_to="group_assignment", values_to="bundle")
+    #     print(Jackson_icW_unique_long, n=Inf)
+    #     
+    #     ##### Keep only the unique intervention/comparison group bundles across all contrasts of each study, numbering each within study  
+    #     Jackson_icW_unique_long_unique <- Jackson_icW_unique_long %>% distinct(record_id, bundle, .keep_all = TRUE)
+    #     print(Jackson_icW_unique_long_unique, n=Inf)
+    #     Jackson_icW_unique_long_unique <- Jackson_icW_unique_long_unique %>% dplyr::select(record_id, bundle) #Now that we've reduced the dataset to the unique intervention/comparison group bundles across all contrasts within the same study, we can drop the contrast_id column.
+    #     Jackson_icW_unique_long_unique <- Jackson_icW_unique_long_unique %>% group_by(record_id) %>% mutate(running_count = row_number()) %>% ungroup()
+    #     print(Jackson_icW_unique_long_unique, n=Inf)
+    #     
+    #     ##### Reshape data wide format so that each unique intervention/comparison group bundle within each study is a column
+    #     Jackson_icW_unique_long_unique_wide <- Jackson_icW_unique_long_unique %>% pivot_wider(record_id, names_from="running_count", values_from="bundle")
+    #     print(Jackson_icW_unique_long_unique_wide, n=Inf)
+    #   
+    #     ##### Create design variable
+    #     Jackson_icW_unique_long_unique_wide <- Jackson_icW_unique_long_unique_wide %>% mutate(design = paste(`1`, `2`, `3`, `4`, sep = "_"))
+    #     print(Jackson_icW_unique_long_unique_wide, n=Inf)
+    # 
+    #     Jackson_icW_contrast_design <- Jackson_icW_unique_long_unique_wide %>% dplyr::select(record_id, design)
+    #     print(Jackson_icW_contrast_design, n=Inf)
+    #     Jackson_icW_contrast_design$design <- gsub("_NA","", Jackson_icW_contrast_design$design)
+    #     tabyl(Jackson_icW_contrast_design$design)
+    #   
+    #     Jackson_icW_contrast_design <- Jackson_icW_contrast_design %>% mutate(design = ifelse(design == "FF_BAU_FF+RS", "FF+RS_FF_BAU", design))
+    #     Jackson_icW_contrast_design <- Jackson_icW_contrast_design %>% mutate(design = ifelse(design == "RS_BAU_FF", "FF+RS_BAU", design))
+    #     Jackson_icW_contrast_design <- Jackson_icW_contrast_design %>% mutate(design = ifelse(design == "VF+FF+RS_BAU_FF+RS", "VF+FF+RS_FF+RS_BAU", design))
+    #     tabyl(Jackson_icW_contrast_design$design)
+    #   
+    #     ##### Merge design variable onto main dataset
+    #     NMA_data_analysis_subset_grpID_icW <- left_join(NMA_data_analysis_subset_grpID_icW, Jackson_icW_contrast_design, by = c("record_id"))
+    #     tabyl(NMA_data_analysis_subset_grpID_icW$contrast)
+    #     tabyl(NMA_data_analysis_subset_grpID_icW$design)
+    #     NMA_data_analysis_subset_grpID_icW_select2 <- dplyr::select(NMA_data_analysis_subset_grpID_icW, record_id, contrast_id, intervention_prelim, comparison_prelim, contrast, design)
+    #     print(NMA_data_analysis_subset_grpID_icW_select2)
+    #   
+    # res_mod_icW_J <- rma.mv(effect_size, V_list,
+    #                           mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons 
+    #                           random = list(~ 1 | record_id/es_id, ~ contrast | record_id, ~ contrast | design),
+    #                           rho=0.60, phi=1/2,
+    #                           data=NMA_data_analysis_subset_grpID_icW)
+    # summary(res_mod_icW_J)
+    #   
+    #   #### profile likelihood CIs for tau^2_beta and tau^2_omega
+    #   confint(res_mod_icW_J, tau2=1, digits=2)
+    #   confint(res_mod_icW_J, gamma2=1, digits=2)
+    #   
+    #   #### LRT comparing res_mod_icW_J and res_mod_icW
+    #   anova(res_mod_icW_J, res_mod_icW)   
+    #   
+    # ### Fit cNMA model 
+    #   
+    #   #### Notes: The following are the bundles from the Whole Numbers domain entered as mods in the domain's NMA: FF + FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS. 
+    #   ####        Each component of the bundles entered as mods in the NMA above needs its own binary variable in the mods argument of the cNMA model.
+    #   ####        Binaries for components FF, RS, and BAU were already created as part of the NMA above because some bundles consisted of just one of these component. 
+    #   ####        As such, we need to create binaries for the other components included within the bundles of the Whole Numbers domain: NL and RS.
+    #   ####        Each component binary is (+) 1 if that component is part of the intervention bundle.
+    #   ####        Each component binary is (-) 1 if that component is part of the comparison bundle.
+    #   
+    #   dat_cNMS_icW <- NMA_data_analysis_subset_grpID_icW
+    #   dat_cNMS_icW %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, FF, FF.RS, NL.FF.RS, NL.RS, RS, VF.FF.RS, VF.RS, BAU) %>% print(na.print="NA", n=Inf) 
+    #   
+    #   #### Prepare component binaries for cNMA
+    #   dat_cNMS_icW$NL <- 0
+    #   dat_cNMS_icW$VF <- 0
+    #   
+    #   tabyl(dat_cNMS_icW$FF)
+    #   tabyl(dat_cNMS_icW$RS)
+    #   tabyl(dat_cNMS_icW$NL)
+    #   tabyl(dat_cNMS_icW$VF)
+    #   tabyl(dat_cNMS_icW$BAU)
+    #   
+    #   dat_cNMS_icW  %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, FF, RS, NL, VF, BAU) %>% print(na.print="NA", n=Inf)
+    #   
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(intervention_prelim=="FF+RS",1, FF))
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(intervention_prelim=="FF+RS",1, RS))
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(comparison_prelim=="FF+RS",-1, FF))
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(comparison_prelim=="FF+RS",-1, RS))
+    #   
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(NL = ifelse(intervention_prelim=="NL+FF+RS",1, NL))
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(intervention_prelim=="NL+FF+RS",1, FF))
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(intervention_prelim=="NL+FF+RS",1, RS))
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(NL = ifelse(comparison_prelim=="NL+FF+RS",-1, NL))
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(comparison_prelim=="NL+FF+RS",-1, FF))
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(comparison_prelim=="NL+FF+RS",-1, RS))        
+    #   
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(NL = ifelse(intervention_prelim=="NL+RS",1, NL))
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(intervention_prelim=="NL+RS",1, RS))
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(NL = ifelse(comparison_prelim=="NL+RS",-1, NL))
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(comparison_prelim=="NL+RS",-1, RS))
+    #   
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(VF = ifelse(intervention_prelim=="VF+FF+RS",1, VF))
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(intervention_prelim=="VF+FF+RS",1, FF))
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(intervention_prelim=="VF+FF+RS",1, RS))     
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(VF = ifelse(comparison_prelim=="VF+FF+RS",-1, VF))
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(FF = ifelse(comparison_prelim=="VF+FF+RS",-1, FF))
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(comparison_prelim=="VF+FF+RS",-1, RS))      
+    # 
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(VF = ifelse(intervention_prelim=="VF+RS",1, VF))
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(intervention_prelim=="VF+RS",1, RS))         
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(VF = ifelse(comparison_prelim=="VF+RS",-1, VF))
+    #   dat_cNMS_icW<- dat_cNMS_icW %>% mutate(RS = ifelse(comparison_prelim=="VF+RS",-1, RS))    
+    #   
+    #   tabyl(dat_cNMS_icW$FF)
+    #   tabyl(dat_cNMS_icW$RS)
+    #   tabyl(dat_cNMS_icW$NL)
+    #   tabyl(dat_cNMS_icW$VF)
+    #   tabyl(dat_cNMS_icW$BAU)
+    #     
+    #   dat_cNMS_icW  %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, FF, RS, NL, VF, BAU) %>% print(na.print="NA", n=Inf)
+    #   write_csv(dat_cNMS_icW, 'dat_cNMS_icW.csv')
+    #   
+    #   #### Fit additive cNMA model
+    #   res_mod_icW_cNMA <- rma.mv(effect_size, V_list, 
+    #                               mods = ~ FF + RS + NL + VF - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+    #                               random = ~ 1 | record_id/es_id, 
+    #                               rho=0.60, 
+    #                               data=dat_cNMS_icW)
+    #   summary(res_mod_icW_cNMA) 
   
     ### Estimate all pairwise differences between treatments
     contr <- data.frame(t(combn(names(coef(res_mod_icW)), 2)))
@@ -587,6 +587,11 @@
       print(res_mod_icW_pscore)
       print(num_contrasts_icW_long3)
       res_mod_icW_pscore <- res_mod_icW_pscore %>% left_join(num_contrasts_icW_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
+      print(num_students_icW_long3)
+      tabyl(num_students_icW_long3$intervention_comparison)
+      num_students_icW_long3$intervention_comparison <- gsub("\\+", ".", num_students_icW_long3$intervention_comparison)
+      num_students_icW_long3 <- num_students_icW_long3 %>% rename(num_students = sum_num_students_bundle)
+      res_mod_icW_pscore <- res_mod_icW_pscore %>% left_join(num_students_icW_long3, by = c("intervention"= "intervention_comparison")) # Merge on number of unique students in which each intervention bundle is included
       res_mod_icW_pscore$colour <- rep(c("yellow","burlywood1","royalblue1","green","azure1","red","pink"))
       str(res_mod_icW_pscore)
       print(res_mod_icW_pscore)
@@ -594,10 +599,10 @@
       res_mod_icW_pscore_forest <- ggplot(res_mod_icW_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) +  
         geom_hline(aes(yintercept = intervention, colour = colour), size=15) +
         geom_pointrange(shape = 22, fill = "black", size = res_mod_icW_pscore$num_contrasts/5) + 
-        geom_text(label = res_mod_icW_pscore$num_contrasts, hjust = 0.5, vjust = 2.25, colour = "black", size =7, family= "Times New Roman") +        
+        geom_text(label = paste("(",res_mod_icW_pscore$num_contrasts, "contrast/s, ", res_mod_icW_pscore$num_students, "students",")"), hjust = 0.5, vjust = 2.95, colour = "black", size =5, family= "Times New Roman") +        
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change (compared to Control)") +
-        labs(caption = "*Values under points indicate number of contrasts                                                        ") +
+        #labs(caption = "*Values under points indicate number of contrasts                                                        ") +
         ylab("Intervention Bundle") +
         theme_classic() +
         scale_colour_identity() +
@@ -702,8 +707,8 @@
       g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
       
       num_students_icW_long3
-      num_students_icW_long4 <- num_students_icW_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="NL+FF+RS" | intervention_comparison=="VF+RS"),sum_num_students_bundle*2,sum_num_students_bundle))
-      num_students_icW_long4 <- num_students_icW_long4 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="FF" | intervention_comparison=="VF+FF+RS"),sum_num_students_bundle2*1.5,sum_num_students_bundle2))
+      num_students_icW_long4 <- num_students_icW_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="NL.FF.RS" | intervention_comparison=="VF.RS"),num_students*2,num_students))
+      num_students_icW_long4 <- num_students_icW_long4 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="FF" | intervention_comparison=="VF.FF.RS"),sum_num_students_bundle2*1.5,sum_num_students_bundle2))
       #num_students_icW_long4 <- num_students_icW_long3 %>% mutate(sum_num_students_bundle2= sum_num_students_bundle)
       num_students_icW_long4 <- num_students_icW_long4 %>% mutate(dist=c(0,1.75,0,1.5,2.5,0,-2,-2))
       num_students_icW_long4 <- num_students_icW_long4 %>% mutate(color=c("lightgray","royalblue1","burlywood1","red","green","azure1","yellow","pink"))
@@ -797,162 +802,162 @@
                            data=NMA_data_analysis_subset_grpID_icR)
     summary(res_mod_icR)
     
-    ### Fit Jackson's model to test for inconsistency 
-    
-      #### Note: First create both a contrast variable and design variable to enter into the random argument as the inconsistency variance component for testing for inconsistency.
-      ####       The contrast variable is a character string that combines the intervention and comparison conditions of each specific contrast into a single variable.
-      ####       The design variable is a character string that combines all the intervention and comparison conditions of all the contrasts of a specific study into a single variable.
-      ####       These variables must be created after reducing the dataset to the domain level because studies with contrasts that only have outcome measures in one of the two domains
-      ####       should only contribute to the concatenated bundles of the design variable for the domain to which all its outcome measures belong.
-      
-      #### Create contrast variable
-      NMA_data_analysis_subset_grpID_icR <- NMA_data_analysis_subset_grpID_icR %>% mutate(intervention_prelim= as.character(intervention_prelim), comparison_prelim= as.character(comparison_prelim))
-      NMA_data_analysis_subset_grpID_icR <- NMA_data_analysis_subset_grpID_icR %>% mutate(contrast = paste(intervention_prelim, comparison_prelim, sep = "_"))
-      tabyl(NMA_data_analysis_subset_grpID_icR$contrast)
-      NMA_data_analysis_subset_grpID_icR_select1 <- dplyr::select(NMA_data_analysis_subset_grpID_icR, record_id, contrast_id, intervention_prelim, comparison_prelim, contrast)
-      print(NMA_data_analysis_subset_grpID_icR_select1)
-      
-      #### Create design variable
-    
-        ##### Reduce dataset from measure level to contrast level
-        Jackson_icR <- NMA_data_analysis_subset_grpID_icR %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
-        print(Jackson_icR)
-        Jackson_icR_unique <- Jackson_icR %>% distinct(record_id, contrast_id, .keep_all = TRUE)
-        print(Jackson_icR_unique)
-        
-        ##### Reshape data long so that each intervention/comparison group bundle of each unique contrast of each study is a row
-        Jackson_icR_unique_long <- Jackson_icR_unique %>% pivot_longer(c(intervention_prelim, comparison_prelim), names_to="group_assignment", values_to="bundle")
-        print(Jackson_icR_unique_long, n=Inf)
-        
-        ##### Keep only the unique intervention/comparison group bundles across all contrasts of each study, numbering each within study  
-        Jackson_icR_unique_long_unique <- Jackson_icR_unique_long %>% distinct(record_id, bundle, .keep_all = TRUE)
-        print(Jackson_icR_unique_long_unique, n=Inf)
-        Jackson_icR_unique_long_unique <- Jackson_icR_unique_long_unique %>% dplyr::select(record_id, bundle) #Now that we've reduced the dataset to the unique intervention/comparison group bundles across all contrasts within the same study, we can drop the contrast_id column.
-        Jackson_icR_unique_long_unique <- Jackson_icR_unique_long_unique %>% group_by(record_id) %>% mutate(running_count = row_number()) %>% ungroup()
-        print(Jackson_icR_unique_long_unique, n=Inf)
-        
-        ##### Reshape data wide format so that each unique intervention/comparison group bundle within each study is a column
-        Jackson_icR_unique_long_unique_wide <- Jackson_icR_unique_long_unique %>% pivot_wider(record_id, names_from="running_count", values_from="bundle")
-        print(Jackson_icR_unique_long_unique_wide, n=Inf)
-        
-        ##### Create design variable
-        Jackson_icR_unique_long_unique_wide <- Jackson_icR_unique_long_unique_wide %>% mutate(design = paste(`1`, `2`, `3`, sep = "_"))
-        print(Jackson_icR_unique_long_unique_wide, n=Inf)
-        
-        Jackson_icR_contrast_design <- Jackson_icR_unique_long_unique_wide %>% dplyr::select(record_id, design)
-        print(Jackson_icR_contrast_design, n=Inf)
-        Jackson_icR_contrast_design$design <- gsub("_NA","", Jackson_icR_contrast_design$design)
-        tabyl(Jackson_icR_contrast_design$design)
-        
-        Jackson_icR_contrast_design <- Jackson_icR_contrast_design %>% mutate(design = ifelse(design == "NL+SE+FF+RS_BAU_NL+FF+RS", "NL+SE+FF+RS_NL+FF+RS_BAU", design))
-        tabyl(Jackson_icR_contrast_design$design)
-        
-        ##### Merge design variable onto main dataset
-        NMA_data_analysis_subset_grpID_icR <- left_join(NMA_data_analysis_subset_grpID_icR, Jackson_icR_contrast_design, by = c("record_id"))
-        tabyl(NMA_data_analysis_subset_grpID_icR$contrast)
-        tabyl(NMA_data_analysis_subset_grpID_icR$design)
-        NMA_data_analysis_subset_grpID_icR_select2 <- dplyr::select(NMA_data_analysis_subset_grpID_icR, record_id, contrast_id, intervention_prelim, comparison_prelim, contrast, design)
-        print(NMA_data_analysis_subset_grpID_icR_select2)
-    
-    res_mod_icR_J <- rma.mv(effect_size, V_list, 
-                           mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS + NL.SE.VF.RS + RS + SE.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
-                           random = list(~ 1 | record_id/es_id, ~ contrast | record_id, ~ contrast | design),
-                           rho=0.60, phi=1/2,
-                           data=NMA_data_analysis_subset_grpID_icR)
-    summary(res_mod_icR_J)
-    
-      #### profile likelihood CIs for tau^2_beta and tau^2_omega
-      confint(res_mod_icR_J, tau2=1, digits=2)
-      confint(res_mod_icR_J, gamma2=1, digits=2)
-      
-      #### LRT comparing res_mod_icR_J and res_mod_icR
-      anova(res_mod_icR_J, res_mod_icR)   
-      
-    ### Fit cNMA model 
-      
-      #### Notes: The following are the bundles from the Rational Numbers domain entered as mods in the domain's NMA: NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS + NL.SE.VF.RS + RS + SE.RS. 
-      ####        Each component of the bundles entered as mods in the NMA above needs its own binary variable in the mods argument of the cNMA model.
-      ####        Binaries for components RS and BAU were already created as part of the NMA above because some bundles consisted of just one of these component. 
-      ####        As such, we need to create binaries for the other components included within the bundles of the Rational Numbers domain: NL, FF, SE and VF.
-      ####        Each component binary is (+) 1 if that component is part of the intervention bundle.
-      ####        Each component binary is (-) 1 if that component is part of the comparison bundle.
-      
-      dat_cNMS_icR <- NMA_data_analysis_subset_grpID_icR
-      dat_cNMS_icR %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, NL.FF.RS, NL.RS, NL.SE.FF.RS, NL.SE.RS, NL.SE.VF.RS, RS, SE.RS, BAU) %>% print(na.print="NA", n=Inf) 
-      
-      #### Prepare component binaries for cNMA
-      dat_cNMS_icR$NL <- 0
-      dat_cNMS_icR$FF <- 0
-      dat_cNMS_icR$SE <- 0
-      dat_cNMS_icR$VF <- 0
-
-      tabyl(dat_cNMS_icR$NL)
-      tabyl(dat_cNMS_icR$FF)
-      tabyl(dat_cNMS_icR$RS)
-      tabyl(dat_cNMS_icR$SE)
-      tabyl(dat_cNMS_icR$VF)
-      tabyl(dat_cNMS_icR$BAU)
-      
-      dat_cNMS_icR  %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, NL, FF, RS, SE, VF, BAU) %>% print(na.print="NA", n=Inf)
-      
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+FF+RS",1, NL))  
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(FF = ifelse(intervention_prelim=="NL+FF+RS",1, FF))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+FF+RS",1, RS))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+FF+RS",-1, NL))   
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(FF = ifelse(comparison_prelim=="NL+FF+RS",-1, FF))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+FF+RS",-1, RS))
-    
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+RS",1, NL))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+RS",1, RS))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+RS",-1, NL))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+RS",-1, RS))
-    
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+SE+FF+RS",1, NL))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(intervention_prelim=="NL+SE+FF+RS",1, SE))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(FF = ifelse(intervention_prelim=="NL+SE+FF+RS",1, FF))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+SE+FF+RS",1, RS))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+SE+FF+RS",-1, NL))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(comparison_prelim=="NL+SE+FF+RS",-1, SE))    
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(FF = ifelse(comparison_prelim=="NL+SE+FF+RS",-1, FF))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+SE+FF+RS",-1, RS))   
-    
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+SE+RS",1, NL))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(intervention_prelim=="NL+SE+RS",1, SE))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+SE+RS",1, RS))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+SE+RS",-1, NL))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(comparison_prelim=="NL+SE+RS",-1, SE))    
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+SE+RS",-1, RS))       
-
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+SE+VF+RS",1, NL))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(intervention_prelim=="NL+SE+VF+RS",1, SE))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(VF = ifelse(intervention_prelim=="NL+SE+VF+RS",1, VF))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+SE+VF+RS",1, RS))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+SE+VF+RS",-1, NL))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(comparison_prelim=="NL+SE+VF+RS",-1, SE))    
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(VF = ifelse(comparison_prelim=="NL+SE+VF+RS",-1, VF))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+SE+VF+RS",-1, RS))      
-
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(intervention_prelim=="SE+RS",1, SE))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="SE+RS",1, RS))         
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(comparison_prelim=="SE+RS",-1, SE))
-      dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="SE+RS",-1, RS))    
-       
-      tabyl(dat_cNMS_icR$NL)
-      tabyl(dat_cNMS_icR$FF)      
-      tabyl(dat_cNMS_icR$RS)
-      tabyl(dat_cNMS_icR$SE)
-      tabyl(dat_cNMS_icR$VF)
-      tabyl(dat_cNMS_icR$BAU)
-      
-      dat_cNMS_icR  %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, NL, FF, RS, SE, VF, BAU) %>% print(na.print="NA", n=Inf)
-      
-      #### Fit cNMA model
-      res_mod_icR_cNMA <- rma.mv(effect_size, V_list, 
-                                  mods = ~ NL + FF + RS + SE + VF - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
-                                  random = ~ 1 | record_id/es_id, 
-                                  rho=0.60, 
-                                  data=dat_cNMS_icR)
-      summary(res_mod_icR_cNMA)     
+    # ### Fit Jackson's model to test for inconsistency 
+    # 
+    #   #### Note: First create both a contrast variable and design variable to enter into the random argument as the inconsistency variance component for testing for inconsistency.
+    #   ####       The contrast variable is a character string that combines the intervention and comparison conditions of each specific contrast into a single variable.
+    #   ####       The design variable is a character string that combines all the intervention and comparison conditions of all the contrasts of a specific study into a single variable.
+    #   ####       These variables must be created after reducing the dataset to the domain level because studies with contrasts that only have outcome measures in one of the two domains
+    #   ####       should only contribute to the concatenated bundles of the design variable for the domain to which all its outcome measures belong.
+    #   
+    #   #### Create contrast variable
+    #   NMA_data_analysis_subset_grpID_icR <- NMA_data_analysis_subset_grpID_icR %>% mutate(intervention_prelim= as.character(intervention_prelim), comparison_prelim= as.character(comparison_prelim))
+    #   NMA_data_analysis_subset_grpID_icR <- NMA_data_analysis_subset_grpID_icR %>% mutate(contrast = paste(intervention_prelim, comparison_prelim, sep = "_"))
+    #   tabyl(NMA_data_analysis_subset_grpID_icR$contrast)
+    #   NMA_data_analysis_subset_grpID_icR_select1 <- dplyr::select(NMA_data_analysis_subset_grpID_icR, record_id, contrast_id, intervention_prelim, comparison_prelim, contrast)
+    #   print(NMA_data_analysis_subset_grpID_icR_select1)
+    #   
+    #   #### Create design variable
+    # 
+    #     ##### Reduce dataset from measure level to contrast level
+    #     Jackson_icR <- NMA_data_analysis_subset_grpID_icR %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
+    #     print(Jackson_icR)
+    #     Jackson_icR_unique <- Jackson_icR %>% distinct(record_id, contrast_id, .keep_all = TRUE)
+    #     print(Jackson_icR_unique)
+    #     
+    #     ##### Reshape data long so that each intervention/comparison group bundle of each unique contrast of each study is a row
+    #     Jackson_icR_unique_long <- Jackson_icR_unique %>% pivot_longer(c(intervention_prelim, comparison_prelim), names_to="group_assignment", values_to="bundle")
+    #     print(Jackson_icR_unique_long, n=Inf)
+    #     
+    #     ##### Keep only the unique intervention/comparison group bundles across all contrasts of each study, numbering each within study  
+    #     Jackson_icR_unique_long_unique <- Jackson_icR_unique_long %>% distinct(record_id, bundle, .keep_all = TRUE)
+    #     print(Jackson_icR_unique_long_unique, n=Inf)
+    #     Jackson_icR_unique_long_unique <- Jackson_icR_unique_long_unique %>% dplyr::select(record_id, bundle) #Now that we've reduced the dataset to the unique intervention/comparison group bundles across all contrasts within the same study, we can drop the contrast_id column.
+    #     Jackson_icR_unique_long_unique <- Jackson_icR_unique_long_unique %>% group_by(record_id) %>% mutate(running_count = row_number()) %>% ungroup()
+    #     print(Jackson_icR_unique_long_unique, n=Inf)
+    #     
+    #     ##### Reshape data wide format so that each unique intervention/comparison group bundle within each study is a column
+    #     Jackson_icR_unique_long_unique_wide <- Jackson_icR_unique_long_unique %>% pivot_wider(record_id, names_from="running_count", values_from="bundle")
+    #     print(Jackson_icR_unique_long_unique_wide, n=Inf)
+    #     
+    #     ##### Create design variable
+    #     Jackson_icR_unique_long_unique_wide <- Jackson_icR_unique_long_unique_wide %>% mutate(design = paste(`1`, `2`, `3`, sep = "_"))
+    #     print(Jackson_icR_unique_long_unique_wide, n=Inf)
+    #     
+    #     Jackson_icR_contrast_design <- Jackson_icR_unique_long_unique_wide %>% dplyr::select(record_id, design)
+    #     print(Jackson_icR_contrast_design, n=Inf)
+    #     Jackson_icR_contrast_design$design <- gsub("_NA","", Jackson_icR_contrast_design$design)
+    #     tabyl(Jackson_icR_contrast_design$design)
+    #     
+    #     Jackson_icR_contrast_design <- Jackson_icR_contrast_design %>% mutate(design = ifelse(design == "NL+SE+FF+RS_BAU_NL+FF+RS", "NL+SE+FF+RS_NL+FF+RS_BAU", design))
+    #     tabyl(Jackson_icR_contrast_design$design)
+    #     
+    #     ##### Merge design variable onto main dataset
+    #     NMA_data_analysis_subset_grpID_icR <- left_join(NMA_data_analysis_subset_grpID_icR, Jackson_icR_contrast_design, by = c("record_id"))
+    #     tabyl(NMA_data_analysis_subset_grpID_icR$contrast)
+    #     tabyl(NMA_data_analysis_subset_grpID_icR$design)
+    #     NMA_data_analysis_subset_grpID_icR_select2 <- dplyr::select(NMA_data_analysis_subset_grpID_icR, record_id, contrast_id, intervention_prelim, comparison_prelim, contrast, design)
+    #     print(NMA_data_analysis_subset_grpID_icR_select2)
+    # 
+    # res_mod_icR_J <- rma.mv(effect_size, V_list, 
+    #                        mods = ~ NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS + NL.SE.VF.RS + RS + SE.RS - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+    #                        random = list(~ 1 | record_id/es_id, ~ contrast | record_id, ~ contrast | design),
+    #                        rho=0.60, phi=1/2,
+    #                        data=NMA_data_analysis_subset_grpID_icR)
+    # summary(res_mod_icR_J)
+    # 
+    #   #### profile likelihood CIs for tau^2_beta and tau^2_omega
+    #   confint(res_mod_icR_J, tau2=1, digits=2)
+    #   confint(res_mod_icR_J, gamma2=1, digits=2)
+    #   
+    #   #### LRT comparing res_mod_icR_J and res_mod_icR
+    #   anova(res_mod_icR_J, res_mod_icR)   
+    #   
+    # ### Fit cNMA model 
+    #   
+    #   #### Notes: The following are the bundles from the Rational Numbers domain entered as mods in the domain's NMA: NL.FF.RS + NL.RS + NL.SE.FF.RS + NL.SE.RS + NL.SE.VF.RS + RS + SE.RS. 
+    #   ####        Each component of the bundles entered as mods in the NMA above needs its own binary variable in the mods argument of the cNMA model.
+    #   ####        Binaries for components RS and BAU were already created as part of the NMA above because some bundles consisted of just one of these component. 
+    #   ####        As such, we need to create binaries for the other components included within the bundles of the Rational Numbers domain: NL, FF, SE and VF.
+    #   ####        Each component binary is (+) 1 if that component is part of the intervention bundle.
+    #   ####        Each component binary is (-) 1 if that component is part of the comparison bundle.
+    #   
+    #   dat_cNMS_icR <- NMA_data_analysis_subset_grpID_icR
+    #   dat_cNMS_icR %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, NL.FF.RS, NL.RS, NL.SE.FF.RS, NL.SE.RS, NL.SE.VF.RS, RS, SE.RS, BAU) %>% print(na.print="NA", n=Inf) 
+    #   
+    #   #### Prepare component binaries for cNMA
+    #   dat_cNMS_icR$NL <- 0
+    #   dat_cNMS_icR$FF <- 0
+    #   dat_cNMS_icR$SE <- 0
+    #   dat_cNMS_icR$VF <- 0
+    # 
+    #   tabyl(dat_cNMS_icR$NL)
+    #   tabyl(dat_cNMS_icR$FF)
+    #   tabyl(dat_cNMS_icR$RS)
+    #   tabyl(dat_cNMS_icR$SE)
+    #   tabyl(dat_cNMS_icR$VF)
+    #   tabyl(dat_cNMS_icR$BAU)
+    #   
+    #   dat_cNMS_icR  %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, NL, FF, RS, SE, VF, BAU) %>% print(na.print="NA", n=Inf)
+    #   
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+FF+RS",1, NL))  
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(FF = ifelse(intervention_prelim=="NL+FF+RS",1, FF))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+FF+RS",1, RS))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+FF+RS",-1, NL))   
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(FF = ifelse(comparison_prelim=="NL+FF+RS",-1, FF))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+FF+RS",-1, RS))
+    # 
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+RS",1, NL))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+RS",1, RS))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+RS",-1, NL))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+RS",-1, RS))
+    # 
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+SE+FF+RS",1, NL))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(intervention_prelim=="NL+SE+FF+RS",1, SE))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(FF = ifelse(intervention_prelim=="NL+SE+FF+RS",1, FF))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+SE+FF+RS",1, RS))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+SE+FF+RS",-1, NL))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(comparison_prelim=="NL+SE+FF+RS",-1, SE))    
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(FF = ifelse(comparison_prelim=="NL+SE+FF+RS",-1, FF))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+SE+FF+RS",-1, RS))   
+    # 
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+SE+RS",1, NL))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(intervention_prelim=="NL+SE+RS",1, SE))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+SE+RS",1, RS))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+SE+RS",-1, NL))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(comparison_prelim=="NL+SE+RS",-1, SE))    
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+SE+RS",-1, RS))       
+    # 
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+SE+VF+RS",1, NL))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(intervention_prelim=="NL+SE+VF+RS",1, SE))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(VF = ifelse(intervention_prelim=="NL+SE+VF+RS",1, VF))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+SE+VF+RS",1, RS))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+SE+VF+RS",-1, NL))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(comparison_prelim=="NL+SE+VF+RS",-1, SE))    
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(VF = ifelse(comparison_prelim=="NL+SE+VF+RS",-1, VF))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+SE+VF+RS",-1, RS))      
+    # 
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(intervention_prelim=="SE+RS",1, SE))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(intervention_prelim=="SE+RS",1, RS))         
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(SE = ifelse(comparison_prelim=="SE+RS",-1, SE))
+    #   dat_cNMS_icR<- dat_cNMS_icR %>% mutate(RS = ifelse(comparison_prelim=="SE+RS",-1, RS))    
+    #    
+    #   tabyl(dat_cNMS_icR$NL)
+    #   tabyl(dat_cNMS_icR$FF)      
+    #   tabyl(dat_cNMS_icR$RS)
+    #   tabyl(dat_cNMS_icR$SE)
+    #   tabyl(dat_cNMS_icR$VF)
+    #   tabyl(dat_cNMS_icR$BAU)
+    #   
+    #   dat_cNMS_icR  %>% dplyr::select(record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, NL, FF, RS, SE, VF, BAU) %>% print(na.print="NA", n=Inf)
+    #   
+    #   #### Fit cNMA model
+    #   res_mod_icR_cNMA <- rma.mv(effect_size, V_list, 
+    #                               mods = ~ NL + FF + RS + SE + VF - 1, # The "treatment" left out (BAU) becomes the reference level for the comparisons
+    #                               random = ~ 1 | record_id/es_id, 
+    #                               rho=0.60, 
+    #                               data=dat_cNMS_icR)
+    #   summary(res_mod_icR_cNMA)     
       
     ### Estimate all pairwise differences between treatments
     contr <- data.frame(t(combn(names(coef(res_mod_icR)), 2)))
@@ -1024,6 +1029,11 @@
       print(res_mod_icR_pscore)
       print(num_contrasts_icR_long3)
       res_mod_icR_pscore <- res_mod_icR_pscore %>% left_join(num_contrasts_icR_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
+      print(num_students_icR_long3)
+      tabyl(num_students_icR_long3$intervention_comparison)
+      num_students_icR_long3$intervention_comparison <- gsub("\\+", ".", num_students_icR_long3$intervention_comparison)
+      num_students_icR_long3 <- num_students_icR_long3 %>% rename(num_students = sum_num_students_bundle)
+      res_mod_icR_pscore <- res_mod_icR_pscore %>% left_join(num_students_icR_long3, by = c("intervention"= "intervention_comparison")) # Merge on number of unique students in which each intervention bundle is included
       #res_mod_icR_pscore$colour <- rep(c("turquoise1","red","mediumpurple1","darkorange","green","yellow","azure1")) 
       #res_mod_icR_pscore$colour <- rep(c("lightyellow","red","mediumpurple1","darkorange","green","maroon1","azure1")) 
       res_mod_icR_pscore$colour <- rep(c("lavenderblush2","red","mediumpurple1","darkorange","maroon1","green","azure1"))
@@ -1033,10 +1043,10 @@
       res_mod_icR_pscore_forest <- ggplot(res_mod_icR_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
         geom_hline(aes(yintercept = intervention, colour = colour), size=15) +
         geom_pointrange(shape = 22, fill = "black", size = res_mod_icR_pscore$num_contrasts/5) + 
-        geom_text(label = res_mod_icR_pscore$num_contrasts, hjust = 0.5, vjust = 2.25, colour = "black", size =7, family= "Times New Roman") +        
+        geom_text(label = paste("(",res_mod_icR_pscore$num_contrasts, "contrast/s, ", res_mod_icR_pscore$num_students, "students",")"), hjust = 0.5, vjust = 2.95, colour = "black", size =5, family= "Times New Roman") +        
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change (compared to Control)") +
-        labs(caption = "*Values under points indicate number of contrasts                                               ") +
+        #labs(caption = "*Values under points indicate number of contrasts                                               ") +
         ylab("Intervention Bundle") +
         theme_classic() +
         scale_colour_identity() +
@@ -1141,9 +1151,9 @@
       g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
       
       num_students_icR_long3
-      #num_students_icR_long4 <- num_students_icR_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="SE+VF+RS" | intervention_comparison=="NL+SE+RS" | intervention_comparison=="NL+SE+VF+RS" | intervention_comparison=="SE+VF+RS"),sum_num_students_bundle*1.5,sum_num_students_bundle))
-      num_students_icR_long4 <- num_students_icR_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="NL+SE+RS" | intervention_comparison=="NL+SE+VF+RS"),sum_num_students_bundle*1.5,sum_num_students_bundle))
-      num_students_icR_long4 <- num_students_icR_long4 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="RS" | intervention_comparison=="SE+RS"),sum_num_students_bundle2*3.5,sum_num_students_bundle2))
+      #num_students_icR_long4 <- num_students_icR_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="SE.VF.RS" | intervention_comparison=="NL.SE.RS" | intervention_comparison=="NL.SE.VF.RS" | intervention_comparison=="SE.VF.RS"),num_students*1.5,num_students))
+      num_students_icR_long4 <- num_students_icR_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="NL.SE.RS" | intervention_comparison=="NL.SE.VF.RS"),num_students*1.5,num_students))
+      num_students_icR_long4 <- num_students_icR_long4 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="RS" | intervention_comparison=="SE.RS"),sum_num_students_bundle2*3.5,sum_num_students_bundle2))
       num_students_icR_long4 <- num_students_icR_long4 %>% mutate(dist=c(0,3.65,3.25,4.9,3.55,-2.5,1.5,-2))
       #num_students_icR_long4 <- num_students_icR_long4 %>% mutate(color=c("lightgray","red","green","mediumpurple1","darkorange","maroon1","lightyellow"))
       num_students_icR_long4 <- num_students_icR_long4 %>% mutate(color=c("lightgray","red","green","mediumpurple1","darkorange","maroon1","azure1","lavenderblush2"))
