@@ -620,7 +620,7 @@
       res_mod_icW_pscore_forest <- ggplot(res_mod_icW_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) +  
         geom_hline(aes(yintercept = intervention, colour = colour), size=15) +
         geom_pointrange(shape = 22, fill = "black", size = res_mod_icW_pscore$num_contrasts/5) + 
-        geom_text(label = paste("(",res_mod_icW_pscore$num_contrasts, "contrast/s, ", res_mod_icW_pscore$num_students, "students",")"), hjust = 0.5, vjust = 2.95, colour = "black", size =5, family= "Times New Roman") +        
+        geom_text(label = paste0("(",res_mod_icW_pscore$num_contrasts, " contrast/s, ", res_mod_icW_pscore$num_students, " students",")"), hjust = 0.5, vjust = 2.95, colour = "black", size =6.5, family= "Times New Roman") +        
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change (compared to Control)") +
         #labs(caption = "*Values under points indicate number of contrasts                                                        ") +
@@ -784,13 +784,17 @@
   ## Calculate the number of students within each intervention bundle across all unique study-contrasts
   num_students_icR <- NMA_data_analysis_subset_grpID_icR %>% dplyr::select(record_id, contrast_id, intervention_content, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
   print(num_students_icR, n=Inf)
+  
+  num_students_icR <- num_students_icR %>% group_by(record_id, contrast_id) %>% arrange(desc(intervention_n), .by_group = TRUE) %>% ungroup() # Arrange by descending intervention_n within each study-contrast so that the largest sample size within the contrast is selected below.
+  print(num_students_icR, n=Inf)
+  
   num_students_icR2 <- num_students_icR %>% distinct(record_id, contrast_id, .keep_all = TRUE) #Keep only one entry of each unique study-contrast so that each group of students is not double counted for each measure within the same contrast (because of multiple measures within some contrasts).
   print(num_students_icR2, n=Inf)
   num_students_icR_long <- num_students_icR2 %>% pivot_longer(c(intervention_prelim, comparison_prelim ), names_to= "group_IC", values_to="intervention_comparison") #Put intervention and comparison group assignments in same column.
   print(num_students_icR_long, n=Inf)
   num_students_icR_long2 <- num_students_icR_long %>% mutate(num_students_bundle= ifelse(group_IC == "intervention_prelim", intervention_n, comparison_n)) #Put number of students by assignment group in same column matching the intervention/comparison group assignment.
   print(num_students_icR_long2, n=Inf)
-  num_students_icR_long2 <- num_students_icR_long2 %>% dplyr::select(record_id, group_IC, intervention_comparison, num_students_bundle)
+  num_students_icR_long2 <- num_students_icR_long2 %>% dplyr::select(record_id, contrast_id, group_IC, intervention_comparison, num_students_bundle)
   print(num_students_icR_long2, n=Inf)
   num_students_icR_long2_1 <- num_students_icR_long2 %>% distinct(record_id, intervention_comparison, .keep_all = TRUE) #Keep only one row of each unique intervention bundle within each study so that each group of students of a specific assignment group is not summed more than once across multiple contrasts of the same study. We assume these are the same groups of students in these cases.
   print(num_students_icR_long2_1, n=Inf)
@@ -1067,7 +1071,7 @@
       res_mod_icR_pscore_forest <- ggplot(res_mod_icR_pscore, aes(x= estimate, y= intervention, xmin= ci.lb, xmax= ci.ub)) + 
         geom_hline(aes(yintercept = intervention, colour = colour), size=15) +
         geom_pointrange(shape = 22, fill = "black", size = res_mod_icR_pscore$num_contrasts/5) + 
-        geom_text(label = paste("(",res_mod_icR_pscore$num_contrasts, "contrast/s, ", res_mod_icR_pscore$num_students, "students",")"), hjust = 0.5, vjust = 2.95, colour = "black", size =5, family= "Times New Roman") +        
+        geom_text(label = paste0("(",res_mod_icR_pscore$num_contrasts, " contrast/s, ", res_mod_icR_pscore$num_students, " students",")"), hjust = 0.5, vjust = 2.95, colour = "black", size =6.5, family= "Times New Roman") +        
         geom_vline(xintercept = 0, linetype = 3) +
         xlab("Difference in Standardized Mean Change (compared to Control)") +
         #labs(caption = "*Values under points indicate number of contrasts                                               ") +
