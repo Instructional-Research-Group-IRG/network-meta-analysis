@@ -1,0 +1,105 @@
+>     
+>NMA_data_analysis_subset_grpID_icW_BAU <- NMA_data_analysis_subset_grpID_icW %>% filter(comparison_prelim=="BAU")
+
+>tabyl(NMA_data_analysis_subset_grpID_icW_BAU$intervention_prelim)
+ NMA_data_analysis_subset_grpID_icW_BAU$intervention_prelim  n     percent
+                                                         FF 17 0.098837209
+                                                      FF+RS 53 0.308139535
+                                                   NL+FF+RS  3 0.017441860
+                                                      NL+RS  1 0.005813953
+                                                NL+SE+FF+RS  0 0.000000000
+                                                   NL+SE+RS  0 0.000000000
+                                                NL+SE+VF+RS  0 0.000000000
+                                                         RS 81 0.470930233
+                                                      SE+RS  0 0.000000000
+                                                   VF+FF+RS  9 0.052325581
+                                                      VF+RS  8 0.046511628
+													  
+>tabyl(NMA_data_analysis_subset_grpID_icW_BAU$comparison_prelim)
+ NMA_data_analysis_subset_grpID_icW_BAU$comparison_prelim   n percent
+                                                      BAU 172       1
+                                                       FF   0       0
+                                                    FF+RS   0       0
+                                                 NL+FF+RS   0       0
+                                                 NL+SE+RS   0       0
+                                                       RS   0       0
+>     V_list_BAU <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_icW_BAU)
+>     V_list_BAU  
+>     
+>     res_mod_icW_BAU <- rma.mv(effect_size, V_list_BAU, 
++                                 mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS - 1, # BAU is excluded to serve as the reference level for the comparisons.
++                                 random = ~ 1 | record_id/es_id, 
++                                 rho=0.60, 
++                                 data=NMA_data_analysis_subset_grpID_icW_BAU)
+>     summary(res_mod_icW_BAU) 
+
+Multivariate Meta-Analysis Model (k = 172; method: REML)
+
+  logLik  Deviance       AIC       BIC      AICc   
+-68.5749  137.1497  155.1497  183.1033  156.3110   
+
+Variance Components:
+
+            estim    sqrt  nlvls  fixed           factor 
+sigma^2.1  0.0000  0.0000     32     no        record_id 
+sigma^2.2  0.1017  0.3188    172     no  record_id/es_id 
+
+Test for Residual Heterogeneity:
+QE(df = 165) = 1468.2362, p-val < .0001
+
+Test of Moderators (coefficients 1:7):
+QM(df = 7) = 148.8962, p-val < .0001
+
+Model Results:
+
+          estimate      se    zval    pval    ci.lb   ci.ub      
+FF          0.5231  0.1294  4.0410  <.0001   0.2694  0.7768  *** 
+FF.RS       0.5737  0.0663  8.6513  <.0001   0.4438  0.7037  *** 
+NL.FF.RS    0.2241  0.2182  1.0267  0.3046  -0.2037  0.6518      
+NL.RS       0.3400  0.3265  1.0414  0.2977  -0.2999  0.9799      
+RS          0.3434  0.0453  7.5804  <.0001   0.2546  0.4322  *** 
+VF.FF.RS    0.5427  0.1351  4.0164  <.0001   0.2779  0.8075  *** 
+VF.RS       0.1496  0.1520  0.9841  0.3251  -0.1484  0.4476      
+
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+
+
+
+
+>     res_mod_icW_BAU2 <- rma.mv(effect_size, V_list_BAU2, 
++                               mods = ~ FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS - 1, # BAU is excluded to serve as the reference level for the comparisons.
++                               random = ~ 1 | record_id/es_id, 
++                               rho=0.60, 
++                               data=NMA_data_analysis_subset_grpID_icW_BAU2)
+Warning message:
+'V' appears to be not positive definite. >     summary(res_mod_icW_BAU2)
+
+Multivariate Meta-Analysis Model (k = 175; method: REML)
+
+  logLik  Deviance       AIC       BIC      AICc   
+-68.0241  136.0481  152.0481  177.0873  152.9481   
+
+Variance Components:
+
+            estim    sqrt  nlvls  fixed           factor 
+sigma^2.1  0.0000  0.0000     30     no        record_id 
+sigma^2.2  0.0978  0.3127    175     no  record_id/es_id 
+
+Test of Moderators (coefficients 1:6):
+QM(df = 6) = 144.2828, p-val < .0001
+
+Model Results:
+
+          estimate      se    zval    pval    ci.lb   ci.ub      
+FF.RS       0.5637  0.0596  9.4547  <.0001   0.4469  0.6806  *** 
+NL.FF.RS    0.2307  0.2150  1.0731  0.2832  -0.1907  0.6522      
+NL.RS       0.3400  0.3205  1.0607  0.2888  -0.2882  0.9682      
+RS          0.3356  0.0432  7.7742  <.0001   0.2510  0.4202  *** 
+VF.FF.RS    0.6114  0.1137  5.3772  <.0001   0.3885  0.8342  *** 
+VF.RS       0.1493  0.1504  0.9929  0.3208  -0.1454  0.4441      
+
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
