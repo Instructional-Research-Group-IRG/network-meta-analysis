@@ -322,11 +322,22 @@
                             data=NMA_data_analysis_subset_grpID_icW)
     summary(res_mod_icW) 
     
+    NMA_data_analysis_subset_grpID_icW2 <- NMA_data_analysis_subset_grpID_icW %>% filter(intervention_prelim!="RS")
+    tabyl(NMA_data_analysis_subset_grpID_icW2$intervention_prelim)
+    tabyl(NMA_data_analysis_subset_grpID_icW2$comparison_prelim)
+    V_list2 <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_icW2)
+    V_list2  
+    res_mod_icW2 <- rma.mv(effect_size, V_list2, 
+                               mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + VF.FF.RS + VF.RS - 1, # BAU is excluded to serve as the reference level for the comparisons.
+                               random = ~ 1 | record_id/es_id, 
+                               rho=0.60, 
+                               data=NMA_data_analysis_subset_grpID_icW2)
+    summary(res_mod_icW2)
+    
     NMA_data_analysis_subset_grpID_icW_BAU <- NMA_data_analysis_subset_grpID_icW %>% filter(comparison_prelim=="BAU")
     tabyl(NMA_data_analysis_subset_grpID_icW_BAU$intervention_prelim)
     tabyl(NMA_data_analysis_subset_grpID_icW_BAU$comparison_prelim)
     V_list_BAU <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_icW_BAU)
-    V_list_BAU  
     
     res_mod_icW_BAU <- rma.mv(effect_size, V_list_BAU, 
                                 mods = ~ FF + FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS - 1, # BAU is excluded to serve as the reference level for the comparisons.
@@ -335,24 +346,33 @@
                                 data=NMA_data_analysis_subset_grpID_icW_BAU)
     summary(res_mod_icW_BAU) 
     
-    NMA_data_analysis_subset_grpID_icW_BAU2 <- NMA_data_analysis_subset_grpID_icW %>% filter(intervention_prelim!="FF")
+    NMA_data_analysis_subset_grpID_icW_BAU2 <- NMA_data_analysis_subset_grpID_icW_BAU %>% filter(intervention_prelim!="FF+RS")
     tabyl(NMA_data_analysis_subset_grpID_icW_BAU2$intervention_prelim)
     tabyl(NMA_data_analysis_subset_grpID_icW_BAU2$comparison_prelim)
     V_list_BAU2 <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_icW_BAU2)
-    V_list_BAU2  
+
     res_mod_icW_BAU2 <- rma.mv(effect_size, V_list_BAU2, 
-                              mods = ~ FF.RS + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS - 1, # BAU is excluded to serve as the reference level for the comparisons.
+                              mods = ~ FF + NL.FF.RS + NL.RS + RS + VF.FF.RS + VF.RS - 1, # BAU is excluded to serve as the reference level for the comparisons.
                               random = ~ 1 | record_id/es_id, 
                               rho=0.60, 
                               data=NMA_data_analysis_subset_grpID_icW_BAU2)
     summary(res_mod_icW_BAU2)
     
-    # res_mod_icW_var2 <- rma.mv(effect_size, V_list, #using variance instead of the variance-covariance matrix as a sensitivity check
-    #                            mods = ~ factor(intervention_prelim) - factor(comparison_prelim), # BAU is excluded to serve as the reference level for the comparisons.
-    #                            random = ~ 1 | record_id/es_id,
-    #                            rho=0.60,
-    #                            data=NMA_data_analysis_subset_grpID_icW)
-    # summary(res_mod_icW_var2)
+    res_mod_icW_var2 <- rma.mv(effect_size, V_list, #using variance instead of the variance-covariance matrix as a sensitivity check
+                               mods = ~ factor(intervention_prelim) - factor(comparison_prelim) - 1, # BAU is excluded to serve as the reference level for the comparisons.
+                               random = ~ 1 | record_id/es_id,
+                               rho=0.60,
+                               data=NMA_data_analysis_subset_grpID_icW)
+    summary(res_mod_icW_var2)
+    
+    X <- model.matrix(~ intervention_prelim - comparison_prelim, dat= NMA_data_analysis_subset_grpID_icW)
+    print(X)
+    res_mod_icW_var9 <- rma.mv(effect_size, V_list, #using variance instead of the variance-covariance matrix as a sensitivity check
+                               mods = X, # BAU is excluded to serve as the reference level for the comparisons.
+                               random = ~ 1 | record_id/es_id,
+                               rho=0.60,
+                               data=NMA_data_analysis_subset_grpID_icW)
+    summary(res_mod_icW_var9)
     # 
     # res_mod_icW_var3 <- rma.mv(effect_size, V_list, #using variance instead of the variance-covariance matrix as a sensitivity check
     #                            mods = ~ factor(intervention_prelim) - factor(comparison_prelim) - 1, # BAU is excluded to serve as the reference level for the comparisons.
@@ -374,7 +394,7 @@
     ### Test for inclusion of indirect evidence: FF VS BAU pairwise comparison
       
       #### Fit NMA model assuming consistency (tau^2_omega=0) using variance instead of V_list
-      NMA_data_analysis_subset_grpID_icW_FF <- NMA_data_analysis_subset_grpID_icW_BAU %>% filter(intervention_prelim=="FF" & comparison_prelim=="BAU")
+      NMA_data_analysis_subset_grpID_icW_FF <- NMA_data_analysis_subset_grpID_icW %>% filter(intervention_prelim=="FF" & comparison_prelim=="BAU")
       tabyl(NMA_data_analysis_subset_grpID_icW_FF$intervention_prelim)
       tabyl(NMA_data_analysis_subset_grpID_icW_FF$comparison_prelim)
       V_list_FF <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_icW_FF)
@@ -389,7 +409,7 @@
     ### Test for inclusion of indirect evidence: FF+RS VS BAU pairwise comparison
       
       #### Fit NMA model assuming consistency (tau^2_omega=0) using variance instead of V_list
-      NMA_data_analysis_subset_grpID_icW_FFRS <- NMA_data_analysis_subset_grpID_icW_BAU %>% filter(intervention_prelim=="FF+RS" & comparison_prelim=="BAU")
+      NMA_data_analysis_subset_grpID_icW_FFRS <- NMA_data_analysis_subset_grpID_icW %>% filter(intervention_prelim=="FF+RS" & comparison_prelim=="BAU")
       tabyl(NMA_data_analysis_subset_grpID_icW_FFRS$intervention_prelim)
       tabyl(NMA_data_analysis_subset_grpID_icW_FFRS$comparison_prelim)
       V_list_FFRS <- vcalc(variance, cluster= record_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=group1_id, grp2=group2_id, w1=intervention_n, w2=comparison_n, data=NMA_data_analysis_subset_grpID_icW_FFRS)
