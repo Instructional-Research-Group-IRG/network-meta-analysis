@@ -84,13 +84,14 @@
   
 # Merge the cNMA data with the updated ESs and SEs
   cNMA_data_4.1_merge_postL <- cNMA_data_4.1_merge %>%
-     left_join(es_se_41_data_merge_short, by = c("study_id", "contrast_id", "es_id")) #Use left join because we want to retain the observations in the CNMA Master Database
+     left_join(es_se_41_data_merge_short, by = c("study_id", "contrast_id", "es_id")) #Use left join because we want to retain all observations in the CNMA Master Database but not those from the conversion database that do not make it into the final cNMA database (i.e., those in the conversion database that do match to an observation in the cNMA database)..
   matched_count_postL <- cNMA_data_4.1_merge_postL %>% filter(!is.na(es_converted_41)) %>% nrow()
   matched_count_postL # 367/424 observations in cNMA database matched to conversion database. 367/367 observations in conversion database matched to cNMA (n=all). 
 
-    ##Explore the 424 - 367 = 57 observations that did not match across the two databases. They should all be observations that are exclusive to the CNMA Master Database.
+    ##Explore the 424 - 367 = 57 observations of the cNMA database that did not match to the conversion database. They should all be observations that are exclusive to the CNMA Master Database.
     cNMA_data_4.1_merge_postF <- cNMA_data_4.1_merge %>%
       full_join(es_se_41_data_merge_short, by = c("study_id", "contrast_id", "es_id"))
+    
     merge_check <- cNMA_data_4.1_merge_postF %>% dplyr::filter(es_id >=104 & es_id < 108) # Check that all es_ids in the conversion database are matched to the CNMA Master Database)
     write_csv(merge_check, 'merge_check.csv')
     matched_count_postF <- cNMA_data_4.1_merge_postF %>% filter(!is.na(cnma_row_num) & !is.na(esse_row_num)) %>% nrow()
