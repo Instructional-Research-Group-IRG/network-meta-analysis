@@ -1,7 +1,7 @@
 # This script merges the CNMA Master Database with the updated WWC v4.1 effect sizes (ESs) and standard errors (SEs) from the conversion database.
 
 # Load required packages
-  pacman::p_load(dplyr, tidyr, readxl, janitor, psych, readr, googlesheets4)
+  pacman::p_load(dplyr, tidyr, readxl, janitor, psych, readr, googlesheets4, checkmate)
   options(max.print = 1000000)
 
 # Load the cNMA data from Excel file in working directory
@@ -61,12 +61,12 @@
   es_se_41_data_merge$contrast_id <- gsub("87213_t2", "87213_a", es_se_41_data_merge$contrast_id) # "87213_t2" changed to "87213_a" in the CNMA Master Database
   tabyl(es_se_41_data_merge$contrast_id)
   es_se_41_data_merge %>% count() # n=376
-  es_se_41_data_merge <- es_se_41_data_merge %>% filter(!(study_id=="MI20755" & contrast_id=="74207_a" & es_id==86)) #This observation is not included in the CNMA Master Database.
-  es_se_41_data_merge <- es_se_41_data_merge %>% filter(!(study_id=="MI20755" & contrast_id=="74207_a" & es_id==87)) #This observation is not included in the CNMA Master Database.
-  es_se_41_data_merge <- es_se_41_data_merge %>% filter(!(study_id=="MI20755" & contrast_id=="74207_a" & es_id==88)) #This observation is not included in the CNMA Master Database.
-  es_se_41_data_merge <- es_se_41_data_merge %>% filter(!(study_id=="MI20755" & contrast_id=="74207_b" & es_id==90)) #This observation is not included in the CNMA Master Database.
-  es_se_41_data_merge <- es_se_41_data_merge %>% filter(!(study_id=="MI20755" & contrast_id=="74207_b" & es_id==91)) #This observation is not included in the CNMA Master Database.
-  es_se_41_data_merge <- es_se_41_data_merge %>% filter(!(study_id=="MI20755" & contrast_id=="74207_b" & es_id==92)) #This observation is not included in the CNMA Master Database.  
+  es_se_41_data_merge <- es_se_41_data_merge %>% filter(!(study_id=="MI20755" & contrast_id=="74207_a" & es_id==86)) #This (disaggregated) observation is not included in the CNMA Master Database. 
+  es_se_41_data_merge <- es_se_41_data_merge %>% filter(!(study_id=="MI20755" & contrast_id=="74207_a" & es_id==87)) #This (disaggregated) observation is not included in the CNMA Master Database.
+  es_se_41_data_merge <- es_se_41_data_merge %>% filter(!(study_id=="MI20755" & contrast_id=="74207_a" & es_id==88)) #This (disaggregated) observation is not included in the CNMA Master Database.
+  es_se_41_data_merge <- es_se_41_data_merge %>% filter(!(study_id=="MI20755" & contrast_id=="74207_b" & es_id==90)) #This (disaggregated) observation is not included in the CNMA Master Database.
+  es_se_41_data_merge <- es_se_41_data_merge %>% filter(!(study_id=="MI20755" & contrast_id=="74207_b" & es_id==91)) #This (disaggregated) observation is not included in the CNMA Master Database.
+  es_se_41_data_merge <- es_se_41_data_merge %>% filter(!(study_id=="MI20755" & contrast_id=="74207_b" & es_id==92)) #This (disaggregated) observation is not included in the CNMA Master Database.  
   es_se_41_data_merge %>% count() # n=370
   es_se_41_data_merge <- es_se_41_data_merge %>% filter(!(study_id=="MI20756" & contrast_id=="74195" & es_id==94)) #This observation is not included in the CNMA Master Database.
   es_se_41_data_merge <- es_se_41_data_merge %>% filter(!(study_id=="MI20756" & contrast_id=="74195" & es_id==95)) #This observation is not included in the CNMA Master Database.
@@ -84,21 +84,20 @@
   
 # Merge the cNMA data with the updated ESs and SEs
   cNMA_data_4.1_merge_postL <- cNMA_data_4.1_merge %>%
-     left_join(es_se_41_data_merge_short, by = c("study_id", "contrast_id", "es_id")) #Use left join because we want to retain all observations in the CNMA Master Database but not those from the conversion database that do not make it into the final cNMA database (i.e., those in the conversion database that do match to an observation in the cNMA database)..
+     left_join(es_se_41_data_merge_short, by = c("study_id", "contrast_id", "es_id")) #Use left join because we want to retain all observations in the CNMA Master Database but not those from the conversion database that do not make it into the final cNMA database (i.e., those in the conversion database that do match to an observation in the cNMA database).
   matched_count_postL <- cNMA_data_4.1_merge_postL %>% filter(!is.na(es_converted_41)) %>% nrow()
-  matched_count_postL # 367/424 observations in cNMA database matched to conversion database. 367/367 observations in conversion database matched to cNMA (n=all). 
+  matched_count_postL # 367/424 observations in cNMA database matched to conversion database. 367/367 observations in conversion database matched to cNMA (n=all), as expected considering the observations dropped above that were known to not be in the CNMA database. 
 
     ##Explore the 424 - 367 = 57 observations of the cNMA database that did not match to the conversion database. They should all be observations that are exclusive to the CNMA Master Database.
     cNMA_data_4.1_merge_postF <- cNMA_data_4.1_merge %>%
       full_join(es_se_41_data_merge_short, by = c("study_id", "contrast_id", "es_id"))
-    
-    merge_check <- cNMA_data_4.1_merge_postF %>% dplyr::filter(es_id >=104 & es_id < 108) # Check that all es_ids in the conversion database are matched to the CNMA Master Database)
-    write_csv(merge_check, 'merge_check.csv')
     matched_count_postF <- cNMA_data_4.1_merge_postF %>% filter(!is.na(cnma_row_num) & !is.na(esse_row_num)) %>% nrow()
     matched_count_postF 
     
     unmatched_postF <- cNMA_data_4.1_merge_postF %>% filter(is.na(cnma_row_num) | is.na(esse_row_num))
-      unmatched_postF %>% count() # n=57 unmatched 
+      unmatched_postF %>% count() # n=57 unmatched
+      tabyl(unmatched_postF$cnma_row_num) # No NAs so all 57 are unmatched from the conversion database (as expected)
+      tabyl(unmatched_postF$esse_row_num) # All 57 are NAs so all unmatched from the conversion database (as expected)
       unmatched_postF <- unmatched_postF %>% arrange(cnma_row_num, esse_row_num, study_id, contrast_id, es_id)
       unmatched_postF <- unmatched_postF %>% mutate(cnma_data= !is.na(cnma_row_num))
       unmatched_postF <- unmatched_postF %>% mutate(esse_data= !is.na(esse_row_num))
@@ -106,8 +105,14 @@
       unmatched_postF <- unmatched_postF %>% dplyr::select(-cnma_row_num, -esse_row_num)
       #View(unmatched_postF)
       write_csv(unmatched_postF, 'cnma_esse_unmatched_postmerge.csv')
-  
-# Finalize the merged dataset  
+      
+    tabyl(unmatched_postF$study_id) 
+      #Studies with IDs that begin with "CN" new entries unique to the cNMA database. As such, we'd expect no matches to these observations in the conversion database.
+    unmatched_postF_MI20755 <- unmatched_postF %>% select(cnma_data, esse_data, study_id, contrast_id, es_id, measure_name, domain, effect_size, standard_error) %>% filter(study_id=="MI20755")
+    unmatched_postF_MI20755
+      #The three measures of contrast 74207 of study MI20755 in the CNMA database are the aggregated versions. The disaggregated versions were dropped above from the conversion database before merging. 
+      #Because the effect sizes and standard errors did not change from 4.0 to 4.1 for the disaggregtaed versions, we can use the aggregated 4.0 effect sizes and standard errors as aggregated 4.1 effect sizes and standard errors.  
+      #This resolves all final merging issues.
   cNMA_data_4.1 <- cNMA_data_4.1_merge_postL #This is our final merged data set.
   cNMA_data_4.1 %>% count() # n=424
   cNMA_data_4.1 <- cNMA_data_4.1 %>% arrange(study_id, contrast_id, es_id)
@@ -117,6 +122,7 @@
   describe(cNMA_data_4.1$es_converted_41) 
   cNMA_data_4.1 <- cNMA_data_4.1 %>%
     mutate(effect_size_final = if_else(!is.na(es_converted_41), es_converted_41, effect_size)) 
+  assert_numeric(cNMA_data_4.1$effect_size_final, any.missing = FALSE) #Check no missing values.
   describe(cNMA_data_4.1$effect_size_final)
   
   ## Create final standard error column in which existing standard error is replaced with the updated 4.1 standard error  (se_converted_41) if not missing.
@@ -124,6 +130,7 @@
   describe(cNMA_data_4.1$se_converted_41) 
   cNMA_data_4.1 <- cNMA_data_4.1 %>%
     mutate(standard_error_final = if_else(!is.na(se_converted_41), se_converted_41, standard_error)) # Create final standard error column in which existing standard error  is replaced with the updated 4.1 standard error  (se_converted_41) if not missing.
+  assert_numeric(cNMA_data_4.1$standard_error_final, any.missing = FALSE) #Check no missing values.
   describe(cNMA_data_4.1$standard_error_final)
   
   ## Export and save final CNMA data set
