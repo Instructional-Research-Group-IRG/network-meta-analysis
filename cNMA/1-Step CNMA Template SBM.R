@@ -62,16 +62,15 @@
 
   str(cNMA_data_4.1_icW_short)
   
-  ## Specify full dependency structure 
-  # In this example, there was dependency within study (cluster) plus multiple outcome measures (obs) and multiple time points (time1).
+  ## Calculate the variance-covariance matrix for multi-treatment studies 
+  # There are the following dependencis within these data: i) multiple contrasts within a study (cluster=study_id); ii) multiple outcome measures within a domain (obs=measure); and iii) multiple outcome domains within a contrast (type=domain).
   # V_es_anxiety <- vcalc(vi = via, cluster = refid_int, obs = measure, grp1 = int, grp2 = comp, w1 = n_int, w2 = n_comp, time1 = timing,
   #                       rho = 0.8, phi = 0.8, data = dat_anxiety)
-  
   V_list <- vcalc(variance, cluster= study_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=intervention_prelim, grp2=comparison_prelim, w1=intervention_n, w2=comparison_n, data=cNMA_data_4.1_icW_short)
   
   
   ## Fit 1-step additive CNMA
-  # List all components as mods, except for the comparator of interest (in this example, it was the no treatment condition, c_comp_inactive)
+  # List all individual intervention components as mods, except for the comparator of interest (in this example, it is the no treatment condition, BAU)
   # For random, specify intervention (contrast) is nested within study
   mod_addCNMA_icW<- rma.mv(effect_size, V_list, 
                                      mods = ~ 0 + FF + RS + NL + TES + VF,
