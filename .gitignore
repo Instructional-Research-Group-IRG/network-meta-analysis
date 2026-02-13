@@ -37,7 +37,6 @@ cNMA/_archive*
 cNMA/dat_cNMS_icW.*
 cNMA/MRGs/*.pdf
 cNMA/CNMA Master Database 4-22-25*.xlsx
-cNMA/*.csv
 cnma_merge_errors.xlsx
 
 cNMA/CNMA*test*
@@ -49,3 +48,11 @@ cNMA_data_4.1_check.xlsx
 cNMA/merge_check.xlsx
 
 NMA_metafor_allnodes_ic_PUBREV.R
+
+cNMA/cNMA_data_*.csv
+cNMA/cnma_esse_*.csv
+cNMA/dat_*.csv
+cNMA/*merge*.csv
+DATABASE Converting ESs and SEs from 4.0 to 4.1.csv
+
+1-Step CNMA Template SBM v2.R
