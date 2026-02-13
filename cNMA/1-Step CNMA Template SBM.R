@@ -296,51 +296,51 @@
   aligned_plots <- align_plots(mod_addCNMA_icW_pscore_forest, data_table1, data_table2, align = "h")
   final_fp_nma_icW <- grid.arrange(grobs = aligned_plots, nrow= 1, widths= c(2.5,0.75,0.5))
   final_fp_nma_icW
-  
-  # ### Create network graph
-  # 
-  # ### Note: The data are currently in a contrast-based, "wide" format in which each contrast is an observation
-  # ###       (i.e., intervention and comparison assignments of each contrast are in separate columns of the same row.)
-  # ###       Need to reshape the data "long" to an arm-based format in which the two assignment groups (intervention/comparison)
-  # ###       are in separate rows of the same column grouped by contrast ID across those rows. This facilitates the pairing of intervention/comparison
-  # ###       groups for the creation of the (weighted) edges of the network graph.
-  # 
-  # #### Review data in contrast-based wide format before reshape for comparison with data after reshape (as a desk check)
-  # NMA_data_analysis_subset2 <- NMA_data_analysis_subset_grpID_icW %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size)
-  # print(NMA_data_analysis_subset2) #Example rows of the contrast-based wide format. Compare to the long format printed below.
-  # 
-  # #### Each unique contrast within each unique study should only be counted once when weighting the network connections between each unique contrast combination of intervention versus comparison in the network graph.
-  # #### Because there can be multiple measures within multiple domains within each unique contrast within each unique study, we need reduce the data set to one observation per unique contrast within each unique study
-  # #### so that a contrast with more domains/measures than another contrast is not overweighted in the visualization of the network connections (re the relative thicknesses of the "edges" between the I/C nodes in the network graph).
-  # NMA_data_analysis_subset_grpID_icW %>% count(record_id, contrast_id)
-  # NMA_data_analysis_subset3 <- NMA_data_analysis_subset_grpID_icW %>% distinct(record_id, contrast_id, .keep_all = TRUE)
-  # NMA_data_analysis_subset3 %>% count(record_id, contrast_id)
-  # NMA_data_analysis_subset3 %>% count()
-  # NMA_data_analysis_subset4 <- NMA_data_analysis_subset3 %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size)
-  # NMA_data_analysis_subset4 <- NMA_data_analysis_subset4 %>% unite("int_comp_prelim" , c(intervention_prelim,comparison_prelim), remove = FALSE)
-  # tabyl(NMA_data_analysis_subset4$int_comp_prelim) #The relative number of observations (n) for the intervention_BAU contrasts in this table should match the relative thicknesses of the lines (called "edges") in the network graph.
-  # 
-  # #### Reshape data to arm-based long format
-  # NMA_data_analysis_subset_long <- pivot_longer(NMA_data_analysis_subset3, c(intervention_prelim, comparison_prelim), names_to = "assignment_I_C", values_to = "intervention_comparison")
-  # 
-  # #### Review data in arm-based long format after reshape for comparison with data before reshape (as a desk check)
-  # NMA_data_analysis_subset_long2 <- NMA_data_analysis_subset_long %>% dplyr::select(record_id, contrast_id, assignment_I_C, intervention_comparison, domain, measure_name, es_id, effect_size)
-  # print(NMA_data_analysis_subset_long2) #Example rows of the arm-based long format. Compare to the wide format printed above.
-  # 
-  # #### Create the table of intervention/comparison pairs for creating the network graph with igraph
-  # dat_igraph <- NMA_data_analysis_subset_long
-  # dat_igraph$intervention_comparison <- as.character(dat_igraph$intervention_comparison)
-  # pairs <- data.frame(do.call(rbind, lapply(split(dat_igraph$intervention_comparison, dat_igraph$contrast_id), function(x) t(combn(x,2)))), stringsAsFactors=FALSE)
-  # print(pairs)
-  # pairs$X1 <- factor(pairs$X1, levels=sort(unique(dat_igraph$intervention_comparison)))
-  # pairs$X2 <- factor(pairs$X2, levels=sort(unique(dat_igraph$intervention_comparison)))
-  # tab <- table(pairs[,1], pairs[,2])
-  # tab
-  # 
-  # #### Creating the network graph with igraph
-  # set.seed(3524)
-  # g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
-  # 
+
+  ### Create network graph
+
+  ### Note: The data are currently in a contrast-based, "wide" format in which each contrast is an observation
+  ###       (i.e., intervention and comparison assignments of each contrast are in separate columns of the same row.)
+  ###       Need to reshape the data "long" to an arm-based format in which the two assignment groups (intervention/comparison)
+  ###       are in separate rows of the same column grouped by contrast ID across those rows. This facilitates the pairing of intervention/comparison
+  ###       groups for the creation of the (weighted) edges of the network graph.
+
+  #### Review data in contrast-based wide format before reshape for comparison with data after reshape (as a desk check)
+  cNMA_data_analysis_subset2 <- cNMA_data_4.1_NMAmerge_icW %>% dplyr::select(study_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size_final)
+  print(cNMA_data_analysis_subset2) #Example rows of the contrast-based wide format. Compare to the long format printed below.
+
+  #### Each unique contrast within each unique study should only be counted once when weighting the network connections between each unique contrast combination of intervention versus comparison in the network graph.
+  #### Because there can be multiple measures within multiple domains within each unique contrast within each unique study, we need reduce the data set to one observation per unique contrast within each unique study
+  #### so that a contrast with more domains/measures than another contrast is not overweighted in the visualization of the network connections (re the relative thicknesses of the "edges" between the I/C nodes in the network graph).
+  cNMA_data_4.1_NMAmerge_icW %>% count(study_id, contrast_id)
+  NMA_data_analysis_subset3 <- cNMA_data_4.1_NMAmerge_icW %>% distinct(study_id, contrast_id, .keep_all = TRUE)
+  NMA_data_analysis_subset3 %>% count(study_id, contrast_id)
+  NMA_data_analysis_subset3 %>% count()
+  NMA_data_analysis_subset4 <- NMA_data_analysis_subset3 %>% dplyr::select(study_id, contrast_id, intervention_prelim, comparison_prelim, domain, measure_name, es_id, effect_size_final)
+  NMA_data_analysis_subset4 <- NMA_data_analysis_subset4 %>% unite("int_comp_prelim" , c(intervention_prelim,comparison_prelim), remove = FALSE)
+  tabyl(NMA_data_analysis_subset4$int_comp_prelim) #The relative number of observations (n) for the intervention_BAU contrasts in this table should match the relative thicknesses of the lines (called "edges") in the network graph.
+
+  #### Reshape data to arm-based long format
+  NMA_data_analysis_subset_long <- pivot_longer(NMA_data_analysis_subset3, c(intervention_prelim, comparison_prelim), names_to = "assignment_I_C", values_to = "intervention_comparison")
+
+  #### Review data in arm-based long format after reshape for comparison with data before reshape (as a desk check)
+  NMA_data_analysis_subset_long2 <- NMA_data_analysis_subset_long %>% dplyr::select(study_id, contrast_id, assignment_I_C, intervention_comparison, domain, measure_name, es_id, effect_size_final)
+  print(NMA_data_analysis_subset_long2) #Example rows of the arm-based long format. Compare to the wide format printed above.
+
+  #### Create the table of intervention/comparison pairs for creating the network graph with igraph
+  dat_igraph <- NMA_data_analysis_subset_long
+  dat_igraph$intervention_comparison <- as.character(dat_igraph$intervention_comparison)
+  pairs <- data.frame(do.call(rbind, lapply(split(dat_igraph$intervention_comparison, dat_igraph$contrast_id), function(x) t(combn(x,2)))), stringsAsFactors=FALSE)
+  print(pairs)
+  pairs$X1 <- factor(pairs$X1, levels=sort(unique(dat_igraph$intervention_comparison)))
+  pairs$X2 <- factor(pairs$X2, levels=sort(unique(dat_igraph$intervention_comparison)))
+  tab <- table(pairs[,1], pairs[,2])
+  tab
+
+  #### Creating the network graph with igraph
+  set.seed(3524)
+  g <- graph_from_adjacency_matrix(tab, mode = "plus", weighted=TRUE, diag=FALSE)
+
   # num_students_icW_long3
   # num_students_icW_long4 <- num_students_icW_long3 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="NL.FF.RS" | intervention_comparison=="VF.RS"),num_students*2,num_students))
   # num_students_icW_long4 <- num_students_icW_long4 %>% mutate(sum_num_students_bundle2= if_else((intervention_comparison=="FF" | intervention_comparison=="VF.FF.RS"),sum_num_students_bundle2*1.5,sum_num_students_bundle2))
@@ -349,11 +349,12 @@
   # num_students_icW_long4 <- num_students_icW_long4 %>% mutate(color=c("lightgray","royalblue1","burlywood1","red","green","azure1","yellow","pink"))
   # num_students_icW_long4 <- num_students_icW_long4 %>% mutate(intervention_comparison= ifelse(intervention_comparison == "BAU", "Control", intervention_comparison))
   # num_students_icW_long4
-  # 
-  # plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
-  #      layout=layout_in_circle(g, order=c("BAU","FF","FF+RS","NL+FF+RS","NL+RS","RS","VF+FF+RS","VF+RS")),
-  #      vertex.size=(num_students_icW_long4$sum_num_students_bundle2)/50, vertex.color=num_students_icW_long4$color,
-  #      vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_icW_long4$intervention_comparison, vertex.label.dist=num_students_icW_long4$dist)
+
+  plot(g, edge.curved=FALSE, edge.width=E(g)$weight,
+       layout=layout_in_circle(g))
+       #layout=layout_in_circle(g, order=c("BAU","FF","FF+RS","NL+FF+RS","NL+RS","RS","VF+FF+RS","VF+RS")),
+       #vertex.size=(num_students_icW_long4$sum_num_students_bundle2)/50, vertex.color=num_students_icW_long4$color,
+       #vertex.label.color="black", vertex.label.font=2, vertex.label=num_students_icW_long4$intervention_comparison, vertex.label.dist=num_students_icW_long4$dist)
 
 
 # Execute CNMA for Rational Numbers domain
