@@ -1,5 +1,5 @@
 # Load required packages
-  pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr, janitor, naniar, igraph, multcomp, broom, gridExtra, ggplot2, writexl, readr, grid, gridExtra, cowplot, extrafont)
+  pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr, janitor, naniar, igraph, multcomp, broom, gridExtra, ggplot2, writexl, readr, grid, gridExtra, cowplot, extrafont, psych, checkmate)
   options(max.print = 1000000)
   
 # Load final CNMA dataset with effect sizes and standard errors converted to 4.1
@@ -141,6 +141,75 @@
 
   str(cNMA_data_4.1_NMAmerge_icW_short)
   
+  ## Calculate the number of unique contrasts in which each intervention component is included
+  # tabyl(cNMA_data_4.1_NMAmerge_icW$intervention_prelim)
+  # tabyl(cNMA_data_4.1_NMAmerge_icW$comparison_prelim)
+  num_contrasts_icW_cnma <- cNMA_data_4.1_NMAmerge_icW_short %>% dplyr::select(study_id, contrast_id, intervention_prelim, comparison_prelim, FF, RS, NL, TES, VF, BAU)
+  print(num_contrasts_icW_cnma, n=Inf)
+  num_contrasts_icW_cnma <- num_contrasts_icW_cnma %>% mutate(BAU = ifelse(BAU=="-1",1, BAU))
+  print(num_contrasts_icW_cnma, n=Inf)
+  num_contrasts_icW_cnma_long <- num_contrasts_icW_cnma %>% pivot_longer(c(FF, RS, NL, TES, VF, BAU), names_to= "group_IC", values_to="group_intervention")
+  print(num_contrasts_icW_cnma_long, n=Inf)
+  
+  num_contrasts_icW_cnma_long2 <- num_contrasts_icW_cnma_long %>% distinct(study_id, contrast_id, group_intervention, .keep_all = TRUE)
+  print(num_contrasts_icW_cnma_long2)
+  
+  tabyl(num_contrasts_icW_cnma_long2$contrast_id) #Should be n=2 for each contrast if reshape and distinct steps done correctly: 1 intervention & 1 comparison per unique contrast. 
+  num_contrasts_icW_cnma_long3 <- tabyl(num_contrasts_icW_cnma_long2$group_intervention)
+  num_contrasts_icW_cnma_long3 <- num_contrasts_icW_cnma_long3 %>% dplyr::select(intervention= 'num_contrasts_icW_cnma_long2$group_intervention', num_contrasts= 'n')
+  str(num_contrasts_icW_cnma_long3)
+  num_contrasts_icW_cnma_long3$intervention <- as.character(num_contrasts_icW_cnma_long3$intervention)
+  num_contrasts_icW_cnma_long3$intervention <- gsub("\\+", ".", num_contrasts_icW_cnma_long3$intervention)
+  str(num_contrasts_icW_cnma_long3)
+  print(num_contrasts_icW_cnma_long3) 
+  
+  ## Calculate the number of students within each intervention bundle across all unique study-contrasts
+  num_students_icW <- cNMA_data_4.1_NMAmerge_icW %>% dplyr::select(study_id, contrast_id, intervention_content, measure_name, intervention_prelim, intervention_n, comparison_prelim, comparison_n, full_sample_size)
+  print(num_students_icW, n=Inf)
+  
+  num_students_icW <- num_students_icW %>% group_by(study_id, contrast_id) %>% arrange(desc(intervention_n), .by_group = TRUE) %>% ungroup() # Arrange by descending intervention_n within each study-contrast so that the largest sample size within the contrast is selected below.
+  print(num_students_icW, n=Inf)
+  
+  num_students_icW2 <- num_students_icW %>% distinct(study_id, contrast_id, .keep_all = TRUE) #Keep only one entry of each unique study-contrast so that each group of students is not double counted for each measure within the same contrast (because of multiple measures within some contrasts).
+  print(num_students_icW2, n=Inf)
+  num_students_icW_long <- num_students_icW2 %>% pivot_longer(c(intervention_prelim, comparison_prelim ), names_to= "group_IC", values_to="intervention_comparison") #Put intervention and comparison group assignments in same column.
+  print(num_students_icW_long, n=Inf)
+  num_students_icW_long2 <- num_students_icW_long %>% mutate(num_students_bundle= ifelse(group_IC == "intervention_prelim", intervention_n, comparison_n)) # Put number of students by assignment group in same column matching the intervention/comparison group assignment.
+  print(num_students_icW_long2, n=Inf)
+  num_students_icW_long2 <- num_students_icW_long2 %>% dplyr::select(study_id, contrast_id, group_IC, intervention_comparison, num_students_bundle)
+  print(num_students_icW_long2, n=Inf)
+  
+  #Note: Change intervention bundle to "KEEP" for groups of students that the team has determiend to not be the same group of students assigned to the same intervention bundle across multiple contrasts of the same study. The default assumption is that groups of students assigned to the same assignment group across multiple contrasts of the same study are the same single group of students if the the sample sizes are the same (or nearly so) and thus only one set is kept in the next step to prevent double counting of the same group of students used in multiple contrasts of the same study.
+  num_students_icW_long2 <- num_students_icW_long2 %>% mutate(intervention_comparison = if_else(contrast_id=="87445_disagg_b" & group_IC=="intervention_prelim", "KEEP", intervention_comparison)) 
+  num_students_icW_long2 <- num_students_icW_long2 %>% mutate(intervention_comparison = if_else(contrast_id=="90429_disagg_b" & group_IC=="intervention_prelim", "KEEP", intervention_comparison)) 
+  num_students_icW_long2 <- num_students_icW_long2 %>% mutate(intervention_comparison = if_else(contrast_id=="90512_disagg_b" & group_IC=="intervention_prelim", "KEEP", intervention_comparison)) 
+  num_students_icW_long2 <- num_students_icW_long2 %>% mutate(intervention_comparison = if_else(contrast_id=="90514_B" & group_IC=="intervention_prelim", "KEEP", intervention_comparison)) 
+  
+  num_students_icW_long2 <- num_students_icW_long2 %>% mutate(intervention_comparison = if_else(contrast_id=="87245_disagg_b" & group_IC=="intervention_prelim", "KEEP", intervention_comparison)) 
+  num_students_icW_long2 <- num_students_icW_long2 %>% mutate(intervention_comparison = if_else(contrast_id=="87220" & group_IC=="intervention_prelim", "KEEP", intervention_comparison)) 
+  print(num_students_icW_long2, n=Inf)
+  
+  num_students_icW_long2_1 <- num_students_icW_long2 %>% distinct(study_id, intervention_comparison, .keep_all = TRUE) #Keep only one row of each unique intervention bundle within each study so that each group of students of a specific assignment group is not summed more than once across multiple contrasts of the same study. We assume these are the same groups of students in these cases.
+  print(num_students_icW_long2_1, n=Inf)
+  
+  #Note: Change intervention bundle back from "KEEP" to original value for groups of students that the team has determiend to not be the same group of students assigned to the same intervention bundle across multiple contrasts of the same study and thus not dropped just above.
+  num_students_icW_long2_1 <- num_students_icW_long2_1 %>% mutate(intervention_comparison = if_else(contrast_id=="87445_disagg_b" & group_IC=="intervention_prelim", "RS", intervention_comparison)) 
+  num_students_icW_long2_1 <- num_students_icW_long2_1 %>% mutate(intervention_comparison = if_else(contrast_id=="90429_disagg_b" & group_IC=="intervention_prelim", "RS", intervention_comparison)) 
+  num_students_icW_long2_1 <- num_students_icW_long2_1 %>% mutate(intervention_comparison = if_else(contrast_id=="90512_disagg_b" & group_IC=="intervention_prelim", "FF+RS", intervention_comparison)) 
+  num_students_icW_long2_1 <- num_students_icW_long2_1 %>% mutate(intervention_comparison = if_else(contrast_id=="90514_B" & group_IC=="intervention_prelim", "RS", intervention_comparison)) 
+  
+  num_students_icW_long2_1 <- num_students_icW_long2_1 %>% mutate(intervention_comparison = if_else(contrast_id=="87245_disagg_b" & group_IC=="intervention_prelim", "FF+RS", intervention_comparison)) 
+  num_students_icW_long2_1 <- num_students_icW_long2_1 %>% mutate(intervention_comparison = if_else(contrast_id=="87220" & group_IC=="intervention_prelim", "FF", intervention_comparison)) 
+  print(num_students_icW_long2_1, n=Inf)
+  
+  num_students_icW_long3 <- num_students_icW_long2_1 %>% group_by(intervention_comparison) %>% summarize(sum_num_students_bundle= sum(num_students_bundle)) # Sum students by intervention bundle.
+  print(num_students_icW_long3)
+  target_icW <- c("BAU","FF","FF+RS","NL+FF+RS","NL+RS","RS","VF+FF+RS","VF+RS")
+  num_students_icW_long3 <- num_students_icW_long3[match(target_icW, num_students_icW_long3$intervention_comparison),]
+  num_students_icW_long3$intervention_comparison <- as.character(num_students_icW_long3$intervention_comparison)
+  str(num_students_icW_long3)  
+  print(num_students_icW_long3)
+  
   ## Calculate the variance-covariance matrix for multi-treatment studies- Whole Numbers domain
   V_list <- vcalc(variance_final, cluster= study_id, obs= measure_name, type= domain, rho=c(0.6, 0.6), grp1=intervention_prelim, grp2=comparison_prelim, w1=intervention_n, w2=comparison_n, data=cNMA_data_4.1_NMAmerge_icW_short)
   
@@ -220,8 +289,8 @@
   mod_addCNMA_icW_pscore <- mod_addCNMA_icW_pscore %>% arrange(desc(Pscore))
   str(mod_addCNMA_icW_pscore)
   print(mod_addCNMA_icW_pscore)
-  # print(num_contrasts_icW_long3)
-  # mod_addCNMA_icW_pscore <- mod_addCNMA_icW_pscore %>% left_join(num_contrasts_icW_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
+  # print(num_contrasts_icW_cnma_long3)
+  # mod_addCNMA_icW_pscore <- mod_addCNMA_icW_pscore %>% left_join(num_contrasts_icW_cnma_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
   # print(num_students_icW_long3)
   # tabyl(num_students_icW_long3$intervention_comparison)
   # num_students_icW_long3$intervention_comparison <- gsub("\\+", ".", num_students_icW_long3$intervention_comparison)
