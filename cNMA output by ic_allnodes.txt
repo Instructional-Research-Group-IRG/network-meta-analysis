@@ -1,0 +1,100 @@
+NNMA database run as CNMA (all nodes included consistent with original NMA):
+
+
+-> Whole numbers domain: 
+
+
+	>   res_mod_icW_cnma <- rma.mv(effect_size, V_list, 
+	+                             mods = ~ FF + RS + NL + SE + VF - 1, # BAU is excluded to serve as the reference level for the comparisons.
+	+                             random = ~ 1 | record_id/es_id, 
+	+                             rho=0.60, 
+	+                             data=cNMA_data_analysis_subset_grpID_icW)
+			Warning messages:
+			1: 'V' appears to be not positive definite. 
+			2: Redundant predictors dropped from the model. 
+			
+	> 	summary(res_mod_icW_cnma) 
+
+			Multivariate Meta-Analysis Model (k = 192; method: REML)
+
+			  logLik  Deviance       AIC       BIC      AICc   
+			-72.7812  145.5624  157.5624  176.9810  158.0264   
+
+			Variance Components:
+
+						estim    sqrt  nlvls  fixed           factor 
+			sigma^2.1  0.0000  0.0000     32     no        record_id 
+			sigma^2.2  0.0937  0.3061    192     no  record_id/es_id 
+
+			Test of Moderators (coefficients 1:4):
+			QM(df = 4) = 152.2474, p-val < .0001
+
+			Model Results:
+
+				estimate      se     zval    pval    ci.lb   ci.ub      
+			FF    0.2910  0.0581   5.0115  <.0001   0.1772  0.4048  *** 
+			RS    0.3125  0.0399   7.8309  <.0001   0.2343  0.3907  *** 
+			NL   -0.2499  0.1790  -1.3961  0.1627  -0.6007  0.1009      
+			VF   -0.0374  0.0921  -0.4063  0.6845  -0.2180  0.1432      
+
+			---
+			Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+	>     res_mod_icW_cnma_pscore
+			# A tibble: 4 × 9
+			  intervention type    estimate     se   zval     pval  ci.lb ci.ub Pscore
+			  <chr>        <chr>      <dbl>  <dbl>  <dbl>    <dbl>  <dbl> <dbl>  <dbl>
+			1 FF           summary   0.291  0.0581  5.01  5.40e- 7  0.177 0.405  0.848
+			2 RS           summary   0.313  0.0399  7.83  4.85e-15  0.234 0.391  0.9  
+			3 NL           summary  -0.250  0.179  -1.40  1.63e- 1 -0.601 0.101  0.055
+			4 VF           summary  -0.0374 0.0921 -0.406 6.85e- 1 -0.218 0.143  0.302
+
+
+-> Rational numbers domain: 
+
+	>       res_mod_icR_cnma <- rma.mv(effect_size, V_list, 
+			+                                  mods = ~ FF + RS + NL + SE + VF - 1, # BAU is excluded to serve as the reference level for the comparisons.
+			+                                  random = ~ 1 | record_id/es_id, 
+			+                                  rho=0.60, 
+			+                                  data=cNMA_data_analysis_subset_grpID_icR)
+			Warning message:
+			'V' appears to be not positive definite. 
+			
+	>       summary(res_mod_icR_cnma) 
+
+			Multivariate Meta-Analysis Model (k = 108; method: REML)
+
+			   logLik   Deviance        AIC        BIC       AICc   
+			-104.6713   209.3425   223.3425   241.7856   224.5215   
+
+			Variance Components:
+
+						estim    sqrt  nlvls  fixed           factor 
+			sigma^2.1  0.3902  0.6247     14     no        record_id 
+			sigma^2.2  0.3266  0.5715    108     no  record_id/es_id 
+
+			Test of Moderators (coefficients 1:5):
+			QM(df = 5) = 49.8419, p-val < .0001
+
+			Model Results:
+
+				estimate      se     zval    pval    ci.lb   ci.ub    
+			FF    0.1811  0.2570   0.7049  0.4809  -0.3225  0.6848    
+			RS    1.1806  0.5643   2.0923  0.0364   0.0747  2.2866  * 
+			NL   -0.2258  0.5979  -0.3777  0.7056  -1.3977  0.9460    
+			SE   -0.0465  0.1995  -0.2330  0.8158  -0.4374  0.3445    
+			VF   -0.0321  0.7327  -0.0438  0.9651  -1.4681  1.4040    
+
+			---
+			Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+	>       res_mod_icR_cnma_pscore  
+			# A tibble: 5 × 9
+			  intervention type    estimate    se    zval   pval   ci.lb ci.ub Pscore
+			  <chr>        <chr>      <dbl> <dbl>   <dbl>  <dbl>   <dbl> <dbl>  <dbl>
+			1 FF           summary   0.181  0.257  0.705  0.481  -0.322  0.685  0.588
+			2 RS           summary   1.18   0.564  2.09   0.0364  0.0747 2.29   0.94 
+			3 NL           summary  -0.226  0.598 -0.378  0.706  -1.40   0.946  0.31 
+			4 SE           summary  -0.0465 0.199 -0.233  0.816  -0.437  0.345  0.35 
+			5 VF           summary  -0.0321 0.733 -0.0438 0.965  -1.47   1.40   0.409

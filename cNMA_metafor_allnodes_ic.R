@@ -243,7 +243,7 @@
   V_list_icW <- data.frame(V_list)
   #write_csv(V_list_icW, 'V_list_icW.csv')
         
-  ##Wun additive cNMA with the unique intervention components as moderators  
+  ## Run additive cNMA with the unique intervention components as moderators  
   tabyl(NMA_data_analysis_subset_grpID_icW$intervention_prelim)
   tabyl(NMA_data_analysis_subset_grpID_icW$comparison_prelim)
   check_icW <- NMA_data_analysis_subset_grpID_icW %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
@@ -320,6 +320,7 @@
     
     ### SE
     cNMA_data_analysis_subset_grpID_icW <- cNMA_data_analysis_subset_grpID_icW %>% mutate(SE = ifelse(intervention_prelim=="NL+SE+FF+RS",1, SE))
+    cNMA_data_analysis_subset_grpID_icW <- cNMA_data_analysis_subset_grpID_icW %>% mutate(SE = ifelse(intervention_prelim=="NL+SE+RS",1, SE))
     cNMA_data_analysis_subset_grpID_icW <- cNMA_data_analysis_subset_grpID_icW %>% mutate(SE = ifelse(intervention_prelim=="NL+SE+VF+RS",1, SE))  
     cNMA_data_analysis_subset_grpID_icW <- cNMA_data_analysis_subset_grpID_icW %>% mutate(SE = ifelse(intervention_prelim=="SE+RS",1, SE))  
     
@@ -422,161 +423,162 @@
     V_list_icR <- data.frame(V_list)
     #write_csv(V_list_icR, 'V_list_icR.csv')
     
-    ##Run additive cNMA with the unique intervention components as moderators  
+    ## Run additive cNMA with the unique intervention components as moderators  
     tabyl(NMA_data_analysis_subset_grpID_icR$intervention_prelim)
     tabyl(NMA_data_analysis_subset_grpID_icR$comparison_prelim)
     check_icR <- NMA_data_analysis_subset_grpID_icR %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
     print(check_icR)
     
-    ### Prepare component binaries for cNMA
-    cNMA_data_analysis_subset_grpID_icR <- NMA_data_analysis_subset_grpID_icR
-    tabyl(cNMA_data_analysis_subset_grpID_icR$intervention_prelim)
-    tabyl(cNMA_data_analysis_subset_grpID_icR$comparison_prelim)
-    
-    cNMA_data_analysis_subset_grpID_icR$FF <- 0
-    cNMA_data_analysis_subset_grpID_icR$RS <- 0
-    cNMA_data_analysis_subset_grpID_icR$NL <- 0
-    cNMA_data_analysis_subset_grpID_icR$SE <- 0
-    cNMA_data_analysis_subset_grpID_icR$VF <- 0
-    cNMA_data_analysis_subset_grpID_icR$BAU <- 0
-    
-    tabyl(cNMA_data_analysis_subset_grpID_icR$FF)
-    tabyl(cNMA_data_analysis_subset_grpID_icR$RS)
-    tabyl(cNMA_data_analysis_subset_grpID_icR$NL)
-    tabyl(cNMA_data_analysis_subset_grpID_icR$SE)  
-    tabyl(cNMA_data_analysis_subset_grpID_icR$VF)
-    tabyl(cNMA_data_analysis_subset_grpID_icR$BAU)
-    
-    ### FF
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(FF = ifelse(intervention_prelim=="FF",1, FF))
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(FF = ifelse(intervention_prelim=="FF+RS",1, FF))
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(FF = ifelse(intervention_prelim=="NL+FF+RS",1, FF))
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(FF = ifelse(intervention_prelim=="NL+SE+FF+RS",1, FF))
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(FF = ifelse(intervention_prelim=="VF+FF+RS",1, FF))
-    
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(FF = ifelse(comparison_prelim=="FF" & FF==0,-1, ifelse(comparison_prelim=="FF" & FF==1, 0, FF)))
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(FF = ifelse(comparison_prelim=="FF+RS" & FF==0,-1, ifelse(comparison_prelim=="FF+RS" & FF==1, 0, FF)))
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(FF = ifelse(comparison_prelim=="NL+FF+RS" & FF==0,-1, ifelse(comparison_prelim=="NL+FF+RS" & FF==1, 0, FF)))
-    
-    cNMA_data_analysis_subset_grpID_icR_FF <- cNMA_data_analysis_subset_grpID_icR %>% dplyr::select(intervention_prelim, comparison_prelim, FF)
-    print(cNMA_data_analysis_subset_grpID_icR_FF)
-    tabyl(cNMA_data_analysis_subset_grpID_icR$FF)
-    
-    ### RS
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(intervention_prelim=="FF+RS",1, RS))
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+FF+RS",1, RS))
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+RS",1, RS))    
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+SE+FF+RS",1, RS))
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+SE+RS",1, RS))   
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+SE+VF+RS",1, RS))     
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(intervention_prelim=="RS",1, RS))    
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(intervention_prelim=="SE+RS",1, RS))     
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(intervention_prelim=="VF+FF+RS",1, RS))
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(intervention_prelim=="VF+RS",1, RS))    
-    
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(comparison_prelim=="FF+RS" & RS==0,-1, ifelse(comparison_prelim=="FF+RS" & RS==1, 0, RS)))
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+FF+RS" & RS==0,-1, ifelse(comparison_prelim=="NL+FF+RS" & RS==1, 0, RS)))
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+SE+RS" & RS==0,-1, ifelse(comparison_prelim=="NL+SE+RS" & RS==1, 0, RS)))
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(comparison_prelim=="RS" & RS==0,-1, ifelse(comparison_prelim=="RS" & RS==1, 0, RS)))
-    
-    cNMA_data_analysis_subset_grpID_icR_RS <- cNMA_data_analysis_subset_grpID_icR %>% dplyr::select(intervention_prelim, comparison_prelim, RS)
-    print(cNMA_data_analysis_subset_grpID_icR_RS)
-    tabyl(cNMA_data_analysis_subset_grpID_icR$RS)    
-    
-    ### NL
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+FF+RS",1, NL))
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+RS",1, NL))    
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+SE+FF+RS",1, NL))
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+SE+RS",1, NL))   
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+SE+VF+RS",1, NL))     
-    
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+FF+RS" & NL==0,-1, ifelse(comparison_prelim=="NL+FF+RS" & NL==1, 0, NL)))
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+SE+RS" & NL==0,-1, ifelse(comparison_prelim=="NL+SE+RS" & NL==1, 0, NL)))
-    
-    cNMA_data_analysis_subset_grpID_icR_NL <- cNMA_data_analysis_subset_grpID_icR %>% dplyr::select(intervention_prelim, comparison_prelim, NL)
-    print(cNMA_data_analysis_subset_grpID_icR_NL)
-    tabyl(cNMA_data_analysis_subset_grpID_icR$NL)
-    
-    ### SE
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(SE = ifelse(intervention_prelim=="NL+SE+FF+RS",1, SE))
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(SE = ifelse(intervention_prelim=="NL+SE+VF+RS",1, SE))  
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(SE = ifelse(intervention_prelim=="SE+RS",1, SE))  
-    
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(SE = ifelse(comparison_prelim=="NL+SE+RS" & SE==0,-1, ifelse(comparison_prelim=="NL+SE+RS" & SE==1, 0, SE)))
-    
-    cNMA_data_analysis_subset_grpID_icR_SE <- cNMA_data_analysis_subset_grpID_icR %>% dplyr::select(intervention_prelim, comparison_prelim, SE)
-    print(cNMA_data_analysis_subset_grpID_icR_SE)
-    tabyl(cNMA_data_analysis_subset_grpID_icR$SE)
-    
-    ### VF
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(VF = ifelse(intervention_prelim=="NL+SE+VF+RS",1, VF))
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(VF = ifelse(intervention_prelim=="VF+FF+RS",1, VF))   
-    cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(VF = ifelse(intervention_prelim=="VF+RS",1, VF))     
-    
-    cNMA_data_analysis_subset_grpID_icR_VF <- cNMA_data_analysis_subset_grpID_icR %>% dplyr::select(intervention_prelim, comparison_prelim, VF)
-    print(cNMA_data_analysis_subset_grpID_icR_VF)
-    tabyl(cNMA_data_analysis_subset_grpID_icR$VF)    
-    
-    ### Fit NMA model assuming consistency (tau^2_omega=0)
-    res_mod_icR_cnma <- rma.mv(effect_size, V_list, 
-                               mods = ~ FF + RS + NL + SE + VF - 1, # BAU is excluded to serve as the reference level for the comparisons.
-                               random = ~ 1 | record_id/es_id, 
-                               rho=0.60, 
-                               data=cNMA_data_analysis_subset_grpID_icR)
-    summary(res_mod_icR_cnma) 
-    
-    ### Estimate all pairwise differences between treatments
-    contr <- data.frame(t(combn(names(coef(res_mod_icR_cnma)), 2)))
-    contr <- contrmat(contr, "X1", "X2")
-    rownames(contr) <- paste(contr$X1, "-", contr$X2)
-    contr <- as.matrix(contr[-c(1:2)])
-    sav <- predict(res_mod_icR_cnma, newmods=contr)
-    sav[["slab"]] <- rownames(contr)
-    sav
-    
-    ### Create league table (create diagonal matrix from output sav)
-    lt_info_df <- as.data.frame(sav, optional = TRUE)
-    lt_info_df <- cbind(Comparison = rownames(lt_info_df), lt_info_df)
-    lt_info_df2 <- lt_info_df %>% separate_wider_delim(Comparison, delim = ' - ', names = c('comp1', 'comp2'))
-    round_digits <- function(x) {
-      round(x, digits = 2)
-    }
-    convert_to_character <- function(x) {
-      as.character(x)
-    }
-    lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], round_digits)
-    lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], as.character)
-    lt_info_df2$ci.lb <- paste("(", lt_info_df2$ci.lb, " ,", sep= "")
-    lt_info_df2$ci.ub <- paste(lt_info_df2$ci.ub, ")", sep= "")
-    lt_info_df2 <- lt_info_df2 %>% unite(pred_cis, pred, ci.lb, ci.ub, sep= " ", remove = FALSE )
-    print(lt_info_df2)
-    lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #This creates the league table formatted as "left vs top".
-    lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
-    print(lt_info_df3)
-    write_csv(lt_info_df3, file = "cNMA/cnma_league_table_icR_allnodes.csv")
-    #write_xlsx(lt_info_df3, 'cnma_league_table_icR_allnodes.xlsx')
-    
-    ### Compute p-values
-    contr <- data.frame(t(combn(c(names(coef(res_mod_icR_cnma)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
-    contr <- contrmat(contr, "X1", "X2", last="BAU", append=FALSE)
-    b <- c(coef(res_mod_icR_cnma),0) # add 0 for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
-    vb <- bldiag(vcov(res_mod_icR_cnma),0) # add 0 row/column for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
-    pvals <- apply(contr, 1, function(x) pnorm((x%*%b) / sqrt(t(x)%*%vb%*%x)))
-    pvals
-    
-    ### Create table of p-values
-    tab <- vec2mat(pvals, corr=FALSE)
-    tab[lower.tri(tab)] <- t((1 - tab)[lower.tri(tab)])
-    rownames(tab) <- colnames(tab) <- colnames(contr)
-    round(tab, 2) # Like Table 2 in the following: https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/s12874-015-0060-8/tables/2
-    
-    ### Compute the P-scores
-    pscores <- cbind(round(sort(apply(tab, 1, mean, na.rm=TRUE), decreasing=TRUE), 3))
-    pscores
-    
-    ### Add P-scores to model output object
-    res_mod_icR_cnma_df <- tidy(res_mod_icR_cnma, conf.int = TRUE)
-    pscores_df <- cbind(term = rownames(pscores), as.data.frame(pscores))
-    res_mod_icR_cnma_pscore <- res_mod_icR_cnma_df %>% left_join(pscores_df, by = c("term"))
-    res_mod_icR_cnma_pscore <- res_mod_icR_cnma_pscore %>% rename(intervention = term, se = std.error, zval = statistic, pval = p.value, ci.lb = conf.low, ci.ub = conf.high,  Pscore = V1)
-    res_mod_icR_cnma_pscore        
+      ### Prepare component binaries for cNMA
+      cNMA_data_analysis_subset_grpID_icR <- NMA_data_analysis_subset_grpID_icR
+      tabyl(cNMA_data_analysis_subset_grpID_icR$intervention_prelim)
+      tabyl(cNMA_data_analysis_subset_grpID_icR$comparison_prelim)
+      
+      cNMA_data_analysis_subset_grpID_icR$FF <- 0
+      cNMA_data_analysis_subset_grpID_icR$RS <- 0
+      cNMA_data_analysis_subset_grpID_icR$NL <- 0
+      cNMA_data_analysis_subset_grpID_icR$SE <- 0
+      cNMA_data_analysis_subset_grpID_icR$VF <- 0
+      cNMA_data_analysis_subset_grpID_icR$BAU <- 0
+      
+      tabyl(cNMA_data_analysis_subset_grpID_icR$FF)
+      tabyl(cNMA_data_analysis_subset_grpID_icR$RS)
+      tabyl(cNMA_data_analysis_subset_grpID_icR$NL)
+      tabyl(cNMA_data_analysis_subset_grpID_icR$SE)  
+      tabyl(cNMA_data_analysis_subset_grpID_icR$VF)
+      tabyl(cNMA_data_analysis_subset_grpID_icR$BAU)
+      
+      ### FF
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(FF = ifelse(intervention_prelim=="FF",1, FF))
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(FF = ifelse(intervention_prelim=="FF+RS",1, FF))
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(FF = ifelse(intervention_prelim=="NL+FF+RS",1, FF))
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(FF = ifelse(intervention_prelim=="NL+SE+FF+RS",1, FF))
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(FF = ifelse(intervention_prelim=="VF+FF+RS",1, FF))
+      
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(FF = ifelse(comparison_prelim=="FF" & FF==0,-1, ifelse(comparison_prelim=="FF" & FF==1, 0, FF)))
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(FF = ifelse(comparison_prelim=="FF+RS" & FF==0,-1, ifelse(comparison_prelim=="FF+RS" & FF==1, 0, FF)))
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(FF = ifelse(comparison_prelim=="NL+FF+RS" & FF==0,-1, ifelse(comparison_prelim=="NL+FF+RS" & FF==1, 0, FF)))
+      
+      cNMA_data_analysis_subset_grpID_icR_FF <- cNMA_data_analysis_subset_grpID_icR %>% dplyr::select(intervention_prelim, comparison_prelim, FF)
+      print(cNMA_data_analysis_subset_grpID_icR_FF)
+      tabyl(cNMA_data_analysis_subset_grpID_icR$FF)
+      
+      ### RS
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(intervention_prelim=="FF+RS",1, RS))
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+FF+RS",1, RS))
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+RS",1, RS))    
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+SE+FF+RS",1, RS))
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+SE+RS",1, RS))   
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(intervention_prelim=="NL+SE+VF+RS",1, RS))     
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(intervention_prelim=="RS",1, RS))    
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(intervention_prelim=="SE+RS",1, RS))     
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(intervention_prelim=="VF+FF+RS",1, RS))
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(intervention_prelim=="VF+RS",1, RS))    
+      
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(comparison_prelim=="FF+RS" & RS==0,-1, ifelse(comparison_prelim=="FF+RS" & RS==1, 0, RS)))
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+FF+RS" & RS==0,-1, ifelse(comparison_prelim=="NL+FF+RS" & RS==1, 0, RS)))
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(comparison_prelim=="NL+SE+RS" & RS==0,-1, ifelse(comparison_prelim=="NL+SE+RS" & RS==1, 0, RS)))
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(RS = ifelse(comparison_prelim=="RS" & RS==0,-1, ifelse(comparison_prelim=="RS" & RS==1, 0, RS)))
+      
+      cNMA_data_analysis_subset_grpID_icR_RS <- cNMA_data_analysis_subset_grpID_icR %>% dplyr::select(intervention_prelim, comparison_prelim, RS)
+      print(cNMA_data_analysis_subset_grpID_icR_RS)
+      tabyl(cNMA_data_analysis_subset_grpID_icR$RS)    
+      
+      ### NL
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+FF+RS",1, NL))
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+RS",1, NL))    
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+SE+FF+RS",1, NL))
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+SE+RS",1, NL))   
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(NL = ifelse(intervention_prelim=="NL+SE+VF+RS",1, NL))     
+      
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+FF+RS" & NL==0,-1, ifelse(comparison_prelim=="NL+FF+RS" & NL==1, 0, NL)))
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(NL = ifelse(comparison_prelim=="NL+SE+RS" & NL==0,-1, ifelse(comparison_prelim=="NL+SE+RS" & NL==1, 0, NL)))
+      
+      cNMA_data_analysis_subset_grpID_icR_NL <- cNMA_data_analysis_subset_grpID_icR %>% dplyr::select(intervention_prelim, comparison_prelim, NL)
+      print(cNMA_data_analysis_subset_grpID_icR_NL)
+      tabyl(cNMA_data_analysis_subset_grpID_icR$NL)
+      
+      ### SE
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(SE = ifelse(intervention_prelim=="NL+SE+FF+RS",1, SE))
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(SE = ifelse(intervention_prelim=="NL+SE+RS",1, SE))      
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(SE = ifelse(intervention_prelim=="NL+SE+VF+RS",1, SE))  
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(SE = ifelse(intervention_prelim=="SE+RS",1, SE))  
+      
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(SE = ifelse(comparison_prelim=="NL+SE+RS" & SE==0,-1, ifelse(comparison_prelim=="NL+SE+RS" & SE==1, 0, SE)))
+      
+      cNMA_data_analysis_subset_grpID_icR_SE <- cNMA_data_analysis_subset_grpID_icR %>% dplyr::select(intervention_prelim, comparison_prelim, SE)
+      print(cNMA_data_analysis_subset_grpID_icR_SE)
+      tabyl(cNMA_data_analysis_subset_grpID_icR$SE)
+      
+      ### VF
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(VF = ifelse(intervention_prelim=="NL+SE+VF+RS",1, VF))
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(VF = ifelse(intervention_prelim=="VF+FF+RS",1, VF))   
+      cNMA_data_analysis_subset_grpID_icR <- cNMA_data_analysis_subset_grpID_icR %>% mutate(VF = ifelse(intervention_prelim=="VF+RS",1, VF))     
+      
+      cNMA_data_analysis_subset_grpID_icR_VF <- cNMA_data_analysis_subset_grpID_icR %>% dplyr::select(intervention_prelim, comparison_prelim, VF)
+      print(cNMA_data_analysis_subset_grpID_icR_VF)
+      tabyl(cNMA_data_analysis_subset_grpID_icR$VF)    
+      
+      ### Fit NMA model assuming consistency (tau^2_omega=0)
+      res_mod_icR_cnma <- rma.mv(effect_size, V_list, 
+                                 mods = ~ FF + RS + NL + SE + VF - 1, # BAU is excluded to serve as the reference level for the comparisons.
+                                 random = ~ 1 | record_id/es_id, 
+                                 rho=0.60, 
+                                 data=cNMA_data_analysis_subset_grpID_icR)
+      summary(res_mod_icR_cnma) 
+      
+      ### Estimate all pairwise differences between treatments
+      contr <- data.frame(t(combn(names(coef(res_mod_icR_cnma)), 2)))
+      contr <- contrmat(contr, "X1", "X2")
+      rownames(contr) <- paste(contr$X1, "-", contr$X2)
+      contr <- as.matrix(contr[-c(1:2)])
+      sav <- predict(res_mod_icR_cnma, newmods=contr)
+      sav[["slab"]] <- rownames(contr)
+      sav
+      
+      ### Create league table (create diagonal matrix from output sav)
+      lt_info_df <- as.data.frame(sav, optional = TRUE)
+      lt_info_df <- cbind(Comparison = rownames(lt_info_df), lt_info_df)
+      lt_info_df2 <- lt_info_df %>% separate_wider_delim(Comparison, delim = ' - ', names = c('comp1', 'comp2'))
+      round_digits <- function(x) {
+        round(x, digits = 2)
+      }
+      convert_to_character <- function(x) {
+        as.character(x)
+      }
+      lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], round_digits)
+      lt_info_df2[c("pred","ci.lb","ci.ub")] <- lapply(lt_info_df2[c("pred","ci.lb","ci.ub")], as.character)
+      lt_info_df2$ci.lb <- paste("(", lt_info_df2$ci.lb, " ,", sep= "")
+      lt_info_df2$ci.ub <- paste(lt_info_df2$ci.ub, ")", sep= "")
+      lt_info_df2 <- lt_info_df2 %>% unite(pred_cis, pred, ci.lb, ci.ub, sep= " ", remove = FALSE )
+      print(lt_info_df2)
+      lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #This creates the league table formatted as "left vs top".
+      lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
+      print(lt_info_df3)
+      write_csv(lt_info_df3, file = "cNMA/cnma_league_table_icR_allnodes.csv")
+      #write_xlsx(lt_info_df3, 'cnma_league_table_icR_allnodes.xlsx')
+      
+      ### Compute p-values
+      contr <- data.frame(t(combn(c(names(coef(res_mod_icR_cnma)),"BAU"), 2))) # add "BAU" to contrast matrix / Likely to remove this from output/forest plot
+      contr <- contrmat(contr, "X1", "X2", last="BAU", append=FALSE)
+      b <- c(coef(res_mod_icR_cnma),0) # add 0 for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
+      vb <- bldiag(vcov(res_mod_icR_cnma),0) # add 0 row/column for 'BAU' (the "reference treatment" excluded from the mods argument of the rma.mv function executing the NMA above)
+      pvals <- apply(contr, 1, function(x) pnorm((x%*%b) / sqrt(t(x)%*%vb%*%x)))
+      pvals
+      
+      ### Create table of p-values
+      tab <- vec2mat(pvals, corr=FALSE)
+      tab[lower.tri(tab)] <- t((1 - tab)[lower.tri(tab)])
+      rownames(tab) <- colnames(tab) <- colnames(contr)
+      round(tab, 2) # Like Table 2 in the following: https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/s12874-015-0060-8/tables/2
+      
+      ### Compute the P-scores
+      pscores <- cbind(round(sort(apply(tab, 1, mean, na.rm=TRUE), decreasing=TRUE), 3))
+      pscores
+      
+      ### Add P-scores to model output object
+      res_mod_icR_cnma_df <- tidy(res_mod_icR_cnma, conf.int = TRUE)
+      pscores_df <- cbind(term = rownames(pscores), as.data.frame(pscores))
+      res_mod_icR_cnma_pscore <- res_mod_icR_cnma_df %>% left_join(pscores_df, by = c("term"))
+      res_mod_icR_cnma_pscore <- res_mod_icR_cnma_pscore %>% rename(intervention = term, se = std.error, zval = statistic, pval = p.value, ci.lb = conf.low, ci.ub = conf.high,  Pscore = V1)
+      res_mod_icR_cnma_pscore        
