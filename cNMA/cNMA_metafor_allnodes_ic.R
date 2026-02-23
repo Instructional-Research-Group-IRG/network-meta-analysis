@@ -1,4 +1,4 @@
-# This script performs a network meta-analysis (NMA) of mathematics education interventions using outcomes in the whole and ration numbers domains. 
+# This script performs a component network meta-analysis (cNMA) of mathematics education interventions using outcomes in the whole and ration numbers domains. 
 # Sample: all nodes
 # Variable for defining outcome domain: intervention_content
 # Disaggregated by domain: Yes
@@ -375,7 +375,7 @@
     lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #This creates the league table formatted as "left vs top".
     lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
     print(lt_info_df3)
-    write_csv(lt_info_df3, file = "cNMA/cnma_league_table_icW_allnodes.csv")
+    write_csv(lt_info_df3, file = "cnma_league_table_icW_allnodes.csv")
     #write_xlsx(lt_info_df3, 'cnma_league_table_icW_allnodes.xlsx')
     
     ### Compute p-values
@@ -555,7 +555,7 @@
       lt_info_df3 <- lt_info_df2 %>% pivot_wider(id_cols= "comp1", names_from= "comp2", values_from = "pred_cis") #This creates the league table formatted as "left vs top".
       lt_info_df3 <- rename(lt_info_df3, Intervention = comp1)
       print(lt_info_df3)
-      write_csv(lt_info_df3, file = "cNMA/cnma_league_table_icR_allnodes.csv")
+      write_csv(lt_info_df3, file = "cnma_league_table_icR_allnodes.csv")
       #write_xlsx(lt_info_df3, 'cnma_league_table_icR_allnodes.xlsx')
       
       ### Compute p-values
