@@ -581,7 +581,7 @@
     geom_hline(aes(yintercept = intervention, colour = colour), size=15) +
     geom_pointrange(shape = 22, fill = "black", size = mod_addCNMA_icR_pscore$num_contrasts/12) + 
     geom_pointrange(shape = 22, fill = "black") + 
-    #geom_text(label = paste0("(",mod_addCNMA_icR_pscore$num_contrasts, " contrast/s, ", mod_addCNMA_icR_pscore$num_students, " students",")"), hjust = 0.5, vjust = 2.95, colour = "black", size =6.5, family= "Times New Roman") +        
+    geom_text(label = paste0("(",mod_addCNMA_icR_pscore$num_contrasts, " contrast/s, ", mod_addCNMA_icR_pscore$num_students, " students",")"), hjust = 0.5, vjust = 2.95, colour = "black", size =6.5, family= "Times New Roman") +        
     geom_vline(xintercept = 0, linetype = 3) +
     xlab("Difference in Standardized Mean Change (compared to Control)") +
     ylab("Intervention Component") +
