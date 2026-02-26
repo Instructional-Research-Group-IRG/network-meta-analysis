@@ -571,7 +571,7 @@
   mod_addCNMA_icR_pscore <- mod_addCNMA_icR_pscore %>% left_join(num_contrasts_icR_cnma_long3, by = "intervention") # Merge on number of unique contrasts in which each intervention bundle is included
   print(num_students_icR_cnma_long3)
   tabyl(num_students_icR_cnma_long3$int_comp)
-  num_students_icR_long3 <- num_students_icR_cnma_long3 %>% rename(num_students = total)
+  num_students_icR_cnma_long3 <- num_students_icR_cnma_long3 %>% rename(num_students = total)
   mod_addCNMA_icR_pscore <- mod_addCNMA_icR_pscore %>% left_join(num_students_icR_cnma_long3, by = c("intervention"= "int_comp")) # Merge on number of unique students in which each intervention bundle is included
   mod_addCNMA_icR_pscore$colour <- rep(c("yellow","burlywood1","royalblue1","green","azure1"))
   str(mod_addCNMA_icR_pscore)
