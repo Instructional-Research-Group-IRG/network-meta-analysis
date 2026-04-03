@@ -11,7 +11,7 @@
    
   ## Install and load other required packages
   ##install.packages("pacman") 
-  pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr, janitor, naniar, igraph, multcomp, broom, gridExtra, ggplot2, writexl, readr, grid, gridExtra, cowplot, extrafont)
+  pacman::p_load(metafor, googlesheets4, dplyr, tidyr, skimr, testit, assertable, meta, netmeta, stringr, janitor, naniar, igraph, multcomp, broom, gridExtra, ggplot2, writexl, readr, grid, gridExtra, cowplot, extrafont, readxl)
 
 # Load (read) data (i.e., copy data to 'dat')
   #dat <- read_sheet("https://docs.google.com/spreadsheets/d/1bWugw06yFyetIVYlhAHHzM_d3KGhegxxLBm-5463j2Q/edit#gid=0") #Test data
@@ -313,6 +313,10 @@
   tabyl(NMA_data_analysis_subset_grpID_icW$comparison_prelim)
   check_icW <- NMA_data_analysis_subset_grpID_icW %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
   print(check_icW)
+    
+    ### Export Whole Numbers analysis dataset for sharing
+    write_csv(NMA_data_analysis_subset_grpID_icW, 'NMA_data_analysis_subset_WholeNumbers.csv')
+    write_xlsx(NMA_data_analysis_subset_grpID_icW, 'NMA_data_analysis_subset_WholeNumbers.xlsx')
 
     ### Fit NMA model assuming consistency (tau^2_omega=0)
     res_mod_icW <- rma.mv(effect_size, V_list, 
@@ -789,6 +793,10 @@
   tabyl(NMA_data_analysis_subset_grpID_icR$comparison_prelim)
   check_icR <- NMA_data_analysis_subset_grpID_icR %>% dplyr::select(record_id, contrast_id, intervention_prelim, comparison_prelim)
   print(check_icR)
+  
+    ### Export Rational Numbers analysis dataset for sharing
+    write_csv(NMA_data_analysis_subset_grpID_icR, 'NMA_data_analysis_subset_RationalNumbers.csv')
+    write_xlsx(NMA_data_analysis_subset_grpID_icR, 'NMA_data_analysis_subset_RationalNumbers.xlsx')
   
     ### Fit model assuming consistency (tau^2_omega=0)
     res_mod_icR <- rma.mv(effect_size, V_list, 
