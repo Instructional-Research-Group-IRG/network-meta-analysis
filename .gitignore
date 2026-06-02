@@ -54,3 +54,5 @@ cNMA/cnma_esse_*.csv
 cNMA/dat_*.csv
 cNMA/*merge*.csv
 DATABASE Converting ESs and SEs from 4.0 to 4.1.csv
+
+NMA_data_analysis_subset_WholeNumbers_SBM.xlsx
