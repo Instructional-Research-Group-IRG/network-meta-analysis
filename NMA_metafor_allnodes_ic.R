@@ -142,14 +142,17 @@
   convert_to_character <- function(x) {
     as.character(x)
   }
-  NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq","grade_level")] <- lapply(NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq","grade_level")], convert_to_character)
+  #NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq","grade_level")] <- lapply(NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq","grade_level")], convert_to_character)
+  NMA_data_analysis_subset_grpID[c("ongoing_training","grade_level")] <- lapply(NMA_data_analysis_subset_grpID[c("ongoing_training","grade_level")], convert_to_character)
   
   convert_to_factor <- function(x) {
     as.factor(x)
   }  
-  NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq","intervention_prelim","comparison_prelim")] <- lapply(NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq","intervention_prelim","comparison_prelim")], convert_to_factor)
-  NMA_data_analysis_subset_grpID[c("domain_numeric","control_nature_numeric","measure_developer_numeric","interventionist_numeric","TvsT")] <- lapply(NMA_data_analysis_subset_grpID[c("domain_numeric","control_nature_numeric","measure_developer_numeric","interventionist_numeric","TvsT")], convert_to_factor)
-  
+  #NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq","intervention_prelim","comparison_prelim")] <- lapply(NMA_data_analysis_subset_grpID[c("group_size_category","ongoing_training","research_lab","dosage_weekly_freq","intervention_prelim","comparison_prelim")], convert_to_factor)
+  #NMA_data_analysis_subset_grpID[c("domain_numeric","control_nature_numeric","measure_developer_numeric","interventionist_numeric","TvsT")] <- lapply(NMA_data_analysis_subset_grpID[c("domain_numeric","control_nature_numeric","measure_developer_numeric","interventionist_numeric","TvsT")], convert_to_factor)
+  NMA_data_analysis_subset_grpID[c("ongoing_training","intervention_prelim","comparison_prelim")] <- lapply(NMA_data_analysis_subset_grpID[c("ongoing_training","intervention_prelim","comparison_prelim")], convert_to_factor)
+  NMA_data_analysis_subset_grpID[c("TvsT")] <- lapply(NMA_data_analysis_subset_grpID[c("TvsT")], convert_to_factor)
+
   NMA_data_analysis_subset_grpID$group_size_average <- as.character(NMA_data_analysis_subset_grpID$group_size_average)
   NMA_data_analysis_subset_grpID$group_size_average <- as.numeric(NMA_data_analysis_subset_grpID$group_size_average)
   
