@@ -1031,61 +1031,64 @@
 #===================================== ANALYSIS SAMPLE SIZES =====================================#        
 
 # Combine final analysis files by domain
-      NMA_data_analysis_subset_grpID_final <- bind_rows(NMA_data_analysis_subset_grpID_icW, NMA_data_analysis_subset_grpID_icR)
-      NMA_data_analysis_subset_grpID_final <- NMA_data_analysis_subset_grpID_final %>% rename(contrast_name= contrast_name...15)
+      NMA_data_analysis_subset_alldomains <- bind_rows(NMA_data_analysis_subset_grpID_icW, NMA_data_analysis_subset_grpID_icR)
+      NMA_data_analysis_subset_alldomains <- NMA_data_analysis_subset_alldomains %>% rename(contrast_name= contrast_name...15)
       #NMA_data_analysis_subset_grpID_final <- NMA_data_analysis_subset_grpID_final %>% rename(intervention_content= intervention_content...36)
-      tabyl(NMA_data_analysis_subset_grpID_final$domain)
-      NMA_data_analysis_subset_grpID_final$simple_number <- as.character(NMA_data_analysis_subset_grpID_final$simple_number)
-      NMA_data_analysis_subset_grpID_final$simple_number <- as.numeric(NMA_data_analysis_subset_grpID_final$simple_number)
-      tabyl(NMA_data_analysis_subset_grpID_final$simple_number)
+      tabyl(NMA_data_analysis_subset_alldomains$domain)
+      NMA_data_analysis_subset_alldomains$simple_number <- as.character(NMA_data_analysis_subset_alldomains$simple_number)
+      NMA_data_analysis_subset_alldomains$simple_number <- as.numeric(NMA_data_analysis_subset_alldomains$simple_number)
+      tabyl(NMA_data_analysis_subset_alldomains$simple_number)
+      
+      ## Export analysis dataset with all domains for sharing
+      write_csv(NMA_data_analysis_subset_alldomains, 'NMA_data_analysis_subset_alldomains.csv')
+      write_xlsx(NMA_data_analysis_subset_alldomains, 'NMA_data_analysis_subset_alldomains.xlsx')
       
 # Check counts of final NMA analysis file
       
-      ### Number of effect sizes
-      NMA_data_analysis_subset_grpID_final %>% count()
-      tabyl(NMA_data_analysis_subset_grpID_final$es_id)
-      NMA_study_contrast_list_es_final <- NMA_data_analysis_subset_grpID_final %>% dplyr::select(record_id, "Abbreviated Citation", contrast_id, simple_number, contrast_name, domain, measure_name, es_id) #Create list of study-contrasts included in NMA.
+      ## Number of effect sizes
+      NMA_data_analysis_subset_alldomains %>% count()
+      tabyl(NMA_data_analysis_subset_alldomains$es_id)
+      NMA_study_contrast_list_es_final <- NMA_data_analysis_subset_alldomains %>% dplyr::select(record_id, "Abbreviated Citation", contrast_id, simple_number, contrast_name, domain, measure_name, es_id) #Create list of study-contrasts included in NMA.
       NMA_study_contrast_list_es_final <- NMA_study_contrast_list_es_final %>% arrange(record_id, contrast_id, es_id)
       print(NMA_study_contrast_list_es_final)
       write_csv(NMA_study_contrast_list_es_final, 'NMA_study_contrast_list_es_final_allnodes.csv')
       
-      ### Number of contrasts
-      NMA_data_analysis_subset_grpID_final_c <- NMA_data_analysis_subset_grpID_final %>% distinct(contrast_id, .keep_all = TRUE)
-      NMA_data_analysis_subset_grpID_final_c %>% count()
-      tabyl(NMA_data_analysis_subset_grpID_final_c$contrast_id)
-      NMA_study_contrast_list_final <- NMA_data_analysis_subset_grpID_final_c %>% dplyr::select(record_id, "Abbreviated Citation", contrast_id, contrast_name) #Create list of study-contrasts included in NMA.
+      ## Number of contrasts
+      NMA_data_analysis_subset_alldomains_c <- NMA_data_analysis_subset_alldomains %>% distinct(contrast_id, .keep_all = TRUE)
+      NMA_data_analysis_subset_alldomains_c %>% count()
+      tabyl(NMA_data_analysis_subset_alldomains_c$contrast_id)
+      NMA_study_contrast_list_final <- NMA_data_analysis_subset_alldomains_c %>% dplyr::select(record_id, "Abbreviated Citation", contrast_id, contrast_name) #Create list of study-contrasts included in NMA.
       NMA_study_contrast_list_final <- NMA_study_contrast_list_final %>% arrange(record_id, contrast_id)
       print(NMA_study_contrast_list_final)
       write_csv(NMA_study_contrast_list_final, 'NMA_study_contrast_list_final_allnodes.csv')
       
-      ### Number of studies
-      NMA_data_analysis_subset_grpID_final_s <- NMA_data_analysis_subset_grpID_final %>% distinct(record_id, .keep_all = TRUE)
-      NMA_data_analysis_subset_grpID_final_s %>% count()
-      tabyl(NMA_data_analysis_subset_grpID_final_s$record_id)     
+      ## Number of studies
+      NMA_data_analysis_subset_alldomains_s <- NMA_data_analysis_subset_alldomains %>% distinct(record_id, .keep_all = TRUE)
+      NMA_data_analysis_subset_alldomains_s %>% count()
+      tabyl(NMA_data_analysis_subset_alldomains_s$record_id)     
       
       ## Calculate the number of students
-      NMA_data_analysis_subset_grpID_final_ord <- NMA_data_analysis_subset_grpID_final %>% arrange(record_id, contrast_id, desc(full_sample_size)) #Sort data based on study id -> contrast id within study id -> largest outcome measure sample size within contrast id. That way when we reduce the dataset to the contrast level below, we take the outcome measure within each contrast with the largest sample size for summing sample sizes across contrasts (We want the max sum).
-      NMA_data_analysis_subset_grpID_final_ord2 <- NMA_data_analysis_subset_grpID_final_ord %>% dplyr::select(record_id, contrast_id, es_id, full_sample_size, TvsT)
-      num_students_final <- NMA_data_analysis_subset_grpID_final_ord2 %>% distinct(record_id, contrast_id, .keep_all = TRUE) #Keep only unique entries of each unique study-contrast so that each group of students is not summed more than once (because of multiple measures within some contrasts).
+      NMA_data_analysis_subset_alldomains_ord <- NMA_data_analysis_subset_alldomains %>% arrange(record_id, contrast_id, desc(full_sample_size)) #Sort data based on study id -> contrast id within study id -> largest outcome measure sample size within contrast id. That way when we reduce the dataset to the contrast level below, we take the outcome measure within each contrast with the largest sample size for summing sample sizes across contrasts (We want the max sum).
+      NMA_data_analysis_subset_alldomains_ord2 <- NMA_data_analysis_subset_alldomains_ord %>% dplyr::select(record_id, contrast_id, es_id, full_sample_size, TvsT)
+      num_students_final <- NMA_data_analysis_subset_alldomains_ord2 %>% distinct(record_id, contrast_id, .keep_all = TRUE) #Keep only unique entries of each unique study-contrast so that each group of students is not summed more than once (because of multiple measures within some contrasts).
       
       num_students_final_ALL <- num_students_final %>% summarize(sum_num_students_bundle= sum(full_sample_size)) # Sum students
       str(num_students_final_ALL)
       print(num_students_final_ALL)
       
-      tabyl(NMA_data_analysis_subset_grpID_final$TvsT)
+      tabyl(NMA_data_analysis_subset_alldomains$TvsT)
       num_students_final_TvT <- num_students_final %>% filter(TvsT==1)
       num_students_final_TvT <- num_students_final_TvT %>% summarize(sum_num_students_bundle= sum(full_sample_size)) # Sum students
       str(num_students_final_TvT)
       print(num_students_final_TvT)
       
-      tabyl(NMA_data_analysis_subset_grpID_final$TvsT)
+      tabyl(NMA_data_analysis_subset_alldomains$TvsT)
       num_students_final_TvBAU <- num_students_final %>% filter(TvsT==0)
       num_students_final_TvBAU <- num_students_final_TvBAU %>% summarize(sum_num_students_bundle= sum(full_sample_size)) # Sum students
       str(num_students_final_TvBAU)
       print(num_students_final_TvBAU)      
       
       ## Export data for verifying counts
-      NMA_data_analysis_subset_grpID_final2 <- NMA_data_analysis_subset_grpID_final %>% dplyr::select(domain, record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, measure_name, measure_type)
-      NMA_data_analysis_subset_grpID_final2 <- NMA_data_analysis_subset_grpID_final2 %>% arrange(domain, record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, measure_name, measure_type)
-      write_csv(NMA_data_analysis_subset_grpID_final2, 'NMA_counts_by_domain_all_nodes.csv')
-     
+      NMA_data_analysis_subset_alldomains2 <- NMA_data_analysis_subset_alldomains %>% dplyr::select(domain, record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, measure_name, measure_type)
+      NMA_data_analysis_subset_alldomains2 <- NMA_data_analysis_subset_alldomains2 %>% arrange(domain, record_id, contrast_id, es_id, intervention_prelim, comparison_prelim, measure_name, measure_type)
+      write_csv(NMA_data_analysis_subset_alldomains2, 'NMA_counts_by_domain_all_nodes.csv')
