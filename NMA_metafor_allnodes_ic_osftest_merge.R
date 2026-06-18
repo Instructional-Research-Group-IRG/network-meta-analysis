@@ -83,9 +83,20 @@
     OSF_Data_check <- OSF_Data_check %>% arrange(record_id, contrast_id, es_id, effect_size)
     OSF_Data_check %>% print(n = Inf) 
     
-    ## Load base OSF revised es_id database
-    OSF_revise_es_ids <- read_csv("OSF/OSF_revise_es_ids.csv") #This is a crosswalk between the effect IDs (which identify unique observations) in the OSF & NMA databases, which are not the same. Both databases have the exact same 373 observations but the effect IDs in the OSF databse were created after the intial NNMA subsetting that results in the n=373 base NMA analysis database (of which the OSF database is the abbreviated version).
+    ## Load revised es_id crosswalk
+    #NOTE: This is a crosswalk between the effect IDs (which identify unique observations) in the OSF & NMA databases, which are not the same. 
+    #      Both databases have the exact same 373 observations but the effect IDs in the OSF databse were created after the intial NNMA subsetting
+    #      that results in the n=373 base NMA analysis database (of which the OSF database is the abbreviated version). Those in the NMA database
+    #      were created before subsetting, and those are the ones we want to use in the OSF database so that they match across databases.
+    #      The crosswalk was created from merging the NMA and OSF print outs above and manually correcting the effect size IDs in Excel. This was done manually  
+    #      because matching observations could be done easily by effect size ID but since that is the column we are updating, matching would have to be done using 
+    #      character columns which is problematic given typos, trailing spaces, etc. As such matching was done visually by record ID (study ID), measure name,
+    #      and effect size value, which was a relatively easy and accurate method for creating the crosswalk given that many effect sizes IDs were already
+    #      the same for the same exact observations across both datasets, and those that did need updated were in batches within the same record ID
+    #      so it was easy to match those observations across datasets using measure name and effect size value, then 
+    OSF_revise_es_ids <- read_csv("OSF/OSF_revise_es_ids.csv")
     OSF_revise_es_ids %>% count() 
+    OSF_revise_es_ids %>% print(n = Inf) 
     
     ## Merge effect size IDs that match base NMA analysis database to base OSF database
     OSF_Data <- OSF_Data %>% rename(es_id_old = es_id)
@@ -96,16 +107,26 @@
     OSF_Data_revise_es_ids_check <- OSF_Data_revise_es_ids_check %>% arrange(record_id, contrast_id, es_id, effect_size)
     OSF_Data_revise_es_ids_check %>% print(n = Inf) 
     
-#Merge contrast IDs of NMA analysis database to OSF database
-    NMA_data_analysis_subset_revid <- NMA_data_analysis_subset %>% dplyr::select(record_id, contrast_id, es_id)
+# Merge contrast IDs of NMA analysis database to OSF database
+    NMA_data_analysis_subset_revid <- NMA_data_analysis_subset %>% dplyr::select(record_id, contrast_id, es_id, simple_number, effect_size)
     NMA_data_analysis_subset_revid %>% print(n = Inf) 
     
     OSF_Data_revise_es_ids <- OSF_Data_revise_es_ids %>% rename(contrast_id_old = contrast_id)
-    OSF_Data_revise_ids <- OSF_Data_revise_es_ids %>% full_join(NMA_data_analysis_subset_check, by = c("record_id", "es_id"), suffix = c("_osf_base", "_nma_base"))
+    OSF_Data_revise_ids <- OSF_Data_revise_es_ids %>% full_join(NMA_data_analysis_subset_revid, by = c("record_id", "es_id"), suffix = c("_osf_base", "_nma_base"))
     OSF_Data_revise_ids %>% count()
     
-    skim(OSF_Data_revise_ids)
+    OSF_Data_revise_ids$simple_number <- as.character(OSF_Data_revise_ids$simple_number)
+    OSF_Data_revise_ids_check <- OSF_Data_revise_ids %>% dplyr::select(record_id, simple_number, contrast_id_old, contrast_id, es_id_old, es_id, effect_size_osf_base, effect_size_nma_base)
+    OSF_Data_revise_ids_check <- OSF_Data_revise_ids_check %>% arrange(record_id, contrast_id_old, contrast_id, es_id, es_id_old, effect_size_osf_base, effect_size_nma_base)
+    OSF_Data_revise_ids_check %>% print(n = Inf) # Check that: i) simple number from NMA equals contrast_id_old (that's what the OSF database was using for contrast ID); and ii) the effect size IDS match indicating the same observations.
     
-    ## Export analysis dataset with all domains for sharing
-    write_csv(OSF_Data_revise_ids, "OSF/OSF_Data_revise_ids.csv")
+# Export OSF database with revised effect size IDs and contrast IDs
+    
+    ## Clean up OSF database with revised IDs to resemble original OSF database
+    OSF_Data_revise_ids <- OSF_Data_revise_ids %>% dplyr::select(!c(es_id_old, contrast_id_old, simple_number, effect_size_nma_base))
+    OSF_Data_revise_ids <- OSF_Data_revise_ids %>% rename(effect_size = effect_size_osf_base)
+    OSF_Data_revise_ids <- OSF_Data_revise_ids %>% dplyr::select(record_id, contrast_id, es_id, everything())
+    
+    ## Export as .csv
+    write_csv(OSF_Data_revise_ids, "OSF/OSF_NMA Database_revised ids.csv")
   
